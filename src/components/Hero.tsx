@@ -1,5 +1,6 @@
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 export const Hero = () => {
   return (
@@ -41,13 +42,16 @@ export const Hero = () => {
               Start Free Trial
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg px-8 border-primary/20 hover:border-primary/40"
-            >
-              Watch Demo
-            </Button>
+            <Link to="/roi-calculator">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg px-8 border-primary/20 hover:border-primary/40"
+              >
+                <Calculator className="mr-2 w-5 h-5" />
+                Calculate ROI
+              </Button>
+            </Link>
           </div>
 
           {/* Stats */}
