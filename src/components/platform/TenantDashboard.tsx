@@ -3,7 +3,7 @@
  * Central hub for tenant management and platform overview
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +41,7 @@ export const TenantDashboard: React.FC<TenantDashboardProps> = ({ tenantId }) =>
 
   useEffect(() => {
     loadTenantData();
-  }, [tenantId]);
+  }, [tenantId, loadTenantData]);
 
   const loadTenantData = async () => {
     // Mock data - replace with actual API calls

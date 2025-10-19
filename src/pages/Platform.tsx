@@ -210,7 +210,7 @@ const PlatformDashboard: React.FC<PlatformDashboardProps> = ({ stats }) => {
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">New tenant "TechCorp" onboarded</p>
+                      <p className="text-sm font-medium">New tenant &quot;TechCorp&quot; onboarded</p>
                       <p className="text-xs text-gray-500">2 minutes ago</p>
                     </div>
                   </div>
@@ -219,7 +219,7 @@ const PlatformDashboard: React.FC<PlatformDashboardProps> = ({ stats }) => {
                       <Workflow className="h-4 w-4 text-blue-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Workflow "Lead Scoring" published to marketplace</p>
+                      <p className="text-sm font-medium">Workflow &quot;Lead Scoring&quot; published to marketplace</p>
                       <p className="text-xs text-gray-500">15 minutes ago</p>
                     </div>
                   </div>
@@ -228,7 +228,7 @@ const PlatformDashboard: React.FC<PlatformDashboardProps> = ({ stats }) => {
                       <Bot className="h-4 w-4 text-purple-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">AI Agent "Customer Support Bot" deployed</p>
+                      <p className="text-sm font-medium">AI Agent &quot;Customer Support Bot&quot; deployed</p>
                       <p className="text-xs text-gray-500">1 hour ago</p>
                     </div>
                   </div>
@@ -237,7 +237,7 @@ const PlatformDashboard: React.FC<PlatformDashboardProps> = ({ stats }) => {
                       <Store className="h-4 w-4 text-orange-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">New integration "Slack" added to marketplace</p>
+                      <p className="text-sm font-medium">New integration &quot;Slack&quot; added to marketplace</p>
                       <p className="text-xs text-gray-500">2 hours ago</p>
                     </div>
                   </div>

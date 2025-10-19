@@ -190,7 +190,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
       ...prev,
       nodes: [...prev.nodes, newNode]
     }));
-  }, [canvasPosition]);
+  }, [canvasPosition, nodeTypes]);
 
   const updateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
     setWorkflow(prev => ({
@@ -307,6 +307,8 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
                 draggable
                 onDragStart={() => setDraggedNode(nodeType.type)}
                 onDragEnd={() => setDraggedNode(null)}
+                role="button"
+                tabIndex={0}
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded ${nodeType.color} text-white`}>
@@ -329,6 +331,14 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
                   key={template.id}
                   className="p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => loadTemplate(template)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      loadTemplate(template);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className="font-medium text-sm">{template.name}</div>
                   <div className="text-xs text-gray-500 mb-2">{template.description}</div>
@@ -352,6 +362,12 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
             ref={canvasRef}
             className="w-full h-full relative overflow-hidden bg-gray-100"
             onClick={handleCanvasClick}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleCanvasClick(e as any);
+              }
+            }}
             onDrop={(e) => {
               e.preventDefault();
               if (draggedNode) {
@@ -389,6 +405,15 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
                   className={`absolute p-4 bg-white border-2 rounded-lg cursor-pointer shadow-sm hover:shadow-md transition-all ${
                     selectedNode === node.id ? 'border-blue-500' : 'border-gray-200'
                   }`}
+                  onClick={() => setSelectedNode(node.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedNode(node.id);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                   style={{
                     left: node.position.x,
                     top: node.position.y,

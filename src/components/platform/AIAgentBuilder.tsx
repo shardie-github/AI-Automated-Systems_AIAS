@@ -337,6 +337,14 @@ export const AIAgentBuilder: React.FC<AIAgentBuilderProps> = ({
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                           onClick={() => updatePersonality({ tone: option.id as 'professional' | 'casual' | 'friendly' | 'technical' | 'creative' })}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              updatePersonality({ tone: option.id as 'professional' | 'casual' | 'friendly' | 'technical' | 'creative' });
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
                         >
                           <div className="font-medium">{option.label}</div>
                           <div className="text-sm text-gray-500">{option.description}</div>
