@@ -233,15 +233,63 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
     updateNode(nodeId, { position });
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(workflow);
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/v1/workflows', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenantId') || ''
+        },
+        body: JSON.stringify({
+          name: workflow.name,
+          description: workflow.description,
+          category: 'custom',
+          difficulty: 'intermediate',
+          price: 0,
+          nodes: workflow.nodes,
+          connections: workflow.connections,
+          tags: []
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setWorkflow(prev => ({ ...prev, id: result.workflow.id, status: 'draft' }));
+        if (onSave) {
+          onSave(workflow);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving workflow:', error);
     }
   };
 
-  const handleExecute = () => {
-    if (onExecute) {
-      onExecute(workflow);
+  const handleExecute = async () => {
+    try {
+      const response = await fetch(`/api/v1/workflows/${workflow.id}/execute`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenantId') || ''
+        },
+        body: JSON.stringify({
+          workflowId: workflow.id,
+          triggerData: { test: true },
+          context: {}
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (onExecute) {
+          onExecute(workflow);
+        }
+      }
+    } catch (error) {
+      console.error('Error executing workflow:', error);
     }
   };
 

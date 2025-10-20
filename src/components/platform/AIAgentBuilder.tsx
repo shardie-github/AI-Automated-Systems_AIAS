@@ -199,22 +199,88 @@ export const AIAgentBuilder: React.FC<AIAgentBuilderProps> = ({
 
   const handleTest = async () => {
     setIsTesting(true);
-    // Mock test response - replace with actual API call
-    setTimeout(() => {
-      setTestResponse(`This is a test response from ${agent.name}. The agent would process your message: "${testMessage}" and provide a helpful response based on its configuration.`);
-      setIsTesting(false);
-    }, 2000);
-  };
+    try {
+      const response = await fetch(`/api/v1/agents/${agent.id}/interact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenantId') || ''
+        },
+        body: JSON.stringify({
+          inputText: testMessage,
+          context: {}
+        })
+      });
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(agent);
+      if (response.ok) {
+        const result = await response.json();
+        setTestResponse(result.output);
+      } else {
+        setTestResponse('Error: Failed to test agent');
+      }
+    } catch (error) {
+      console.error('Error testing agent:', error);
+      setTestResponse('Error: Failed to test agent');
+    } finally {
+      setIsTesting(false);
     }
   };
 
-  const handleDeploy = () => {
-    if (onDeploy) {
-      onDeploy(agent);
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/v1/agents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenantId') || ''
+        },
+        body: JSON.stringify({
+          name: agent.name,
+          description: agent.description,
+          capabilities: agent.capabilities,
+          model: agent.model,
+          trainingData: agent.trainingData,
+          personality: agent.personality,
+          pricing: agent.pricing
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAgent(prev => ({ ...prev, id: result.agent.id, status: 'draft' }));
+        if (onSave) {
+          onSave(agent);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving agent:', error);
+    }
+  };
+
+  const handleDeploy = async () => {
+    try {
+      const response = await fetch(`/api/v1/agents/${agent.id}/train`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenantId') || ''
+        },
+        body: JSON.stringify({
+          trainingData: agent.trainingData
+        })
+      });
+
+      if (response.ok) {
+        setAgent(prev => ({ ...prev, status: 'training' }));
+        if (onDeploy) {
+          onDeploy(agent);
+        }
+      }
+    } catch (error) {
+      console.error('Error deploying agent:', error);
     }
   };
 
