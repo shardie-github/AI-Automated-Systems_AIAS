@@ -12,66 +12,38 @@ alerting:
           - alertmanager:9093
 
 scrape_configs:
+  # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
+  # AIAS Application
+  - job_name: 'aias-app'
+    static_configs:
+      - targets: ['app:3000']
+    metrics_path: '/api/metrics'
+    scrape_interval: 10s
+
+  # PostgreSQL
   - job_name: 'postgres'
     static_configs:
       - targets: ['postgres:5432']
-    metrics_path: /metrics
     scrape_interval: 30s
 
+  # Redis
   - job_name: 'redis'
     static_configs:
       - targets: ['redis:6379']
-    metrics_path: /metrics
     scrape_interval: 30s
 
-  - job_name: 'kong'
+  # Nginx
+  - job_name: 'nginx'
     static_configs:
-      - targets: ['kong:8001']
-    metrics_path: /metrics
+      - targets: ['nginx:80']
     scrape_interval: 30s
 
-  - job_name: 'supabase-studio'
+  # Node Exporter (if available)
+  - job_name: 'node-exporter'
     static_configs:
-      - targets: ['studio:3000']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  - job_name: 'supabase-rest'
-    static_configs:
-      - targets: ['rest:3000']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  - job_name: 'supabase-realtime'
-    static_configs:
-      - targets: ['realtime:4000']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  - job_name: 'supabase-storage'
-    static_configs:
-      - targets: ['storage:5000']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  - job_name: 'supabase-functions'
-    static_configs:
-      - targets: ['functions:9000']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  - job_name: 'elasticsearch'
-    static_configs:
-      - targets: ['elasticsearch:9200']
-    metrics_path: /_prometheus/metrics
-    scrape_interval: 30s
-
-  - job_name: 'grafana'
-    static_configs:
-      - targets: ['grafana:3000']
-    metrics_path: /metrics
+      - targets: ['node-exporter:9100']
     scrape_interval: 30s
