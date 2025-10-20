@@ -1,8 +1,36 @@
 {
-  "name": "ai-consultancy-website",
+  "name": "aias-platform",
   "version": "1.0.0",
-  "description": "Self-hostable AI consultancy website with interactive features, monetization, and data feeds",
+  "description": "Enterprise-grade AI consultancy platform showcasing custom AI agents, workflow automation, and intelligent business solutions",
   "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "AIAS Platform Team",
+    "email": "team@aias-platform.com",
+    "url": "https://aias-platform.com"
+  },
+  "homepage": "https://aias-platform.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/aias-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/aias-platform/issues",
+    "email": "support@aias-platform.com"
+  },
+  "keywords": [
+    "ai",
+    "artificial-intelligence",
+    "automation",
+    "workflow",
+    "saas",
+    "multi-tenant",
+    "enterprise",
+    "typescript",
+    "react",
+    "nextjs",
+    "supabase"
+  ],
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -84,5 +112,12 @@
     "node": ">=18.17.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.15.0"
+  "packageManager": "pnpm@8.15.0",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/your-org"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
 }
