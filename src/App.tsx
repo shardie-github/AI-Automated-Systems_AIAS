@@ -17,6 +17,10 @@ import NotFound from "./pages/NotFound";
 import PrivacyCompliance from "./components/PrivacyCompliance";
 import TrustBadges from "./components/TrustBadges";
 import AutomationDashboard from "./components/AutomationDashboard";
+import BusinessDashboard from "./components/BusinessDashboard";
+import Pricing from "./components/Pricing";
+import Marketplace from "./components/platform/Marketplace";
+import PartnershipPortal from "./components/PartnershipPortal";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,11 +59,15 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/roi-calculator" element={<ROICalculator />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/dashboard" element={<BusinessDashboard />} />
             <Route path="/platform/*" element={<Platform />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/partners" element={<PartnershipPortal />} />
             <Route path="/privacy" element={<PrivacyCompliance />} />
             <Route path="/trust" element={<TrustBadges />} />
             <Route path="/automation" element={<AutomationDashboard />} />
