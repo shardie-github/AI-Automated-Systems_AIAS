@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { monitoringService, initializeErrorHandling } from "@/lib/monitoring";
-import { useEffect } from "react";
+import { observabilityService } from "@/lib/observability";
+import { useEffect, Suspense, lazy } from "react";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import CaseStudies from "./pages/CaseStudies";
@@ -21,6 +22,15 @@ import BusinessDashboard from "./components/BusinessDashboard";
 import Pricing from "./components/Pricing";
 import Marketplace from "./components/platform/Marketplace";
 import PartnershipPortal from "./components/PartnershipPortal";
+import Health from "./pages/Health";
+
+// Lazy load heavy components
+const LazyPlatform = lazy(() => import("./pages/Platform"));
+const LazyAdmin = lazy(() => import("./pages/Admin"));
+const LazyBusinessDashboard = lazy(() => import("./components/BusinessDashboard"));
+const LazyAutomationDashboard = lazy(() => import("./components/AutomationDashboard"));
+const LazyMarketplace = lazy(() => import("./components/platform/Marketplace"));
+const LazyPartnershipPortal = lazy(() => import("./components/PartnershipPortal"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +48,9 @@ const App = () => {
     // Initialize error handling
     initializeErrorHandling();
     
+    // Initialize observability service
+    observabilityService;
+    
     // Track app initialization
     monitoringService.trackEvent('app_initialized', {
       version: import.meta.env.VITE_APP_VERSION || '1.0.0',
@@ -47,6 +60,12 @@ const App = () => {
 
     // Track page view
     monitoringService.trackPageView(window.location.pathname);
+    
+    // Record performance metrics
+    observabilityService.recordMetric('app_initialized', 1, {
+      version: import.meta.env.VITE_APP_VERSION || '1.0.0',
+      environment: import.meta.env.MODE
+    });
   }, []);
 
   return (
@@ -63,14 +82,39 @@ const App = () => {
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/roi-calculator" element={<ROICalculator />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/dashboard" element={<BusinessDashboard />} />
-            <Route path="/platform/*" element={<Platform />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/partners" element={<PartnershipPortal />} />
+            <Route path="/admin" element={
+              <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white text-xl">Loading...</div></div>}>
+                <LazyAdmin />
+              </Suspense>
+            } />
+            <Route path="/dashboard" element={
+              <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white text-xl">Loading...</div></div>}>
+                <LazyBusinessDashboard />
+              </Suspense>
+            } />
+            <Route path="/platform/*" element={
+              <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white text-xl">Loading...</div></div>}>
+                <LazyPlatform />
+              </Suspense>
+            } />
+            <Route path="/marketplace" element={
+              <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white text-xl">Loading...</div></div>}>
+                <LazyMarketplace />
+              </Suspense>
+            } />
+            <Route path="/partners" element={
+              <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white text-xl">Loading...</div></div>}>
+                <LazyPartnershipPortal />
+              </Suspense>
+            } />
             <Route path="/privacy" element={<PrivacyCompliance />} />
             <Route path="/trust" element={<TrustBadges />} />
-            <Route path="/automation" element={<AutomationDashboard />} />
+            <Route path="/automation" element={
+              <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white text-xl">Loading...</div></div>}>
+                <LazyAutomationDashboard />
+              </Suspense>
+            } />
+            <Route path="/health" element={<Health />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

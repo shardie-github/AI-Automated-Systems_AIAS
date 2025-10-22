@@ -1,383 +1,334 @@
-# 🚀 AIAS Consultancy - Production Deployment Guide
+# 🚀 AIAS Platform - Production Deployment Guide
 
 ## Overview
 
-This guide will walk you through deploying the AIAS Consultancy platform to production, making it demo and live ready with full monetization capabilities.
+This guide provides step-by-step instructions for deploying the AIAS platform to production with enterprise-grade monitoring, security, and performance optimizations.
 
-## 🎯 What We've Built
+## Prerequisites
 
-### Core Platform Features
-- ✅ **Multi-tenant SaaS Architecture** - Ready for enterprise customers
-- ✅ **Comprehensive Billing System** - Stripe integration with subscription tiers
-- ✅ **AI Workflow Builder** - Visual no-code automation platform
-- ✅ **Marketplace** - One-time apps and template sales
-- ✅ **Partnership Portal** - Referral tracking and commission management
-- ✅ **Business Analytics** - Real-time metrics and KPI tracking
-- ✅ **SEO Optimization** - Search engine ready with structured data
-- ✅ **Security & Compliance** - Enterprise-grade security features
+### System Requirements
+- **OS**: Ubuntu 20.04+ or CentOS 8+
+- **RAM**: Minimum 8GB, Recommended 16GB+
+- **CPU**: Minimum 4 cores, Recommended 8+ cores
+- **Storage**: Minimum 100GB SSD, Recommended 500GB+ SSD
+- **Network**: Stable internet connection with static IP
 
-### Monetization Streams
-1. **SaaS Subscriptions** - $29-$299/month recurring revenue
-2. **One-time Apps** - $49-$199 per application
-3. **API Usage** - Pay-per-use API services
-4. **Partnership Commissions** - 15%-30% referral commissions
-5. **White-label Licensing** - Custom deployment solutions
-6. **Consulting Services** - High-value professional services
+### Software Requirements
+- **Docker**: 20.10+
+- **Docker Compose**: 2.0+
+- **Node.js**: 18.17.0+
+- **pnpm**: 8.0.0+
+- **Git**: 2.30+
 
-## 🛠 Pre-Deployment Checklist
+## Environment Setup
 
-### 1. Environment Setup
+### 1. Server Preparation
+
 ```bash
-# Install required tools
-npm install -g pnpm
-npm install -g @vercel/cli
-npm install -g vercel
+# Update system
+sudo apt update && sudo apt upgrade -y
 
-# Clone and setup
-git clone <your-repo>
-cd aias-consultancy
-pnpm install
+# Install required packages
+sudo apt install -y curl wget git nginx certbot python3-certbot-nginx
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Install Node.js and pnpm
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+npm install -g pnpm@8.15.0
 ```
 
-### 2. Environment Variables
-Create `.env.production` with the following variables:
+### 2. Clone Repository
+
+```bash
+git clone https://github.com/your-org/aias-platform.git
+cd aias-platform
+```
+
+### 3. Environment Configuration
+
+Create production environment file:
+
+```bash
+cp .env.example .env.production
+```
+
+Configure production environment variables:
 
 ```env
-# Core Configuration
+# Application
 NODE_ENV=production
 VITE_APP_URL=https://your-domain.com
-LOG_LEVEL=warn
+VITE_APP_VERSION=1.0.0
 
 # Database
-DATABASE_URL=postgresql://user:password@host:5432/aias_production
-DIRECT_URL=postgresql://user:password@host:5432/aias_production
+POSTGRES_DB=aias_production
+POSTGRES_USER=aias_user
+POSTGRES_PASSWORD=your_secure_password
+DATABASE_URL=postgresql://aias_user:your_secure_password@postgres:5432/aias_production
 
 # Supabase
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+VITE_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_KEY=your_service_key
 
-# Stripe (Production)
-VITE_STRIPE_PUBLISHABLE_KEY=pk_live_...
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+# Redis
+REDIS_PASSWORD=your_redis_password
+REDIS_URL=redis://:your_redis_password@redis:6379
 
-# AI Providers
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-GOOGLE_API_KEY=AIza...
+# Stripe
+VITE_STRIPE_PUBLISHABLE_KEY=pk_live_your_key
+STRIPE_SECRET_KEY=sk_live_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
-# Email
-RESEND_API_KEY=re_...
-POSTMARK_API_TOKEN=...
+# PayPal
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
 
-# Security
-ENCRYPTION_KEY=your-32-char-encryption-key
-JWT_SECRET=your-jwt-secret
+# AI Services
+OPENAI_API_KEY=sk-your_openai_key
+ANTHROPIC_API_KEY=sk-ant-your_anthropic_key
 
 # Monitoring
-SENTRY_DSN=https://...@sentry.io/...
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=your_grafana_password
+
+# Security
+JWT_SECRET=your_jwt_secret_key
+ENCRYPTION_KEY=your_encryption_key
 ```
 
-### 3. Database Setup
+## Build and Deploy
+
+### 1. Build Application
+
 ```bash
-# Run migrations
-pnpm run db:migrate
+# Install dependencies
+pnpm install
 
-# Seed initial data
-pnpm run db:seed
-```
-
-## 🚀 Deployment Options
-
-### Option 1: Docker Deployment (Recommended)
-
-#### 1. Build and Deploy
-```bash
-# Build the application
+# Build for production
 pnpm run build
 
-# Build Docker image
-docker build -t aias-consultancy .
+# Run type checking
+pnpm run typecheck
 
-# Deploy with Docker Compose
-docker-compose -f docker-compose.prod.yml up -d
+# Run linting
+pnpm run lint
+
+# Run tests
+pnpm run test
 ```
 
-#### 2. Verify Deployment
+### 2. Docker Build
+
 ```bash
-# Check container status
-docker-compose ps
+# Build production image
+docker build -t aias-platform:latest .
+
+# Tag for registry
+docker tag aias-platform:latest your-registry/aias-platform:latest
+```
+
+### 3. Deploy with Docker Compose
+
+```bash
+# Deploy production stack
+docker-compose -f docker-compose.prod.yml up -d
+
+# Check status
+docker-compose -f docker-compose.prod.yml ps
 
 # View logs
-docker-compose logs -f app
-
-# Health check
-curl http://localhost:3000/health
+docker-compose -f docker-compose.prod.yml logs -f
 ```
 
-### Option 2: Vercel Deployment
+## SSL Configuration
 
-#### 1. Deploy to Vercel
+### 1. Obtain SSL Certificate
+
 ```bash
-# Install Vercel CLI
-npm i -g vercel
+# Install certbot
+sudo apt install certbot python3-certbot-nginx
 
-# Deploy
-vercel --prod
+# Obtain certificate
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
 
-# Set environment variables
-vercel env add DATABASE_URL
-vercel env add VITE_SUPABASE_URL
-# ... add all required variables
+# Test renewal
+sudo certbot renew --dry-run
 ```
 
-#### 2. Configure Custom Domain
+### 2. Configure Nginx
+
+Update nginx configuration:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com www.your-domain.com;
+
+    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'self';" always;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Health check endpoint
+    location /health {
+        proxy_pass http://localhost:3000/health;
+        access_log off;
+    }
+
+    # Monitoring endpoints
+    location /metrics {
+        proxy_pass http://localhost:9090/metrics;
+        allow 127.0.0.1;
+        deny all;
+    }
+}
+```
+
+## Monitoring Setup
+
+### 1. Access Monitoring Dashboards
+
+- **Grafana**: https://your-domain.com:3001
+  - Username: admin
+  - Password: your_grafana_password
+
+- **Prometheus**: https://your-domain.com:9090
+
+- **Health Dashboard**: https://your-domain.com/health
+
+### 2. Configure Alerts
+
+Update alert rules in `monitoring/alert_rules.yml`:
+
+```yaml
+groups:
+  - name: aias.rules
+    rules:
+      - alert: ApplicationDown
+        expr: up{job="aias-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AIAS application is down"
+          description: "The AIAS application has been down for more than 1 minute."
+```
+
+## Database Setup
+
+### 1. Run Migrations
+
 ```bash
-# Add custom domain
-vercel domains add your-domain.com
+# Connect to database container
+docker exec -it aias-postgres psql -U aias_user -d aias_production
 
-# Configure DNS
-# Point your domain to Vercel's servers
+# Run migrations
+\i /docker-entrypoint-initdb.d/migrations/001_initial_schema.sql
+\i /docker-entrypoint-initdb.d/migrations/002_platform_tables.sql
+\i /docker-entrypoint-initdb.d/migrations/003_monitoring_tables.sql
 ```
 
-### Option 3: AWS/GCP/Azure Deployment
+### 2. Seed Initial Data
 
-#### 1. Container Registry
 ```bash
-# Build and push to registry
-docker build -t your-registry/aias-consultancy .
-docker push your-registry/aias-consultancy
+# Run seed script
+docker exec -it aias-app pnpm run db:seed
 ```
 
-#### 2. Deploy to Cloud
-- Use AWS ECS, Google Cloud Run, or Azure Container Instances
-- Configure load balancer and auto-scaling
-- Set up managed database (RDS, Cloud SQL, etc.)
+## Security Configuration
 
-## 🔧 Post-Deployment Configuration
+### 1. Firewall Setup
 
-### 1. SSL Certificate
 ```bash
-# Using Let's Encrypt (if self-hosting)
-certbot --nginx -d your-domain.com
-
-# Or configure in your hosting provider's dashboard
+# Configure UFW
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
 ```
 
-### 2. Domain Configuration
+### 2. Security Headers
+
+Verify security headers are properly configured:
+
 ```bash
-# Update DNS records
-A record: your-domain.com -> your-server-ip
-CNAME: www.your-domain.com -> your-domain.com
-
-# Configure subdomains
-partners.your-domain.com -> your-domain.com
-api.your-domain.com -> your-domain.com
+# Test security headers
+curl -I https://your-domain.com
 ```
 
-### 3. Monitoring Setup
+### 3. Rate Limiting
+
+Configure rate limiting in nginx:
+
+```nginx
+# Rate limiting
+limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+
+location /api/ {
+    limit_req zone=api burst=20 nodelay;
+    proxy_pass http://localhost:3000;
+}
+
+location /auth/ {
+    limit_req zone=login burst=5 nodelay;
+    proxy_pass http://localhost:3000;
+}
+```
+
+## Backup Configuration
+
+### 1. Database Backup
+
 ```bash
-# Access monitoring dashboards
-# Grafana: http://your-domain.com:3001
-# Prometheus: http://your-domain.com:9090
+# Create backup script
+cat > /opt/backup-db.sh << 'EOF'
+#!/bin/bash
+BACKUP_DIR="/opt/backups"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="aias_backup_$DATE.sql"
 
-# Configure alerts
-# Update alert_rules.yml with your notification channels
-```
+mkdir -p $BACKUP_DIR
 
-### 4. Backup Configuration
-```bash
-# Set up automated backups
-crontab -e
+docker exec aias-postgres pg_dump -U aias_user aias_production > $BACKUP_DIR/$BACKUP_FILE
 
-# Add daily backup
-0 2 * * * /path/to/scripts/backup.sh
-```
+# Compress backup
+gzip $BACKUP_DIR/$BACKUP_FILE
 
-## 📊 Business Configuration
-
-### 1. Stripe Configuration
-1. Create Stripe account and get API keys
-2. Set up webhook endpoints:
-   - `https://your-domain.com/api/webhooks/stripe`
-3. Configure products and pricing:
-   - Starter Plan: $29/month
-   - Professional Plan: $99/month
-   - Enterprise Plan: $299/month
-
-### 2. Supabase Setup
-1. Create Supabase project
-2. Run database migrations
-3. Configure Row Level Security (RLS)
-4. Set up storage buckets for file uploads
-
-### 3. Email Configuration
-1. Set up Resend or Postmark account
-2. Configure email templates
-3. Set up transactional email flows
-
-### 4. Analytics Setup
-1. Configure Google Analytics 4
-2. Set up conversion tracking
-3. Configure custom events
-
-## 🎯 Go-Live Checklist
-
-### Technical Readiness
-- [ ] All environment variables configured
-- [ ] Database migrations completed
-- [ ] SSL certificate installed
-- [ ] Domain DNS configured
-- [ ] Monitoring dashboards accessible
-- [ ] Backup system operational
-- [ ] Health checks passing
-
-### Business Readiness
-- [ ] Stripe payment processing tested
-- [ ] Email notifications working
-- [ ] Analytics tracking configured
-- [ ] SEO meta tags optimized
-- [ ] Content and copy reviewed
-- [ ] Legal pages (Privacy, Terms) published
-
-### Security Readiness
-- [ ] Security headers configured
-- [ ] Rate limiting enabled
-- [ ] Input validation implemented
-- [ ] Authentication flows tested
-- [ ] Data encryption enabled
-
-## 📈 Launch Strategy
-
-### Phase 1: Soft Launch (Week 1-2)
-- Deploy to production
-- Test all functionality
-- Invite beta users
-- Gather feedback
-- Fix critical issues
-
-### Phase 2: Public Launch (Week 3-4)
-- Announce publicly
-- Launch marketing campaigns
-- Onboard first customers
-- Monitor performance
-- Optimize conversion
-
-### Phase 3: Scale (Month 2+)
-- Implement feedback
-- Add new features
-- Scale infrastructure
-- Expand marketing
-- Grow partnerships
-
-## 🔍 Monitoring & Maintenance
-
-### Daily Checks
-- [ ] Application health status
-- [ ] Error rates and logs
-- [ ] Database performance
-- [ ] Payment processing
-- [ ] User registrations
-
-### Weekly Reviews
-- [ ] Business metrics dashboard
-- [ ] Customer feedback
-- [ ] Performance optimization
-- [ ] Security updates
-- [ ] Backup verification
-
-### Monthly Tasks
-- [ ] Security audit
-- [ ] Performance analysis
-- [ ] Feature planning
-- [ ] Partnership reviews
-- [ ] Financial reconciliation
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-#### Application Won't Start
-```bash
-# Check logs
-docker-compose logs app
-
-# Check environment variables
-docker-compose exec app env | grep VITE_
-
-# Restart services
-docker-compose restart
-```
-
-#### Database Connection Issues
-```bash
-# Check database status
-docker-compose exec postgres pg_isready
-
-# Check connection string
-echo $DATABASE_URL
-
-# Test connection
-docker-compose exec app npm run db:push
-```
-
-#### Payment Processing Issues
-```bash
-# Check Stripe webhook logs
-# Verify webhook endpoint is accessible
-# Check Stripe dashboard for failed payments
-```
-
-## 📞 Support & Resources
-
-### Documentation
-- API Documentation: `/api/docs`
-- Admin Dashboard: `/admin`
-- Business Dashboard: `/dashboard`
-- Partnership Portal: `/partners`
-
-### Monitoring
-- Application Metrics: Grafana dashboard
-- Error Tracking: Sentry
-- Performance: Lighthouse CI
-- Uptime: UptimeRobot
-
-### Contact
-- Technical Support: support@your-domain.com
-- Business Inquiries: sales@your-domain.com
-- Partnerships: partners@your-domain.com
-
-## 🎉 Success Metrics
-
-### Technical KPIs
-- Uptime: >99.9%
-- Response Time: <200ms
-- Error Rate: <0.1%
-- Security: Zero breaches
-
-### Business KPIs
-- MRR Growth: 20% month-over-month
-- Customer Acquisition: 100+ new customers/month
-- Conversion Rate: >2% visitor to paid
-- Churn Rate: <5% monthly
-
----
-
-## 🚀 Ready to Launch!
-
-Your AIAS Consultancy platform is now production-ready with:
-- ✅ Full monetization capabilities
-- ✅ Enterprise-grade security
-- ✅ Scalable architecture
-- ✅ Comprehensive monitoring
-- ✅ Partnership program
-- ✅ SEO optimization
-
-**Next Steps:**
-1. Deploy using your preferred method
-2. Configure all services
-3. Test thoroughly
-4. Launch and scale!
-
-**Good luck with your AI consultancy business! 🎯**
+# Keep only last 30 days
+find $BACKUP_DIR -name "*.sql.gz" -mtime +30 -delete

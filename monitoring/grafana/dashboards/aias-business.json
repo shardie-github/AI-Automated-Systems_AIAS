@@ -1,0 +1,188 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "AIAS Business Metrics",
+    "tags": ["aias", "business", "revenue"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Monthly Recurring Revenue (MRR)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(subscription_revenue_monthly)",
+            "legendFormat": "MRR"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Customers",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(customers_active)",
+            "legendFormat": "Active Customers"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Churn Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(customers_churned[30d]) / rate(customers_active[30d]) * 100",
+            "legendFormat": "Churn Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 5
+                },
+                {
+                  "color": "red",
+                  "value": 10
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 4,
+        "title": "Conversion Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(conversions_total[7d]) / rate(visitors_total[7d]) * 100",
+            "legendFormat": "Conversion Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        }
+      },
+      {
+        "id": 5,
+        "title": "Revenue Trend",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(subscription_revenue_monthly)",
+            "legendFormat": "MRR"
+          },
+          {
+            "expr": "sum(one_time_revenue)",
+            "legendFormat": "One-time Revenue"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 6,
+        "title": "Customer Growth",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "count(customers_active)",
+            "legendFormat": "Active Customers"
+          },
+          {
+            "expr": "count(customers_new)",
+            "legendFormat": "New Customers"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "time": {
+      "from": "now-30d",
+      "to": "now"
+    },
+    "refresh": "1m"
+  }
+}
