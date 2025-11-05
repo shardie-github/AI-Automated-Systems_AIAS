@@ -6,7 +6,13 @@ import StreakFlame from "@/components/gamification/StreakFlame";
 import QuestCard from "@/components/gamification/QuestCard";
 import AvatarStack from "@/components/social/AvatarStack";
 import ShareButton from "@/components/social/ShareButton";
+import ReferralWidget from "@/components/gamification/ReferralWidget";
+import OnboardingQuests from "@/components/gamification/OnboardingQuests";
+import ProgressAnalytics from "@/components/gamification/ProgressAnalytics";
+import PushNotificationButton from "@/components/gamification/PushNotificationButton";
+import NotificationsCenter from "@/components/gamification/NotificationsCenter";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const LiveVisitors = dynamic(()=>import("@/components/integrations/LiveVisitors").then(m=>m.default), { ssr:false });
 
@@ -23,7 +29,10 @@ function HubInner(){
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Play Hub</h1>
-        <LiveVisitors />
+        <div className="flex items-center gap-2">
+          <NotificationsCenter />
+          <LiveVisitors />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -41,17 +50,31 @@ function HubInner(){
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="text-sm font-semibold">Daily Quests</div>
-        <QuestCard title="Complete one journal entry" xp={20}/>
-        <QuestCard title="Share a tip in community" xp={15}/>
-        <QuestCard title="Invite a friend" xp={25}/>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-3">
+          <div className="text-sm font-semibold">Daily Quests</div>
+          <QuestCard title="Complete one journal entry" xp={20}/>
+          <QuestCard title="Share a tip in community" xp={15}/>
+          <QuestCard title="Invite a friend" xp={25}/>
+        </div>
+
+        <div className="space-y-3">
+          <div className="text-sm font-semibold">Getting Started</div>
+          <OnboardingQuests />
+        </div>
       </div>
 
-      <div className="flex gap-2">
-        <a className="h-10 px-4 rounded-xl bg-secondary grid place-items-center" href="/journal">Open Journal</a>
-        <a className="h-10 px-4 rounded-xl bg-secondary grid place-items-center" href="/community">Community</a>
+      <ReferralWidget />
+
+      <ProgressAnalytics />
+
+      <div className="flex flex-wrap gap-2">
+        <Link href="/journal" className="h-10 px-4 rounded-xl bg-secondary grid place-items-center">Open Journal</Link>
+        <Link href="/community" className="h-10 px-4 rounded-xl bg-secondary grid place-items-center">Community</Link>
+        <Link href="/challenges" className="h-10 px-4 rounded-xl bg-secondary grid place-items-center">Challenges</Link>
+        <Link href="/leaderboard" className="h-10 px-4 rounded-xl bg-secondary grid place-items-center">Leaderboard</Link>
         <ShareButton />
+        <PushNotificationButton />
       </div>
     </div>
   );

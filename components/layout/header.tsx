@@ -12,11 +12,20 @@ export function Header() {
           Hardonia
         </Link>
         <nav aria-label="Primary" className="hidden md:flex items-center gap-4">
-          <Link href="/shop" className="px-3 py-2 hover:underline text-sm">
-            Shop
+          <Link href="/play" className="px-3 py-2 hover:underline text-sm">
+            Play
           </Link>
-          <Link href="/about" className="px-3 py-2 hover:underline text-sm">
-            About
+          <Link href="/community" className="px-3 py-2 hover:underline text-sm">
+            Community
+          </Link>
+          <Link href="/challenges" className="px-3 py-2 hover:underline text-sm">
+            Challenges
+          </Link>
+          <Link href="/leaderboard" className="px-3 py-2 hover:underline text-sm">
+            Leaderboard
+          </Link>
+          <Link href="/journal" className="px-3 py-2 hover:underline text-sm">
+            Journal
           </Link>
           <ThemeToggle />
         </nav>
