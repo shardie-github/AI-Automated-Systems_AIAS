@@ -248,16 +248,19 @@ ls ops/dashboards/
 
 ### Setup Instructions
 
+**Quick Start:** Follow `ops/SETUP_CHECKLIST.md` for complete step-by-step setup guide.
+
 1. **Review Daily Routine**
    - Read `ops/daily-routine.md` for 15-minute startup checklist
    - Understand what runs automatically vs. manually
 
 2. **Configure Automation**
-   - Set up GitHub Actions workflows (see `.github/workflows/`)
-   - Configure Zapier/Make flows from `ops/automation-blueprints/`
+   - **GitHub Actions:** See `ops/automation-blueprints/GITHUB_ACTIONS_SETUP.md`
+   - **Zapier/Make:** See `ops/automation-blueprints/ZAPIER_MAKE_SETUP.md`
    - Set up Supabase functions for scheduled tasks
 
 3. **Customize Dashboards**
+   - See `ops/dashboards/DASHBOARD_SETUP.md` for complete guide
    - Copy dashboard templates from `ops/dashboards/`
    - Connect to your data sources (Stripe, Supabase, etc.)
    - Update analytics scripts with your API keys
@@ -270,6 +273,8 @@ ls ops/dashboards/
 5. **Review Legal Templates**
    - Customize vendor contract and NDA templates
    - Have legal counsel review before use
+
+**Complete Setup Checklist:** See `ops/SETUP_CHECKLIST.md` for all 10 phases.
 
 ### Financial Tracking (CAD)
 
