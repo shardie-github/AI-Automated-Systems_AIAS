@@ -1,0 +1,28 @@
+Month,Starting Users,New Sign-ups,Paid Conversions,Churned Users,Ending Users,MRR (CAD),COGS (CAD),Gross Profit (CAD),Marketing Spend (CAD),Operating Expenses (CAD),Net Cash Flow (CAD),Cumulative Cash Flow (CAD)
+January 2024,0,100,20,0,100,980,150,830,1000,500,-670,-670
+February 2024,100,150,30,5,245,2401,367.5,2033.5,1500,500,33.5,-636.5
+March 2024,245,200,40,12,433,4243.4,636.51,3606.89,2000,500,1106.89,470.39
+April 2024,433,250,50,22,661,6477.8,971.67,5506.13,2500,500,2506.13,2976.52
+May 2024,661,300,60,33,928,9094.4,1364.16,7730.24,3000,500,4230.24,7206.76
+June 2024,928,350,70,46,1302,12759.6,1913.94,10845.66,3500,500,6845.66,14052.42
+July 2024,1302,400,80,65,1717,16826.6,2523.99,14302.61,4000,500,9802.61,23855.03
+August 2024,1717,450,90,86,2171,21275.8,3191.37,18084.43,4500,500,13084.43,36939.46
+September 2024,2171,500,100,108,2663,26097.4,3914.61,22182.79,5000,500,16682.79,53622.25
+October 2024,2663,550,110,133,3190,31262,4689.3,26572.7,5500,500,20572.7,74194.95
+November 2024,3190,600,120,159,3751,36759.8,5513.97,31245.83,6000,500,24745.83,98940.78
+December 2024,3751,650,130,187,4344,42571.2,6385.68,36185.52,6500,500,29185.52,128126.3
+
+Assumptions:
+- Starting Users: 0 (launch month)
+- New Sign-ups: 100-650/month (growth)
+- Paid Conversion: 20% of new sign-ups
+- Churn Rate: 5%/month (Starter plan average)
+- MRR: Starter CAD $49/month, Pro CAD $149/month (80% Starter, 20% Pro = blended CAD $75/month)
+- COGS: CAD $15/user/month (infrastructure + payment processing)
+- Marketing Spend: CAD $1,000-6,500/month (scaling with growth)
+- Operating Expenses: CAD $500/month (fixed costs - solo operator, part-time)
+
+Side-Gig Hours:
+- January-March: 10 hours/week (nights/weekends)
+- April-June: 15 hours/week (scaling up)
+- July-December: 20 hours/week (full-time side-gig)

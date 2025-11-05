@@ -1,0 +1,21 @@
+Metric,Value,Notes
+COGS (Cost of Goods Sold),CAD $15/month,Infrastructure (Supabase) + payment processing (Stripe)
+CAC (Customer Acquisition Cost),CAD $50-100,Marketing (Google Ads, LinkedIn) + sales (content, partnerships)
+LTV (Lifetime Value) - Starter,CAD $588,12-month average lifetime × CAD $49/month
+LTV (Lifetime Value) - Pro,CAD $1788,12-month average lifetime × CAD $149/month
+Payback Period - Starter,2-4 months,CAC ÷ (Monthly Revenue - COGS)
+Payback Period - Pro,2-4 months,CAC ÷ (Monthly Revenue - COGS)
+Gross Margin,70%+,(Revenue - COGS) ÷ Revenue
+Churn Rate - Starter,5%/month,Industry average for SaaS
+Churn Rate - Pro,3%/month,Lower churn for higher-value customers
+ARPU (Average Revenue Per User) - Starter,CAD $49/month,Starter plan pricing
+ARPU (Average Revenue Per User) - Pro,CAD $149/month,Pro plan pricing
+Blended ARPU,CAD $75/month,Weighted average (80% Starter, 20% Pro)
+Magic Number (Sales Efficiency),1.5+,LTV ÷ CAC (target: >1.0 for profitability)
+Net Revenue Retention,110%+,(Starting MRR + Expansion - Churn) ÷ Starting MRR
+
+Notes:
+- Unit economics calculated for Canadian market (CAD pricing)
+- Assumes 20% paid conversion rate (free to paid)
+- Assumes 60% activation rate (create first workflow)
+- Assumes 70% 7-day retention (vs. industry average 45%)

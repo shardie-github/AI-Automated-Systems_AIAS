@@ -1,0 +1,18 @@
+date,invoice_id,gross_cad,gst_hst_cad,net_cad,remitted,notes
+2024-01-15,INV-001,49.00,6.37,42.63,No,Monthly subscription - Starter Plan
+2024-01-15,INV-002,149.00,19.37,129.63,No,Monthly subscription - Pro Plan
+2024-01-15,INV-003,490.00,63.70,426.30,No,Annual subscription - Starter Plan
+2024-01-15,INV-004,1490.00,193.70,1296.30,No,Annual subscription - Pro Plan
+2024-02-15,INV-005,98.00,12.74,85.26,No,Monthly subscriptions (2 Starter)
+2024-02-15,INV-006,298.00,38.74,259.26,No,Monthly subscriptions (2 Pro)
+2024-03-15,INV-007,147.00,19.11,127.89,No,Monthly subscriptions (3 Starter)
+2024-03-15,INV-008,447.00,58.11,388.89,No,Monthly subscriptions (3 Pro)
+2024-04-15,INV-009,196.00,25.48,170.52,No,Monthly subscriptions (4 Starter)
+2024-04-15,INV-010,596.00,77.48,518.52,No,Monthly subscriptions (4 Pro)
+2024-05-15,INV-011,245.00,31.85,213.15,No,Monthly subscriptions (5 Starter)
+2024-05-15,INV-012,745.00,96.85,648.15,No,Monthly subscriptions (5 Pro)
+2024-06-15,INV-013,294.00,38.22,255.78,No,Monthly subscriptions (6 Starter)
+2024-06-15,INV-014,894.00,116.22,777.78,No,Monthly subscriptions (6 Pro)
+
+Note: GST/HST rate is 13% (Ontario). Remit quarterly (April 30, July 31, October 31, January 31).
+Remitted column: Update to "Yes" after remittance submitted to CRA.

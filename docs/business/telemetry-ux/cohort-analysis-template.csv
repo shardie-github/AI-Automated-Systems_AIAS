@@ -1,0 +1,19 @@
+cohort_month,user_count,month_0,month_1,month_2,month_3,month_4,month_5,month_6
+January 2024,100,100,70,60,55,50,45,40
+February 2024,150,150,105,90,82,75,68,
+March 2024,200,200,140,120,110,100,
+April 2024,250,250,175,150,137,
+May 2024,300,300,210,180,
+June 2024,350,350,245,
+July 2024,400,400,
+
+Notes:
+- Cohort Analysis: Track retention by sign-up month
+- Month 0: Sign-up month (100% retention baseline)
+- Month 1-6: Retention percentages (e.g., Month 1 = 70% means 70% of cohort still active)
+- Assumes 70% Month 1 retention, declining to 60% Month 2, etc.
+- Use for calculating cohort-based retention and LTV
+
+Calculation:
+- Retention Rate = (Active Users in Month N) / (Cohort Size)
+- Example: January cohort Month 1 retention = 70 / 100 = 70%

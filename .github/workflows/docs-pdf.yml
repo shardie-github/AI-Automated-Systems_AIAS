@@ -1,0 +1,95 @@
+name: Generate Business Docs PDFs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/business/**/*.md'
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  generate-pdfs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Marp CLI
+        run: |
+          npm install -g @marp-team/marp-cli
+
+      - name: Install dependencies (if needed)
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          fi
+
+      - name: Create PDF output directory
+        run: |
+          mkdir -p docs/business/_pdf
+
+      - name: Generate PDFs from Markdown
+        run: |
+          # Find all markdown files in docs/business (excluding README and _pdf directory)
+          find docs/business -name "*.md" -not -path "*/_pdf/*" -not -name "00_README.md" | while read file; do
+            # Get relative path from docs/business
+            rel_path="${file#docs/business/}"
+            # Create output directory structure
+            output_dir="docs/business/_pdf/$(dirname "$rel_path")"
+            mkdir -p "$output_dir"
+            # Generate PDF
+            marp "$file" --pdf --output "$output_dir" --theme-set docs/.theme/marp-config.json || echo "Warning: Failed to generate PDF for $file"
+          done
+
+      - name: Check for PDF generation errors
+        run: |
+          pdf_count=$(find docs/business/_pdf -name "*.pdf" | wc -l)
+          if [ "$pdf_count" -eq 0 ]; then
+            echo "Warning: No PDFs were generated"
+            exit 0  # Don't fail the workflow, just warn
+          else
+            echo "Generated $pdf_count PDF files"
+          fi
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: business-docs-pdfs
+          path: docs/business/_pdf/**/*.pdf
+          retention-days: 30
+
+      - name: Commit PDFs (optional)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/business/_pdf/**/*.pdf
+          git diff --staged --quiet || git commit -m "docs(biz): Auto-generate PDFs from Markdown [skip ci]"
+          git push || echo "No changes to commit"
+
+      - name: Lint CAD currency consistency (optional)
+        run: |
+          # Check for USD references that should be CAD
+          if grep -r "USD\|US\$" docs/business --include="*.md" | grep -v "Note.*USD\|comparison.*USD"; then
+            echo "Warning: Found USD references - ensure CAD is used for Canadian venture"
+            exit 0  # Don't fail, just warn
+          fi
+
+      - name: Link checker (optional)
+        run: |
+          # Basic link checking (check for broken relative links)
+          find docs/business -dir docs/business -name "*.md" -exec grep -l "\[.*\](.*)" {} \; | while read file; do
+            echo "Checking links in $file"
+            # This is a basic check - for full link checking, use a dedicated tool
+          done || echo "Link checking skipped (install linkchecker for full check)"

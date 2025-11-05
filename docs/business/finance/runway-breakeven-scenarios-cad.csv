@@ -1,0 +1,25 @@
+Scenario,Users/Day,ARPU (CAD),Monthly Churn (%),Monthly Revenue (CAD),Monthly COGS (CAD),Monthly Marketing (CAD),Monthly Operating Expenses (CAD),Net Monthly Cash Flow (CAD),Breakeven Month,Notes
+Base Case,50,75,5,3375,750,2000,500,125,Month 6,50 users/day sign-up, 80% Starter/20% Pro mix
+Optimistic Case,100,75,3,6750,1500,3000,500,1750,Month 3,100 users/day sign-up, lower churn
+Pessimistic Case,25,75,7,1687.5,375,1000,500,-187.5,Month 12+,25 users/day sign-up, higher churn
+High ARPU Case,50,100,5,4500,1000,2000,500,1000,Month 4,50 users/day, higher Pro mix (50% Pro)
+Low ARPU Case,50,50,5,2250,500,2000,500,-750,Month 12+,50 users/day, 100% Starter plan
+Low Marketing Case,50,75,5,3375,750,1000,500,1125,Month 2,50 users/day, lower marketing spend
+High Marketing Case,50,75,5,3375,750,4000,500,-1875,Month 12+,50 users/day, higher marketing spend
+
+Sensitivity Analysis:
+- Users/Day: 25-100 (sign-up rate)
+- ARPU: CAD $50-100 (pricing mix)
+- Monthly Churn: 3-7% (retention)
+- Marketing Spend: CAD $1,000-4,000 (acquisition)
+
+Breakeven Formula:
+- Breakeven when Net Monthly Cash Flow > 0
+- Net Monthly Cash Flow = Monthly Revenue - COGS - Marketing - Operating Expenses
+- Breakeven Month = Month when cumulative cash flow turns positive
+
+Notes:
+- Assumes 20% paid conversion rate (free to paid)
+- Assumes CAD $15 COGS per user/month
+- Assumes CAD $500 fixed operating expenses (solo operator)
+- Side-gig hours: 10-20 hours/week (nights/weekends)

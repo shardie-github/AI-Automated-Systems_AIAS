@@ -1,0 +1,33 @@
+{
+  "theme": "default",
+  "themeSet": [
+    {
+      "theme": "default",
+      "color": {
+        "background": "#ffffff",
+        "foreground": "#333333",
+        "primary": "#1a73e8"
+      },
+      "font": {
+        "base": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "heading": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+      },
+      "size": {
+        "base": "16px",
+        "h1": "2.5em",
+        "h2": "2em",
+        "h3": "1.5em"
+      }
+    }
+  ],
+  "custom": {
+    "branding": {
+      "logo": "https://aias-platform.com/logo.png",
+      "color": "#1a73e8"
+    },
+    "footer": {
+      "text": "AIAS Platform — Made in Canada 🇨🇦",
+      "color": "#666666"
+    }
+  }
+}
