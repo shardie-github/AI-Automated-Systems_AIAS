@@ -25,7 +25,8 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><a href="/blog" className="hover:underline">Blog</a></li>
+              <li><a href="/blog" className="hover:underline">Blog (Daily Articles)</a></li>
+              <li><a href="/rss-news" className="hover:underline">AI & Tech News Feed</a></li>
               <li><a href="/help" className="hover:underline">Help Center</a></li>
               <li><a href="/demo" className="hover:underline">Book Demo</a></li>
               <li><a href="/status" className="hover:underline">Status</a></li>
