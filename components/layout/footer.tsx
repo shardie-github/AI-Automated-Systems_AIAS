@@ -5,8 +5,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-semibold mb-4">AIAS Platform</h3>
-            <p className="text-xs mb-2">AI automation built in Canada, trusted globally. Save 10+ hours/week with no-code AI agents.</p>
-            <p className="text-xs">🇨🇦 Built in Canada • 🌍 Trusted Worldwide • PIPEDA & GDPR Compliant</p>
+            <p className="text-xs mb-2">
+              Systems thinking + AI automation. THE critical skill for the AI age. What makes you stand out in the job market, 
+              succeed in business, and achieve optimal outcomes.
+            </p>
+            <p className="text-xs">🧠 Systems Thinking • 🤖 AI-Powered • 🇨🇦 Built in Canada • 🌍 Trusted Worldwide</p>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Product</h4>

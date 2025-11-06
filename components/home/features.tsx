@@ -41,9 +41,10 @@ export function Features() {
     <section className="py-20">
       <FadeIn>
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose AIAS Platform</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Systems Thinking + AI = Success</h2>
           <p className="text-muted-foreground text-lg">
-            Built in Canada with global perspective. Trusted by businesses worldwide across industries and markets
+            Systems thinking is THE critical skill for the AI age. It's what makes you stand out in the job market, 
+            succeed in business, and achieve optimal outcomes. Combined with AI automation, it's unstoppable.
           </p>
         </div>
       </FadeIn>
@@ -51,10 +52,10 @@ export function Features() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
             <StaggerItem key={feature.title}>
-              <Card className="h-full">
+              <Card className={`h-full ${feature.highlight ? 'border-primary border-2 shadow-lg' : ''}`}>
                 <CardHeader>
                   <div className="text-4xl mb-2">{feature.icon}</div>
-                  <CardTitle>{feature.title}</CardTitle>
+                  <CardTitle className={feature.highlight ? 'text-primary' : ''}>{feature.title}</CardTitle>
                   <CardDescription>{feature.description}</CardDescription>
                 </CardHeader>
               </Card>

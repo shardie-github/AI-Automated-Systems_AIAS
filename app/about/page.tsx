@@ -15,36 +15,61 @@ export default function AboutPage() {
             About AIAS Platform
           </h1>
           <p className="text-lg text-muted-foreground">
-            AI automation that speaks Canadian business. Made in Canada 🇨🇦
+            Systems thinking + AI automation. The critical skill for the AI age. Built in Canada, serving the world. 🇨🇦 🌍
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            🧠 Systems Thinking: The Critical Skill for the AI Age
+          </div>
         </div>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
+          <h2 className="text-2xl font-bold mb-4">Our Mission: Systems Thinking for the AI Age</h2>
+          <div className="bg-primary/10 p-6 rounded-lg mb-4">
+            <p className="font-semibold text-lg mb-2">
+              Systems thinking is THE critical skill needed more than ever in the AI age.
+            </p>
+            <p className="text-muted-foreground">
+              It's what makes you stand out in the job market, succeed in business, and achieve optimal outcomes. 
+              AI amplifies systems thinking — it doesn't replace it.
+            </p>
+          </div>
           <p className="text-muted-foreground mb-4">
             AIAS Platform was founded in Canada with a global vision. Built on years of experience supporting 
             stakeholders across education, healthcare, technology, and business sectors worldwide, we understand 
-            the unique challenges of operating across different markets, cultures, and regulatory environments.
+            that <strong>productivity requires multiple approaches</strong> — not just automation. Systems thinking is 
+            the foundation of everything we do.
           </p>
           <p className="text-muted-foreground mb-4">
-            Our mission is to make AI automation accessible to businesses everywhere—from solo entrepreneurs to 
-            global enterprises. We believe that automation shouldn't be limited by geography, currency, or technical 
-            expertise. That's why we've built a platform that works seamlessly across North America, Europe, 
-            Asia-Pacific, and beyond.
+            Our mission is to develop systems thinking capabilities while making AI automation accessible to businesses everywhere. 
+            We believe that <strong>automation alone fails</strong> — but systems thinking combined with AI automation creates 
+            unstoppable results. That's why every solution we build analyzes problems from multiple perspectives, finds root causes, 
+            and designs holistic solutions.
           </p>
           <p className="text-muted-foreground mb-4">
-            With deep roots in education and stakeholder management, we've seen first-hand how automation can 
-            transform workflows across industries. Whether you're managing educational programs, healthcare operations, 
-            or business processes, AIAS Platform adapts to your needs—no matter where you are in the world.
+            With deep roots in education and stakeholder management, we've seen first-hand how <strong>systems thinking</strong> 
+            transforms outcomes across industries. Whether you're managing educational programs, healthcare operations, or business 
+            processes, systems thinking reveals optimal solutions that automation alone cannot achieve.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4">Built in Canada, Designed for the World</h2>
+          <h2 className="text-2xl font-bold mb-4">Why Systems Thinking + AI = Success</h2>
+          <div className="bg-muted/50 p-6 rounded-lg mb-4">
+            <h3 className="font-semibold text-lg mb-3">The AI Paradox:</h3>
+            <p className="text-muted-foreground mb-3">
+              The more AI advances, the more systems thinking is needed. AI can automate tasks, but AI cannot replicate systems thinking.
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>• AI eliminates routine → Systems thinking becomes essential</li>
+              <li>• AI handles data → Systems thinking interprets meaning</li>
+              <li>• AI automates tasks → Systems thinking designs solutions</li>
+              <li>• AI scales execution → Systems thinking creates strategy</li>
+            </ul>
+          </div>
           <p className="text-muted-foreground mb-4">
             Our Canadian roots give us a unique perspective on global business needs. We understand the importance of 
-            strong privacy laws (PIPEDA), transparent pricing, and reliable service. But we also know that businesses 
-            operate across borders, currencies, and cultures.
+            strong privacy laws (PIPEDA), transparent pricing, and reliable service. But more importantly, we understand 
+            that <strong>systems thinking is the foundation of success</strong> in the AI age.
           </p>
           <p className="text-muted-foreground mb-4">
             That's why AIAS Platform combines:
@@ -52,23 +77,23 @@ export default function AboutPage() {
           <ul className="space-y-2 text-muted-foreground mb-4">
             <li className="flex items-start gap-2">
               <span className="text-primary mt-1">✓</span>
-              <span><strong>Canadian Excellence:</strong> PIPEDA compliance, Canadian data residency options, transparent pricing</span>
+              <span><strong>Systems Thinking:</strong> THE critical skill for the AI age. Multi-perspective analysis, root cause identification, holistic solutions</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-1">✓</span>
-              <span><strong>Global Reach:</strong> Multi-currency support (CAD, USD, EUR, GBP, AUD, and more), 100+ international integrations</span>
+              <span><strong>AI Automation:</strong> Strategic automation that amplifies systems thinking. AI handles execution, systems thinking creates strategy</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-1">✓</span>
-              <span><strong>Universal Compliance:</strong> GDPR, PIPEDA, SOC 2, and regional data residency options</span>
+              <span><strong>Job Market Advantage:</strong> Systems thinking is what makes you stand out. Career differentiation, higher compensation, job security</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-1">✓</span>
-              <span><strong>Market Understanding:</strong> Built by someone with experience in education and stakeholder management across global markets</span>
+              <span><strong>Business Success:</strong> Systems thinking drives sustainable success. Competitive advantage, optimal outcomes, market leadership</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-1">✓</span>
-              <span><strong>24/7 Global Support:</strong> Support teams across time zones to serve you wherever you are</span>
+              <span><strong>Global Excellence:</strong> Built in Canada, serving the world. Systems thinking works everywhere, across all markets and cultures</span>
             </li>
           </ul>
         </section>

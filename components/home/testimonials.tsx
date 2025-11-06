@@ -5,21 +5,21 @@ import FadeIn from "@/components/motion/fade-in";
 
 const testimonials = [
   {
-    quote: "AIAS saves me 12 hours per week on order processing and customer support. The global integrations and multi-currency support make it perfect for our international e-commerce business. Setup took 25 minutes.",
+    quote: "Systems thinking is what sets AIAS apart. They didn't just automate my processes — they analyzed my entire system from multiple perspectives, found root causes, and designed a holistic solution. This is THE skill needed in the AI age, and it made all the difference.",
     author: "Emma Chen",
     role: "E-commerce Store Owner",
     company: "Chen's Boutique, Toronto, Canada",
     flag: "🇨🇦",
   },
   {
-    quote: "As an education consultant working with stakeholders across 15 countries, I needed a platform that understands global markets. AIAS's multi-currency support and international integrations made it easy to automate workflows across different regions.",
+    quote: "As an education consultant, I've seen how automation alone fails. AIAS's systems thinking approach — analyzing from process, technology, people, data, systems, AND automation perspectives — revealed solutions I never would have found. This is the critical skill for success.",
     author: "Dr. Michael Rodriguez",
     role: "International Education Consultant",
     company: "Global Education Partners, London, UK",
     flag: "🇬🇧",
   },
   {
-    quote: "The enterprise security and global compliance (GDPR, PIPEDA) are crucial for our organization. We serve clients in North America, Europe, and APAC, and AIAS handles all our automation needs seamlessly.",
+    quote: "Systems thinking is what makes you stand out in the job market and succeed in business. AIAS didn't just implement automation — they applied systems thinking to understand our entire operation, find root causes, and create sustainable solutions. This is the future.",
     author: "Sarah Watanabe",
     role: "Operations Director",
     company: "Tech Solutions Inc., Singapore",
@@ -32,9 +32,10 @@ export function Testimonials() {
     <section className="py-20 bg-muted/50">
       <FadeIn>
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by Businesses Worldwide</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Systems Thinking Makes the Difference</h2>
           <p className="text-muted-foreground text-lg">
-            Join 2,000+ businesses across North America, Europe, Asia-Pacific, and beyond
+            Systems thinking is THE critical skill for the AI age. It's what makes you stand out in the job market, 
+            succeed in business, and achieve optimal outcomes. See how it's transforming businesses worldwide.
           </p>
         </div>
       </FadeIn>
@@ -61,6 +62,9 @@ export function Testimonials() {
         </div>
       </StaggerList>
       <div className="text-center mt-12">
+        <p className="text-sm text-muted-foreground mb-2">
+          <strong className="text-foreground">Systems thinking is THE skill needed more than ever in the AI age.</strong>
+        </p>
         <p className="text-sm text-muted-foreground">
           NPS: 62 • 70% 7-day retention • 20% free-to-paid conversion • Serving 40+ countries
         </p>

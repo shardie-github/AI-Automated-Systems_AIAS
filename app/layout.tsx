@@ -11,9 +11,9 @@ import AgentProvider from "@/components/agent/AgentProvider";
 import { OrganizationSchema, WebSiteSchema } from "@/components/seo/structured-data";
 
 export const metadata: Metadata = {
-  title: "AIAS Platform — AI Automation for Global Businesses | Canadian-Built, World-Class",
-  description: "Save 10+ hours/week with no-code AI agents. Built in Canada, trusted globally. Multi-currency support, 100+ integrations, enterprise security. Starting at $49/month.",
-  keywords: ["AI automation", "global business automation", "no-code AI agents", "workflow automation", "Shopify automation", "AI agents for SMB", "international SaaS", "automation software", "Canadian SaaS", "worldwide business tools", "enterprise automation", "international integrations"],
+  title: "Systems Thinking + AI: The Critical Skill for the AI Age | AIAS Platform",
+  description: "Systems thinking is THE skill needed more than ever in the AI age. It's what makes you stand out in the job market, succeed in business, and achieve optimal outcomes. Combined with AI automation.",
+  keywords: ["systems thinking", "AI age skills", "job market advantage", "business success", "systems thinking training", "critical thinking skills", "AI automation", "holistic problem solving", "root cause analysis", "multi-perspective thinking", "career differentiation", "systems thinking methodology"],
   authors: [{ name: "AIAS Platform Team" }],
   creator: "AIAS Platform",
   publisher: "AIAS Platform",

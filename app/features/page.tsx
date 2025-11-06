@@ -4,30 +4,52 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Features — AIAS Platform | No-Code AI Agents & Automation",
-  description: "Build custom AI agents with drag-and-drop interface. 20+ Canadian integrations. 50+ templates. Save 10+ hours/week. CAD $49/month.",
+  title: "Features — Systems Thinking + AI | AIAS Platform",
+  description: "Systems thinking is THE critical skill for the AI age. Combined with AI automation, it creates unstoppable results. Multi-dimensional analysis, root cause identification, holistic solutions.",
 };
 
 const featureCategories = [
   {
-    title: "AI Agent Builder",
-    description: "Create intelligent AI agents without coding",
+    title: "Systems Thinking Framework",
+    description: "THE critical skill for the AI age. Analyze problems from multiple perspectives.",
     features: [
       {
-        name: "No-Code Visual Builder",
-        description: "Drag-and-drop interface to build AI agents. No coding required. Deploy in 30 minutes.",
+        name: "6-Perspective Analysis",
+        description: "Every challenge analyzed through process, technology, people, data, systems, AND automation. Systems thinking reveals optimal solutions.",
       },
       {
-        name: "Context-Aware AI",
-        description: "AI agents understand your business context and workflows. Not just rule-based automation.",
+        name: "Root Cause Identification",
+        description: "Find underlying causes, not symptoms. Systems thinking identifies leverage points for sustainable change.",
       },
       {
-        name: "Pre-Built Templates",
-        description: "50+ industry-specific templates: e-commerce, customer support, invoicing, lead qualification.",
+        name: "Holistic Solution Design",
+        description: "Design integrated solutions that work together. Systems thinking creates synergies that point solutions cannot.",
       },
       {
-        name: "Custom AI Agents",
-        description: "Build agents tailored to your specific business needs. Train on your data.",
+        name: "Multi-Dimensional Problem Solving",
+        description: "Understand system interconnections, feedback loops, and unintended consequences. Systems thinking prevents costly mistakes.",
+      },
+    ],
+  },
+  {
+    title: "AI + Systems Thinking",
+    description: "AI amplifies systems thinking — it doesn't replace it",
+    features: [
+      {
+        name: "AI Handles Execution",
+        description: "AI automates tasks, processes data, and scales execution. Systems thinking directs AI effectively.",
+      },
+      {
+        name: "Systems Thinking Creates Strategy",
+        description: "Systems thinking defines problems, designs solutions, and creates strategy. AI amplifies systems thinking.",
+      },
+      {
+        name: "Unstoppable Combination",
+        description: "Together, AI and systems thinking create optimal outcomes. AI scales execution, systems thinking ensures optimal direction.",
+      },
+      {
+        name: "Job Market Advantage",
+        description: "Systems thinking is uniquely human, irreplaceable. Combined with AI, it's the competitive advantage in the AI age.",
       },
     ],
   },
@@ -126,12 +148,15 @@ export default function FeaturesPage() {
     <div className="container py-16">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Everything You Need to Automate Your Business
+          Systems Thinking + AI: The Complete Solution
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          No-code AI agents, Canadian integrations, and powerful automation workflows. 
-          Built for Canadian businesses who want to save time without the complexity.
+        <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          Systems thinking is THE critical skill for the AI age. It's what makes you stand out in the job market, 
+          succeed in business, and achieve optimal outcomes. Combined with AI automation, it's unstoppable.
         </p>
+        <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+          🧠 Systems Thinking • 🤖 AI-Powered • 🎯 Optimal Outcomes
+        </div>
       </div>
 
       {featureCategories.map((category) => (
@@ -153,17 +178,18 @@ export default function FeaturesPage() {
         </section>
       ))}
 
-      <div className="text-center mt-12 space-y-4">
-        <h2 className="text-2xl font-bold">Ready to Get Started?</h2>
-        <p className="text-muted-foreground">
-          Start automating your business today. No credit card required.
+      <div className="text-center mt-12 space-y-4 bg-primary/5 rounded-lg p-8">
+        <h2 className="text-2xl font-bold mb-2">Systems Thinking: The Critical Skill for the AI Age</h2>
+        <p className="text-muted-foreground mb-4">
+          Systems thinking is THE skill needed more than ever. It's what makes you stand out in the job market, 
+          succeed in business, and achieve optimal outcomes. AI amplifies systems thinking — it doesn't replace it.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" asChild>
-            <Link href="/pricing">Start Free Trial</Link>
+            <Link href="/systems-thinking">Learn About Systems Thinking</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/demo">Book Demo</Link>
+            <Link href="/demo">Book Consultation</Link>
           </Button>
         </div>
       </div>
