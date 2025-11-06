@@ -86,14 +86,26 @@ Each RSS item is analyzed for:
 - **Perspectives:** Which of 6 perspectives apply
 - **Insights:** Systems thinking commentary
 
+### Editorial Takes
+**Location:** `lib/blog/rss-editorial.ts`
+
+Every RSS item gets:
+1. **Quick Editorial Take:** Short immediate systems thinking perspective (shown on listing page)
+2. **Full Editorial:** Detailed analysis with key takeaways (shown on individual item page)
+3. **Open Discussion:** Blog-style comments section (AI-moderated)
+
 ### Processing:
 1. RSS feeds fetched daily
 2. Items analyzed with systems thinking
-3. Filtered by relevance
-4. Commentary generated
-5. Published to news feed page
+3. Editorial takes generated (quick + full)
+4. Filtered by relevance
+5. Published to news feed page with quick takes
+6. Individual pages with full editorial + discussion
 
 **Script:** `scripts/rss-feed-processor.ts`
+**Pages:** 
+- `/rss-news` - Listing with quick editorial takes
+- `/rss-news/[id]` - Individual item with full editorial + discussion
 
 ---
 
@@ -120,7 +132,15 @@ Each RSS item is analyzed for:
 - Insight generated for systems thinking discussions
 - Priority given to multi-perspective discussions
 
-**API:** `/api/blog/comments` (GET, POST)
+### Comment Sections:
+1. **Blog Articles:** `/api/blog/comments` (GET, POST)
+   - Comments on blog articles
+   - Component: `components/blog/comments-section.tsx`
+
+2. **RSS News Items:** `/api/blog/rss-comments` (GET, POST)
+   - Comments on RSS news items
+   - Component: `components/blog/rss-item-comments.tsx`
+   - Open discussion on each news item
 
 ---
 
@@ -210,9 +230,13 @@ Each RSS item is analyzed for:
 ### RSS Feed:
 - [x] Feed sources defined
 - [x] Systems thinking analysis
+- [x] Editorial takes (quick + full)
 - [x] Feed processor script
+- [x] News feed listing page
+- [x] Individual RSS item pages
+- [x] Discussion sections
 - [ ] RSS parser library integration
-- [ ] News feed page display
+- [ ] Real RSS feed fetching
 
 ### Comments:
 - [x] Comment moderation system
@@ -235,8 +259,10 @@ Each RSS item is analyzed for:
 ### Week 1:
 1. Test daily publishing workflow
 2. Test RSS feed processing
-3. Test comment moderation
-4. Gather feedback
+3. Test editorial takes generation
+4. Test comment moderation (blog + RSS)
+5. Test discussion sections
+6. Gather feedback
 
 ### Week 2+:
 1. Optimize systems thinking analysis

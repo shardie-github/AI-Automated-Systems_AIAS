@@ -2,6 +2,7 @@
 // Automated content curation with systems thinking analysis
 
 export interface RSSFeedItem {
+  id?: string;
   title: string;
   link: string;
   description: string;
@@ -10,6 +11,9 @@ export interface RSSFeedItem {
   category?: string;
   relevance?: "high" | "medium" | "low";
   systemsThinkingAngle?: string; // How systems thinking applies
+  editorialTake?: string; // Quick editorialized take on the news
+  perspectives?: string[]; // Which perspectives apply
+  discussionEnabled?: boolean; // Whether comments are enabled
 }
 
 export interface RSSFeed {
