@@ -1,0 +1,6 @@
+Process Name,Department,Owner,Frequency,Time per Instance (hours),Instances per Week,Total Hours per Week,Current Tools,Automation Potential,Priority,Estimated Time Savings (hours/week),Estimated Cost Savings ($/year),Status
+Example: Invoice Processing,Finance,John Smith,Weekly,2,5,10,Excel + Email,High,High,8,15000,Not Started
+Example: Lead Qualification,Sales,Sarah Johnson,Daily,0.5,20,10,CRM Manual,High,High,9,20000,Not Started
+Example: Customer Support Triage,Support,Mike Chen,Real-time,0.25,100,25,Email + Spreadsheet,High,High,20,40000,Not Started
+Example: Report Generation,Operations,Lisa Wang,Weekly,3,4,12,Manual Data Pull,Medium,Medium,10,20000,Not Started
+Example: Employee Onboarding,HR,David Kim,Monthly,4,2,0.5,Paper Forms + Email,High,Low,0.4,5000,Not Started
