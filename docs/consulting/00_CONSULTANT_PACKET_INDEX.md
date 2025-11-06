@@ -28,11 +28,13 @@ This consultant packet contains everything you need to:
 5. **Current State Analysis Template** (`05_current_state_analysis.md`)
 
 ### Phase 2: Planning & Strategy
-6. **Automation Strategy Framework** (`06_automation_strategy_framework.md`)
-7. **ROI Calculator & Business Case** (`07_roi_calculator.md`)
-8. **Implementation Roadmap Template** (`08_implementation_roadmap.md`)
-9. **Risk Assessment & Mitigation Plan** (`09_risk_assessment.md`)
-10. **Success Metrics & KPIs Framework** (`10_success_metrics.md`)
+6. **Systems Thinking Framework** (`06_systems_thinking_framework.md`) ⭐ NEW**
+7. **Holistic Productivity Methodology** (`10_holistic_productivity_methodology.md`) ⭐ NEW
+8. **Automation Strategy Framework** (`06_automation_strategy_framework.md`)
+9. **ROI Calculator & Business Case** (`07_roi_calculator.md`)
+10. **Implementation Roadmap Template** (`08_implementation_roadmap.md`)
+11. **Risk Assessment & Mitigation Plan** (`09_risk_assessment.md`)
+12. **Success Metrics & KPIs Framework** (`10_success_metrics.md`)
 
 ### Phase 3: Execution & Delivery
 11. **Automation Design Document Template** (`11_automation_design_document.md`)
@@ -101,12 +103,25 @@ This consultant packet contains everything you need to:
 ## 🎯 BEST PRACTICES
 
 1. **Always Start with Discovery** - Never skip the assessment phase
-2. **Quantify Everything** - Use ROI calculators and metrics
-3. **Involve Stakeholders** - Use stakeholder analysis framework
-4. **Document Everything** - Use templates for consistency
-5. **Measure Success** - Track KPIs from day one
-6. **Plan for Change** - Change management is critical
-7. **Continuous Improvement** - Review and optimize regularly
+2. **Use Systems Thinking** - Analyze from multiple perspectives, not just automation
+3. **Find Root Causes** - Don't just treat symptoms, understand the system
+4. **Holistic Approach** - Productivity requires multiple approaches (process, technology, people, data, systems, automation)
+5. **Quantify Everything** - Use ROI calculators and metrics
+6. **Involve Stakeholders** - Use stakeholder analysis framework
+7. **Document Everything** - Use templates for consistency
+8. **Measure Success** - Track KPIs from day one
+9. **Plan for Change** - Change management is critical
+10. **Continuous Improvement** - Review and optimize regularly
+
+## 🧠 CORE METHODOLOGY
+
+**Our Philosophy:**
+- **Systems Thinking:** Analyze problems from multiple perspectives
+- **Root Cause Focus:** Address underlying causes, not symptoms
+- **Holistic Solutions:** Productivity requires process, technology, people, data, systems, AND automation
+- **Optimal Outcomes:** Best results come from integrated, multi-dimensional approaches
+
+**Key Principle:** Automation is one tool among many - not the solution itself.
 
 ---
 

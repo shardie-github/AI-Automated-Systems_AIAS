@@ -25,6 +25,17 @@
 
 ## 1. INVESTMENT CALCULATION
 
+### Note: Holistic Approach Investment
+**This ROI includes investments across multiple dimensions:**
+- Process optimization (consulting, redesign)
+- Technology improvements (integration, tools)
+- People & culture (training, change management)
+- Data & analytics (implementation, dashboards)
+- Systems architecture (integration, scaling)
+- Strategic automation (platform, implementation)
+
+**Total investment reflects multi-dimensional approach, not just automation.**
+
 ### 1.1 Software/Platform Costs
 | Item | Cost | Frequency | Annual Cost |
 |------|------|-----------|-------------|

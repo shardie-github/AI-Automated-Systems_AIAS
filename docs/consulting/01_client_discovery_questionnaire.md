@@ -106,39 +106,74 @@
 
 ---
 
-## 3. AUTOMATION READINESS
+## 3. SYSTEMS & PRODUCTIVITY ANALYSIS
 
-### 3.1 Current Automation
-- **Do you currently use any automation tools?**
-  [ ] Yes [ ] No [ ] Limited
+### 3.1 Systems Thinking Questions
+**We believe productivity requires multiple approaches, not just automation. Let's understand your system holistically:**
 
-- **If yes, which ones?**
-  _________________________________________________________________
-  _________________________________________________________________
+- **How do you currently think about productivity?**
+  [ ] Automation-focused [ ] Process-focused [ ] People-focused [ ] Multi-faceted [ ] Not sure
 
-- **What's working well?**
-  _________________________________________________________________
-  _________________________________________________________________
-
-- **What's not working?**
-  _________________________________________________________________
+- **Have you analyzed productivity challenges from multiple perspectives?**
+  [ ] Yes [ ] No [ ] Somewhat
+  **If yes, what perspectives did you consider?**
   _________________________________________________________________
 
-### 3.2 Automation Interest
-- **What processes would you like to automate?** (Top 5)
+- **What do you think are the root causes of productivity challenges?** (Not just symptoms)
   1. _____________________________________________________________
   2. _____________________________________________________________
   3. _____________________________________________________________
-  4. _____________________________________________________________
-  5. _____________________________________________________________
 
-- **What's preventing you from automating more?**
-  [ ] Cost [ ] Lack of expertise [ ] Time [ ] Uncertainty [ ] Other: _________
+### 3.2 Multi-Dimensional Assessment
 
-- **Have you tried automation before?**
-  [ ] Yes [ ] No
-  **If yes, what happened?**
+**Process Dimension:**
+- **Are your processes optimized, or are they just "how things have always been done"?**
+  [ ] Optimized [ ] Traditional [ ] Inefficient [ ] Don't know
+
+- **Where do you see process bottlenecks or inefficiencies?**
   _________________________________________________________________
+  _________________________________________________________________
+
+**Technology Dimension:**
+- **Do your tools work well together, or do you have integration challenges?**
+  _________________________________________________________________
+  _________________________________________________________________
+
+- **Are you using tools to their full potential?**
+  [ ] Yes [ ] No [ ] Not sure
+
+**People Dimension:**
+- **Do your team members have the skills needed for their roles?**
+  [ ] Yes [ ] No [ ] Some gaps
+  **What gaps exist?**
+  _________________________________________________________________
+
+- **How would you describe your organizational culture regarding productivity?**
+  _________________________________________________________________
+  _________________________________________________________________
+
+**Data Dimension:**
+- **Do you make decisions based on data or intuition?**
+  [ ] Mostly data [ ] Mix [ ] Mostly intuition
+
+- **Do you have the data you need when you need it?**
+  [ ] Yes [ ] No [ ] Sometimes
+
+**Systems Architecture:**
+- **How well do your systems integrate with each other?**
+  [ ] Seamlessly [ ] Somewhat [ ] Poorly [ ] Not at all
+
+- **Can your current systems scale with growth?**
+  [ ] Yes [ ] No [ ] Not sure
+
+**Automation Dimension:**
+- **Do you currently use any automation?**
+  [ ] Yes [ ] No [ ] Limited
+  **If yes, what's working/not working?**
+  _________________________________________________________________
+
+- **What's your view on automation?**
+  [ ] Solution to everything [ ] One tool among many [ ] Overhyped [ ] Not sure
 
 ### 3.3 Technical Comfort
 - **How comfortable are you with technology?**

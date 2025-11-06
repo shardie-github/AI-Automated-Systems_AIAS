@@ -75,7 +75,23 @@
 
 ---
 
-## SLIDE 5: ABOUT AIAS PLATFORM
+## SLIDE 5: OUR METHODOLOGY
+
+**Our Approach: Systems Thinking + Holistic Productivity**
+
+**We believe productivity requires multiple approaches:**
+- ✅ Process Optimization (how work flows)
+- ✅ Technology & Tools (what tools are used)
+- ✅ People & Culture (who and how work is done)
+- ✅ Data & Analytics (how decisions are made)
+- ✅ Systems Architecture (how everything connects)
+- ✅ Strategic Automation (what to automate)
+
+**Why This Matters:**
+- Automation alone often fails
+- Root causes must be addressed
+- Multiple perspectives reveal optimal solutions
+- Sustainable results require holistic approach
 
 **AIAS Platform:**
 - Built in Canada, trusted globally
@@ -85,9 +101,10 @@
 - Enterprise security (GDPR, PIPEDA, SOC 2)
 
 **Our Expertise:**
-- [X] years of automation consulting
+- Systems thinking methodology
+- Multi-dimensional productivity analysis
+- [X] years of holistic consulting
 - [X] successful implementations
-- [X] industries served
 - Education & stakeholder management expertise
 
 ---
@@ -192,24 +209,39 @@ Other: [X] hours/week ([X]%)
 
 ---
 
-## SLIDE 11: AUTOMATION OPPORTUNITIES
+## SLIDE 11: PRODUCTIVITY OPPORTUNITIES (Multi-Dimensional)
 
-**We Identified [X] High-Impact Opportunities:**
+**We analyzed your challenges from 6 perspectives and identified [X] opportunities:**
 
+### Process Optimization:
 1. **[Opportunity 1]**
    - Impact: [X] hours/week saved
-   - Effort: [Low/Medium/High]
-   - Priority: [Quick Win/High-Value]
+   - Approach: Process redesign
 
+### Technology & Tools:
 2. **[Opportunity 2]**
    - Impact: [X] hours/week saved
-   - Effort: [Low/Medium/High]
-   - Priority: [Quick Win/High-Value]
+   - Approach: Integration improvement
 
+### People & Culture:
 3. **[Opportunity 3]**
    - Impact: [X] hours/week saved
-   - Effort: [Low/Medium/High]
-   - Priority: [Quick Win/High-Value]
+   - Approach: Training/role optimization
+
+### Data & Analytics:
+4. **[Opportunity 4]**
+   - Impact: Better decision-making
+   - Approach: Analytics implementation
+
+### Systems Architecture:
+5. **[Opportunity 5]**
+   - Impact: Improved scalability
+   - Approach: Architecture improvement
+
+### Strategic Automation:
+6. **[Opportunity 6]**
+   - Impact: [X] hours/week saved
+   - Approach: Intelligent automation
 
 ---
 
@@ -273,19 +305,28 @@ Consider (Low Impact, High Effort):
 
 ---
 
-## SLIDE 15: SOLUTION ARCHITECTURE
+## SLIDE 15: HOLISTIC SOLUTION ARCHITECTURE
 
-**How AIAS Platform Integrates:**
+**Our Multi-Dimensional Approach:**
 
 ```
-[Visual: Integration Diagram]
+[Visual: 6-Dimension Framework]
 
-[Client Tools] ──┐
-                │
-                ├──> [AIAS Platform] <── [Additional Integrations]
-                │
-[Client Tools] ──┘
+Process Optimization ──┐
+Technology & Tools ────┤
+People & Culture ──────├──> [Integrated Solution] ──> Optimal Outcomes
+Data & Analytics ──────┤
+Systems Architecture ──┤
+Strategic Automation ──┘
 ```
+
+**How Everything Works Together:**
+- **Foundation:** Process optimization ensures work flows efficiently
+- **Enhancement:** Technology integration connects tools seamlessly
+- **Enabler:** People & culture ensure adoption and engagement
+- **Intelligence:** Data & analytics provide insights for decisions
+- **Connection:** Systems architecture scales with growth
+- **Acceleration:** Strategic automation handles repetitive work
 
 **Key Integrations:**
 - [Integration 1]: [Purpose]
