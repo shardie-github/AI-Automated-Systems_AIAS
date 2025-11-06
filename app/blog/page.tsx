@@ -204,9 +204,11 @@ export default function BlogPage() {
             optimized website pages with proper SEO, user experience, and conversion optimization.
           </p>
           <p className="text-sm text-muted-foreground">
-            <strong>Recommended Tools:</strong> Use <AffiliateLink product="Notion">Notion</AffiliateLink> for content planning, 
-            <AffiliateLink product="Zapier"> Zapier</AffiliateLink> for automation workflows, or 
-            <AffiliateLink product="Make"> Make</AffiliateLink> for advanced integrations.
+            <strong>Systems Thinking Tools:</strong> When building your content system, consider 
+            <AffiliateLink product="Notion"> Notion</AffiliateLink> for interconnected knowledge management, 
+            <AffiliateLink product="Zapier"> Zapier</AffiliateLink> for process automation (remember: automation alone isn't enough — apply systems thinking), or 
+            <AffiliateLink product="Make"> Make</AffiliateLink> for advanced workflow orchestration. 
+            Each tool is powerful, but systems thinking ensures they work together effectively.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild>

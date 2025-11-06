@@ -11,6 +11,7 @@ export interface AffiliateLink {
   enabled: boolean;
   category?: string;
   keywords?: string[]; // Keywords that trigger this affiliate link
+  systemsThinkingAlignment?: string; // How this product aligns with systems thinking
 }
 
 export interface AffiliateStats {
@@ -22,6 +23,7 @@ export interface AffiliateStats {
 }
 
 // Affiliate Programs Configuration
+// All affiliates are systems thinking and AI automation tools that align with our mission
 export const affiliatePrograms: AffiliateLink[] = [
   {
     id: "shopify",
@@ -33,6 +35,7 @@ export const affiliatePrograms: AffiliateLink[] = [
     enabled: true,
     category: "E-Commerce",
     keywords: ["shopify", "e-commerce", "online store", "store builder"],
+    systemsThinkingAlignment: "E-commerce automation requires systems thinking to connect processes, inventory, and customer experience",
   },
   {
     id: "stripe",
@@ -44,6 +47,7 @@ export const affiliatePrograms: AffiliateLink[] = [
     enabled: true,
     category: "Payments",
     keywords: ["stripe", "payment", "payments", "payment processing"],
+    systemsThinkingAlignment: "Payment systems require understanding of process flows, data security, and user experience — all systems thinking dimensions",
   },
   {
     id: "wave",
@@ -55,6 +59,7 @@ export const affiliatePrograms: AffiliateLink[] = [
     enabled: true,
     category: "Accounting",
     keywords: ["wave", "accounting", "bookkeeping", "invoicing"],
+    systemsThinkingAlignment: "Canadian accounting tool that fits our systems thinking approach to financial processes and data flows",
   },
   {
     id: "notion",
@@ -66,6 +71,7 @@ export const affiliatePrograms: AffiliateLink[] = [
     enabled: true,
     category: "Productivity",
     keywords: ["notion", "productivity", "workspace", "notes"],
+    systemsThinkingAlignment: "Notion embodies systems thinking by connecting knowledge, processes, and people in an interconnected workspace",
   },
   {
     id: "zapier",
@@ -77,6 +83,7 @@ export const affiliatePrograms: AffiliateLink[] = [
     enabled: true,
     category: "Automation",
     keywords: ["zapier", "automation", "workflow", "integrations"],
+    systemsThinkingAlignment: "Automation tool that enables systems thinking by connecting processes across tools — but requires systems thinking to design effective workflows",
   },
   {
     id: "make",
@@ -88,6 +95,7 @@ export const affiliatePrograms: AffiliateLink[] = [
     enabled: true,
     category: "Automation",
     keywords: ["make", "integromat", "automation", "workflow"],
+    systemsThinkingAlignment: "Advanced automation platform that benefits from systems thinking to design complex, multi-step workflows",
   },
 ];
 

@@ -18,7 +18,8 @@ export default function PremiumPage() {
         </h1>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
           Unlock premium systems thinking frameworks, exclusive case studies, and advanced features. 
-          Get deeper insights and exclusive content to accelerate your success.
+          Get deeper insights into how systems thinking is THE critical skill for the AI age — 
+          and how it drives job market success and business outcomes.
         </p>
       </div>
 
@@ -33,23 +34,23 @@ export default function PremiumPage() {
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Unlock all premium blog articles</span>
+                <span>Unlock all premium systems thinking articles</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Premium RSS feed with deeper analysis</span>
+                <span>Premium RSS feed with deeper systems thinking analysis</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Advanced systems thinking frameworks</span>
+                <span>Advanced 6-perspective frameworks and templates</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Exclusive case studies</span>
+                <span>Exclusive case studies: Systems thinking in action</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Monthly systems thinking newsletter</span>
+                <span>Monthly systems thinking insights newsletter</span>
               </li>
             </ul>
             <Button size="lg" className="w-full" asChild>
@@ -72,23 +73,23 @@ export default function PremiumPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Exclusive systems thinking frameworks</span>
+                <span>Exclusive systems thinking methodologies (consultant-level)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Priority support</span>
+                <span>Priority support for systems thinking questions</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Early access to new features</span>
+                <span>Early access to new systems thinking frameworks</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Access to private community</span>
+                <span>Private systems thinking community discussions</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-primary" />
-                <span>Advanced GenAI Content Engine features</span>
+                <span>Advanced GenAI Content Engine with systems thinking analysis</span>
               </li>
             </ul>
             <Button size="lg" className="w-full" asChild>
@@ -107,31 +108,35 @@ export default function PremiumPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">Premium Blog Articles</h3>
+                <h3 className="font-semibold mb-2">🧠 Premium Systems Thinking Articles</h3>
                 <p className="text-sm text-muted-foreground">
-                  Access to exclusive systems thinking articles, advanced frameworks, and in-depth case studies 
-                  not available to free users.
+                  Access to exclusive articles that go deeper into systems thinking: multi-perspective analysis, 
+                  root cause methodologies, leverage point identification, and how systems thinking creates job market 
+                  advantage in the AI age.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Premium RSS Feed</h3>
+                <h3 className="font-semibold mb-2">📰 Premium RSS Feed with Systems Thinking Lens</h3>
                 <p className="text-sm text-muted-foreground">
-                  Get deeper systems thinking analysis on AI and tech news, with exclusive editorial takes 
-                  and extended commentary.
+                  Get deeper systems thinking analysis on AI and tech news. Each news item analyzed through our 
+                  6-perspective framework (Process, Technology, People, Data, Systems, Automation) with exclusive 
+                  editorial commentary.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Advanced Frameworks</h3>
+                <h3 className="font-semibold mb-2">📋 Advanced Systems Thinking Frameworks</h3>
                 <p className="text-sm text-muted-foreground">
-                  Access to exclusive systems thinking frameworks, templates, and tools used by consultants 
-                  and business leaders.
+                  Access to exclusive frameworks used by consultants: causal loop diagrams, stock/flow models, 
+                  5 Whys methodology, and the holistic productivity methodology. These are the tools that make 
+                  systems thinking actionable.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Exclusive Case Studies</h3>
+                <h3 className="font-semibold mb-2">📊 Exclusive Case Studies: Systems Thinking in Action</h3>
                 <p className="text-sm text-muted-foreground">
-                  Real-world case studies showing how systems thinking drives business success, with detailed 
-                  analysis and actionable insights.
+                  Real-world case studies showing how systems thinking drives business success: how it identifies 
+                  root causes, reveals leverage points, and creates sustainable competitive advantages. Learn from 
+                  businesses that applied systems thinking to achieve breakthrough results.
                 </p>
               </div>
             </CardContent>
@@ -140,10 +145,11 @@ export default function PremiumPage() {
 
         {/* CTA */}
         <div className="text-center bg-muted/50 rounded-lg p-8">
-          <h2 className="text-2xl font-bold mb-4">Ready to Unlock Premium Content?</h2>
+          <h2 className="text-2xl font-bold mb-4">Ready to Master Systems Thinking?</h2>
           <p className="text-muted-foreground mb-6">
-            Join premium subscribers and get exclusive access to systems thinking frameworks, 
-            case studies, and advanced features.
+            Systems thinking is THE critical skill for the AI age. Join premium subscribers and get exclusive access 
+            to frameworks, case studies, and methodologies that show how systems thinking creates job market advantage 
+            and drives business success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>

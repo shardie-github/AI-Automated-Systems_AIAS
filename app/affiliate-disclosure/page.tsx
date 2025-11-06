@@ -30,8 +30,9 @@ export default function AffiliateDisclosurePage() {
             <h3 className="font-semibold mb-2">Why We Use Affiliate Links</h3>
             <p className="text-muted-foreground">
               Affiliate commissions help us maintain and improve our content, support our systems thinking research, 
-              and keep our platform free for users. We only recommend products and services that we believe provide 
-              value and align with our mission of promoting systems thinking and AI automation.
+              and keep our platform free for users. We only recommend products and services that align with our mission: 
+              promoting systems thinking as THE critical skill for the AI age. Every tool we recommend is evaluated 
+              through our systems thinking framework to ensure it helps our community think systemically and succeed.
             </p>
           </div>
 
@@ -44,10 +45,13 @@ export default function AffiliateDisclosurePage() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Our Commitment</h3>
+            <h3 className="font-semibold mb-2">Our Commitment: Systems Thinking First</h3>
             <p className="text-muted-foreground">
-              We only promote products and services that we genuinely believe in and that align with systems thinking 
-              principles. Our recommendations are based on value and quality, not commission rates.
+              We only promote products and services that genuinely support systems thinking principles. Each recommendation 
+              is evaluated through our 6-perspective framework: Does it improve processes? Enhance technology? Support people? 
+              Enable better data? Strengthen systems? Enable effective automation? Our recommendations are based on systems 
+              thinking value, not commission rates. We're committed to helping you develop the critical skill that makes 
+              you stand out in the job market and succeed in business.
             </p>
           </div>
 

@@ -34,6 +34,13 @@ export function PremiumContentGate({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="bg-primary/10 border-l-4 border-primary p-4 rounded-r-lg mb-4">
+          <p className="text-sm font-semibold mb-1">🧠 Systems Thinking Premium Content</p>
+          <p className="text-xs text-muted-foreground">
+            This content goes deeper into systems thinking frameworks, multi-perspective analysis, 
+            and advanced methodologies that help you apply systems thinking to real-world challenges.
+          </p>
+        </div>
         {preview && (
           <div className="prose prose-sm dark:prose-invert max-w-none opacity-60 blur-sm pointer-events-none">
             {preview}
@@ -41,15 +48,15 @@ export function PremiumContentGate({
         )}
         <div className="flex flex-col sm:flex-row gap-4">
           <Button size="lg" asChild>
-            <Link href="/pricing">Subscribe to Premium (${unlockPrice}/month)</Link>
+            <Link href="/pricing">Unlock Systems Thinking Premium (${unlockPrice}/month)</Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
-            <Link href="/premium">View Premium Features</Link>
+            <Link href="/premium">View Premium Frameworks</Link>
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Premium subscribers get access to all premium content, exclusive frameworks, 
-          and advanced systems thinking resources.
+          Premium subscribers get exclusive access to advanced systems thinking frameworks, 
+          detailed case studies, and the tools that make systems thinking THE critical skill for the AI age.
         </p>
       </CardContent>
     </Card>
