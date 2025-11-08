@@ -198,7 +198,8 @@
     "knip": "^5.0.0",
     "@next/bundle-analyzer": "^14.2.0",
     "@vercel/analytics": "^1.1.1",
-    "@vercel/speed-insights": "^1.0.2"
+    "@vercel/speed-insights": "^1.0.2",
+    "@vitest/coverage-v8": "^1.0.4"
   },
   "engines": {
     "node": ">=18.17.0",

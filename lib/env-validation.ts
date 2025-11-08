@@ -48,6 +48,20 @@ export function validateEnvOnStartup(): void {
 /**
  * Validate environment variables for API routes
  * Use this in API route handlers that require specific variables
+ * 
+ * @param requiredVars - Array of required environment variable names
+ * @returns Validation result with missing variables list
+ * 
+ * @example
+ * ```ts
+ * const validation = validateApiEnv(['STRIPE_SECRET_KEY', 'DATABASE_URL']);
+ * if (!validation.valid) {
+ *   return NextResponse.json(
+ *     { error: `Missing: ${validation.missing.join(', ')}` },
+ *     { status: 500 }
+ *   );
+ * }
+ * ```
  */
 export function validateApiEnv(requiredVars: string[]): { valid: boolean; missing: string[] } {
   const missing: string[] = [];
@@ -61,5 +75,37 @@ export function validateApiEnv(requiredVars: string[]): { valid: boolean; missin
   return {
     valid: missing.length === 0,
     missing,
+  };
+}
+
+/**
+ * Validate environment variables with detailed error messages
+ * Provides more context about missing variables
+ * 
+ * @param requiredVars - Object mapping variable names to descriptions
+ * @returns Validation result with detailed errors
+ * 
+ * @example
+ * ```ts
+ * const validation = validateApiEnvDetailed({
+ *   STRIPE_SECRET_KEY: 'Stripe API secret key for payment processing',
+ *   DATABASE_URL: 'PostgreSQL connection string'
+ * });
+ * ```
+ */
+export function validateApiEnvDetailed(
+  requiredVars: Record<string, string>
+): { valid: boolean; errors: Array<{ name: string; description: string }> } {
+  const errors: Array<{ name: string; description: string }> = [];
+  
+  for (const [varName, description] of Object.entries(requiredVars)) {
+    if (!process.env[varName]) {
+      errors.push({ name: varName, description });
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
   };
 }
