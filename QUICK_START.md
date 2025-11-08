@@ -13,7 +13,7 @@ cp .env.example .env.local
 # Edit .env.local with your Supabase credentials
 ```
 
-**Required values** (get from https://supabase.com/dashboard/project/ghqyxhbyyirveptgwoqm):
+**Required values** (get from https://supabase.com/dashboard/project/{your-project-ref}):
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
@@ -71,6 +71,7 @@ pnpm run dev
 - [ ] All Vercel secrets above
 - [ ] `VERCEL_TOKEN` (optional)
 - [ ] `SUPABASE_ACCESS_TOKEN` (optional)
+- [ ] `SUPABASE_PROJECT_REF` (your Supabase project reference)
 
 ## 🧪 Testing
 
@@ -86,9 +87,11 @@ curl https://your-app.vercel.app/api/healthz
 
 ### Edge Function Health Check
 ```bash
-curl https://ghqyxhbyyirveptgwoqm.supabase.co/functions/v1/app-health \
+curl https://{project-ref}.supabase.co/functions/v1/app-health \
   -H "Authorization: Bearer YOUR_SUPABASE_ANON_KEY"
 ```
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 ## 📚 Documentation
 

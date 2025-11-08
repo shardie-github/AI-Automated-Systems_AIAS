@@ -16,8 +16,10 @@ The platform supports OAuth authentication via Supabase Auth. Configure provider
    - **Application name**: AIAS Platform
    - **Homepage URL**: `https://your-app.vercel.app` (or `http://localhost:3000` for dev)
    - **Authorization callback URL**: 
-     - Production: `https://ghqyxhbyyirveptgwoqm.supabase.co/auth/v1/callback`
-     - Development: `https://ghqyxhbyyirveptgwoqm.supabase.co/auth/v1/callback` (same for both)
+     - Production: `https://{project-ref}.supabase.co/auth/v1/callback`
+     - Development: `https://{project-ref}.supabase.co/auth/v1/callback` (same for both)
+     
+   Replace `{project-ref}` with your actual Supabase project reference.
 
 4. Click "Register application"
 5. Copy the **Client ID** and generate a **Client Secret**
@@ -52,11 +54,11 @@ GITHUB_CLIENT_SECRET=your_github_client_secret
    - **Application type**: Web application
    - **Name**: AIAS Platform
    - **Authorized JavaScript origins**:
-     - `https://ghqyxhbyyirveptgwoqm.supabase.co`
+     - `https://{project-ref}.supabase.co` (replace `{project-ref}` with your project ref)
      - `https://your-app.vercel.app` (production)
      - `http://localhost:3000` (development, optional)
    - **Authorized redirect URIs**:
-     - `https://ghqyxhbyyirveptgwoqm.supabase.co/auth/v1/callback`
+     - `https://{project-ref}.supabase.co/auth/v1/callback` (replace `{project-ref}` with your project ref)
 6. Click "Create"
 7. Copy the **Client ID** and **Client Secret**
 
@@ -82,8 +84,10 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 All OAuth providers use the same Supabase callback URL:
 
-- **Production**: `https://ghqyxhbyyirveptgwoqm.supabase.co/auth/v1/callback`
-- **Development**: `https://ghqyxhbyyirveptgwoqm.supabase.co/auth/v1/callback`
+- **Production**: `https://{project-ref}.supabase.co/auth/v1/callback`
+- **Development**: `https://{project-ref}.supabase.co/auth/v1/callback`
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 **Note**: The callback URL is the same for both environments because Supabase handles the redirect. Your app's `NEXTAUTH_URL` determines where users land after authentication.
 
@@ -108,7 +112,7 @@ All OAuth providers use the same Supabase callback URL:
 
 ### "Redirect URI mismatch" error
 
-- Verify the redirect URI in your OAuth provider matches exactly: `https://ghqyxhbyyirveptgwoqm.supabase.co/auth/v1/callback`
+- Verify the redirect URI in your OAuth provider matches exactly: `https://{project-ref}.supabase.co/auth/v1/callback` (replace `{project-ref}` with your project ref)
 - Check for trailing slashes or protocol mismatches (http vs https)
 
 ### "Invalid client" error

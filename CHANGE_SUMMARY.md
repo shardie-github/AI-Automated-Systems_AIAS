@@ -5,7 +5,7 @@ This document summarizes all changes made to configure the backend with Supabase
 ## Files Created
 
 ### Environment & Configuration
-- `.env.example` - Complete environment variable template with Supabase project ref `ghqyxhbyyirveptgwoqm`
+- `.env.example` - Complete environment variable template with placeholders for Supabase project ref
 - `docs/secrets.md` - Comprehensive guide for setting secrets in Vercel and GitHub Actions
 
 ### Database & Migrations
@@ -51,8 +51,8 @@ This document summarizes all changes made to configure the backend with Supabase
 
 ### 1. Environment Variables
 - ✅ Complete `.env.example` with all required Supabase keys
-- ✅ Project ref hardcoded: `ghqyxhbyyirveptgwoqm`
-- ✅ Database URL format: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.ghqyxhbyyirveptgwoqm.supabase.co:5432/postgres?sslmode=require`
+- ✅ Uses placeholders `{project-ref}` for Supabase project reference
+- ✅ Database URL format: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.{project-ref}.supabase.co:5432/postgres?sslmode=require`
 - ✅ Prisma WASM engine: `PRISMA_CLIENT_ENGINE_TYPE=wasm` (Termux/Android compatible)
 
 ### 2. Database Schema
@@ -114,14 +114,14 @@ This document summarizes all changes made to configure the backend with Supabase
 Go to Vercel Dashboard → Your Project → Settings → Environment Variables and set:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://ghqyxhbyyirveptgwoqm.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://{project-ref}.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<from Supabase Dashboard>
-SUPABASE_URL=https://ghqyxhbyyirveptgwoqm.supabase.co
+SUPABASE_URL=https://{project-ref}.supabase.co
 SUPABASE_ANON_KEY=<from Supabase Dashboard>
 SUPABASE_SERVICE_ROLE_KEY=<from Supabase Dashboard>
 SUPABASE_JWT_SECRET=<from Supabase Dashboard>
-DATABASE_URL=postgresql://postgres:<SERVICE_ROLE_KEY>@db.ghqyxhbyyirveptgwoqm.supabase.co:5432/postgres?sslmode=require
-DIRECT_URL=postgresql://postgres:<SERVICE_ROLE_KEY>@db.ghqyxhbyyirveptgwoqm.supabase.co:5432/postgres?sslmode=require
+DATABASE_URL=postgresql://postgres:<SERVICE_ROLE_KEY>@db.{project-ref}.supabase.co:5432/postgres?sslmode=require
+DIRECT_URL=postgresql://postgres:<SERVICE_ROLE_KEY>@db.{project-ref}.supabase.co:5432/postgres?sslmode=require
 PRISMA_CLIENT_ENGINE_TYPE=wasm
 NEXTAUTH_URL=https://your-app.vercel.app
 NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
@@ -129,8 +129,10 @@ NEXT_PUBLIC_APP_ENV=production
 LOG_LEVEL=info
 ```
 
+Replace `{project-ref}` with your actual Supabase project reference.
+
 **Get Supabase Secrets**:
-1. Go to https://supabase.com/dashboard/project/ghqyxhbyyirveptgwoqm
+1. Go to https://supabase.com/dashboard/project/{your-project-ref}
 2. Settings → API → Copy keys
 3. Settings → Auth → JWT Settings → Copy JWT Secret
 
@@ -158,8 +160,11 @@ pnpm run db:migrate
 
 **Via Supabase CLI** (if configured):
 ```bash
+supabase link --project-ref {project-ref}
 supabase db push
 ```
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 ### 4. Deploy Edge Functions
 
@@ -189,9 +194,11 @@ curl https://your-app.vercel.app/api/healthz
 
 **Edge Function**:
 ```bash
-curl https://ghqyxhbyyirveptgwoqm.supabase.co/functions/v1/app-health \
+curl https://{project-ref}.supabase.co/functions/v1/app-health \
   -H "Authorization: Bearer YOUR_SUPABASE_ANON_KEY"
 ```
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 ### 6. Configure OAuth (Optional)
 

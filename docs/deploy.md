@@ -5,7 +5,7 @@ This guide covers deploying the AIAS Platform backend to Vercel with Supabase an
 ## Prerequisites
 
 - Vercel account
-- Supabase project (ref: `ghqyxhbyyirveptgwoqm`)
+- Supabase project
 - GitHub repository connected to Vercel
 
 ## One-Time Setup

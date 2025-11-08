@@ -28,9 +28,11 @@ This guide explains how to rollback database migrations and restore from backups
 **Via CLI** (pg_dump):
 
 ```bash
-pg_dump "postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.ghqyxhbyyirveptgwoqm.supabase.co:5432/postgres?sslmode=require" \
+pg_dump "postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.{project-ref}.supabase.co:5432/postgres?sslmode=require" \
   > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 **Automated Backup Script**:
 

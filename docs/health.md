@@ -74,7 +74,9 @@ curl https://your-app.vercel.app/api/healthz
 
 ### `app-health` Edge Function
 
-**URL**: `https://ghqyxhbyyirveptgwoqm.supabase.co/functions/v1/app-health`
+**URL**: `https://{project-ref}.supabase.co/functions/v1/app-health`
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 **Method**: `GET`
 
@@ -110,9 +112,11 @@ Authorization: Bearer YOUR_SUPABASE_ANON_KEY
 ### Usage
 
 ```bash
-curl https://ghqyxhbyyirveptgwoqm.supabase.co/functions/v1/app-health \
+curl https://{project-ref}.supabase.co/functions/v1/app-health \
   -H "Authorization: Bearer YOUR_SUPABASE_ANON_KEY"
 ```
+
+Replace `{project-ref}` with your actual Supabase project reference.
 
 ## Monitoring Integration
 

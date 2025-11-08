@@ -6,7 +6,7 @@ This guide helps you set up the AIAS Platform backend for local development, inc
 
 - Node.js >= 18.17.0
 - pnpm >= 8.0.0
-- Supabase project access (project ref: `ghqyxhbyyirveptgwoqm`)
+- Supabase project access
 
 ## One-Time Setup
 
@@ -29,17 +29,19 @@ cp .env.example .env.local
 Edit `.env.local` and fill in your Supabase credentials:
 
 ```bash
-# Get these from: https://supabase.com/dashboard/project/ghqyxhbyyirveptgwoqm/settings/api
-NEXT_PUBLIC_SUPABASE_URL=https://ghqyxhbyyirveptgwoqm.supabase.co
+# Get these from: https://supabase.com/dashboard/project/{your-project-ref}/settings/api
+# Replace {project-ref} with your actual Supabase project reference
+NEXT_PUBLIC_SUPABASE_URL=https://{project-ref}.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
-SUPABASE_URL=https://ghqyxhbyyirveptgwoqm.supabase.co
+SUPABASE_URL=https://{project-ref}.supabase.co
 SUPABASE_ANON_KEY=your_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 SUPABASE_JWT_SECRET=your_jwt_secret_here
 
 # Database URL (uses service role key)
-DATABASE_URL=postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.ghqyxhbyyirveptgwoqm.supabase.co:5432/postgres?sslmode=require
-DIRECT_URL=postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.ghqyxhbyyirveptgwoqm.supabase.co:5432/postgres?sslmode=require
+# Replace {project-ref} with your actual Supabase project reference
+DATABASE_URL=postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.{project-ref}.supabase.co:5432/postgres?sslmode=require
+DIRECT_URL=postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.{project-ref}.supabase.co:5432/postgres?sslmode=require
 
 # Prisma (REQUIRED for Termux/Android)
 PRISMA_CLIENT_ENGINE_TYPE=wasm

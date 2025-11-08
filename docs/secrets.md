@@ -7,7 +7,7 @@ This document explains where to set secrets for the AIAS Platform backend.
 Set these in your Vercel project dashboard under **Settings → Environment Variables**:
 
 ### Core Supabase
-- `NEXT_PUBLIC_SUPABASE_URL` - Public Supabase URL (https://ghqyxhbyyirveptgwoqm.supabase.co)
+- `NEXT_PUBLIC_SUPABASE_URL` - Public Supabase URL (https://{project-ref}.supabase.co)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key (public)
 - `SUPABASE_URL` - Supabase URL (same as above)
 - `SUPABASE_ANON_KEY` - Supabase anonymous key (server-side)
@@ -74,7 +74,7 @@ Copy all the Vercel environment variables listed above to GitHub Actions secrets
 
 ## Getting Supabase Secrets
 
-1. Go to your Supabase project dashboard: https://supabase.com/dashboard/project/ghqyxhbyyirveptgwoqm
+1. Go to your Supabase project dashboard: https://supabase.com/dashboard/project/{your-project-ref}
 2. Navigate to **Settings → API**
 3. Copy:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_URL`
@@ -82,6 +82,8 @@ Copy all the Vercel environment variables listed above to GitHub Actions secrets
    - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` (keep secret!)
 4. Navigate to **Settings → Auth → JWT Settings**
 5. Copy **JWT Secret** → `SUPABASE_JWT_SECRET`
+
+**Note**: Replace `{your-project-ref}` with your actual Supabase project reference.
 
 ## Verifying Secrets
 
