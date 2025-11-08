@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   publisher: "AIAS Platform",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
   manifest: "/manifest.webmanifest",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://aias-platform.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://aias-platform.com"),
   alternates: {
     canonical: "/",
   },

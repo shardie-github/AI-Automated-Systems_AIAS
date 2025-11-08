@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { env } from "@/lib/env";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const databaseUrl = process.env.DATABASE_URL;
+// Load environment variables dynamically
+const supabaseUrl = env.supabase.url;
+const supabaseAnonKey = env.supabase.anonKey;
+const supabaseServiceKey = env.supabase.serviceRoleKey;
+const databaseUrl = env.database.url;
 
 export const dynamic = "force-dynamic";
 

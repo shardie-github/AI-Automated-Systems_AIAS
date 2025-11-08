@@ -6,15 +6,20 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { env, validateEnv } from "../lib/env";
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const databaseUrl = process.env.DATABASE_URL;
+// Load environment variables dynamically
+const supabaseUrl = env.supabase.url;
+const supabaseAnonKey = env.supabase.anonKey;
+const supabaseServiceKey = env.supabase.serviceRoleKey;
+const databaseUrl = env.database.url;
 const healthUrl = process.env.HEALTH_URL || "http://localhost:3000/api/healthz";
 
-if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey || !databaseUrl) {
-  console.error("❌ Missing required environment variables");
+// Validate required environment variables
+const validation = validateEnv();
+if (!validation.valid) {
+  console.error("❌ Missing required environment variables:");
+  validation.errors.forEach(err => console.error(`  - ${err}`));
   process.exit(1);
 }
 

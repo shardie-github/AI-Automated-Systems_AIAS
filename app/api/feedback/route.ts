@@ -6,8 +6,10 @@ export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    // Load environment variables dynamically
+    const { env } = await import("@/lib/env");
+    const supabaseUrl = env.supabase.url;
+    const supabaseKey = env.supabase.anonKey;
 
     if (!supabaseUrl || !supabaseKey) {
       return NextResponse.json(

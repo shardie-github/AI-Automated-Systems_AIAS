@@ -10,16 +10,40 @@ import { join, extname } from 'path';
 
 class EmbeddingsGenerator {
   constructor() {
+    // Load environment variables dynamically - no hardcoded fallbacks
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error(
+        'Missing required environment variable: OPENAI_API_KEY\n' +
+        'Please set this variable in:\n' +
+        '- Vercel: Dashboard → Settings → Environment Variables\n' +
+        '- GitHub Actions: Repository → Settings → Secrets\n' +
+        '- Local: .env.local file'
+      );
+    }
+    
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      throw new Error(
+        'Missing required environment variables: SUPABASE_URL and/or SUPABASE_ANON_KEY\n' +
+        'Please set these variables in:\n' +
+        '- Vercel: Dashboard → Settings → Environment Variables\n' +
+        '- Supabase: Dashboard → Settings → API\n' +
+        '- GitHub Actions: Repository → Settings → Secrets\n' +
+        '- Local: .env.local file'
+      );
+    }
+    
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
     
     this.supabase = createClient(
-      process.env.SUPABASE_URL || `https://${process.env.SUPABASE_PROJECT_REF || 'ghqyxhbyyirveptgwoqm'}.supabase.co`,
-      process.env.SUPABASE_ANON_KEY || ''
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY
     );
     
-    this.projectRef = process.env.SUPABASE_PROJECT_REF || 'ghqyxhbyyirveptgwoqm';
+    // Extract project ref from URL if needed
+    const urlMatch = process.env.SUPABASE_URL?.match(/https:\/\/([^.]+)\.supabase\.co/);
+    this.projectRef = process.env.SUPABASE_PROJECT_REF || urlMatch?.[1] || '';
   }
 
   /**

@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { supabase } from "@/lib/supabase/client";
+import { env } from "@/lib/env";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Load environment variables dynamically - no hardcoded values
+const stripe = new Stripe(env.stripe.secretKey!, {
   apiVersion: "2024-11-20.acacia",
 });
 
@@ -48,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 // Webhook handler for subscription events
 export async function handleStripeWebhook(req: NextApiRequest, res: NextApiResponse) {
   const sig = req.headers["stripe-signature"]!;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+  const webhookSecret = env.stripe.webhookSecret!;
 
   let event: Stripe.Event;
 

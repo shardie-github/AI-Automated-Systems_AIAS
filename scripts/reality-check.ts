@@ -6,6 +6,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { env, validateEnv } from "../lib/env";
 // Prisma client is generated in apps/web, so we'll use direct DB connection for checks
 
 const requiredEnvVars = [
@@ -54,10 +55,19 @@ async function main() {
     process.exit(1);
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL!;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  const databaseUrl = process.env.DATABASE_URL!;
+  // Validate environment variables first
+  const validation = validateEnv();
+  if (!validation.valid) {
+    console.error("❌ Environment validation failed:");
+    validation.errors.forEach(err => console.error(`  - ${err}`));
+    process.exit(1);
+  }
+
+  // Load environment variables dynamically
+  const supabaseUrl = env.supabase.url;
+  const supabaseAnonKey = env.supabase.anonKey;
+  const supabaseServiceKey = env.supabase.serviceRoleKey;
+  const databaseUrl = env.database.url;
 
   // 2. Supabase REST API
   console.log("\n🌐 Checking Supabase REST API...");

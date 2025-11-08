@@ -1,14 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 import * as fs from "fs";
 import * as path from "path";
+import { env, validateEnv } from "../lib/env";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error("❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+// Validate environment variables dynamically
+const validation = validateEnv();
+if (!validation.valid) {
+  console.error("❌ Missing required environment variables:");
+  validation.errors.forEach(err => console.error(`  - ${err}`));
   process.exit(1);
 }
+
+// Load environment variables dynamically - no hardcoded values
+const SUPABASE_URL = env.supabase.url;
+const SUPABASE_SERVICE_ROLE_KEY = env.supabase.serviceRoleKey;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
