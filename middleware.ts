@@ -19,6 +19,8 @@ const securityHeaders = {
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
   'Content-Security-Policy': [
     "default-src 'self'",
+    // Scripts: 'unsafe-inline' and 'unsafe-eval' required for Next.js hydration
+    // Consider migrating to nonce-based CSP in future Next.js versions
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.supabase.in",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
@@ -30,6 +32,10 @@ const securityHeaders = {
     "form-action 'self'",
     "frame-ancestors 'self'",
     "upgrade-insecure-requests",
+    // Additional security directives
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    "media-src 'self'",
   ].join('; '),
 };
 

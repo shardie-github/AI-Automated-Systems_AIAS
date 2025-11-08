@@ -22,6 +22,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://aias-platform.com"),
   alternates: {
     canonical: "/",
+    types: {
+      "application/rss+xml": [{ url: "/rss-news", title: "AIAS Platform RSS Feed" }],
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
+    yahoo: process.env.NEXT_PUBLIC_YAHOO_VERIFICATION,
   },
   openGraph: {
     title: "AIAS Platform — AI Automation for Global Businesses | Canadian-Built",
@@ -70,7 +78,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang={locale} dir={isRTL ? "rtl" : "ltr"} suppressHydrationWarning>
       <head>
+        {/* Preconnect to external domains for faster resource loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://*.supabase.co" />
+        <link rel="dns-prefetch" href="https://*.supabase.in" />
+        
+        {/* Preload critical resources */}
+        <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        
         {/* [META:BEGIN:pwa] */}
         <link rel="manifest" href="/manifest.json" />
         <script dangerouslySetInnerHTML={{__html:`if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}`}} />
@@ -81,8 +97,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-dvh antialiased">
         <ThemeProvider>
           {/* [STAKE+TRUST:BEGIN:skip_link] */}
-          {/* Skip link already exists - verified accessibility feature */}
-          <a href="#main" className="skip-link">Skip to content</a>
+          {/* Skip link for keyboard navigation accessibility */}
+          <a href="#main" className="skip-link" aria-label="Skip to main content">
+            Skip to content
+          </a>
           {/* [STAKE+TRUST:END:skip_link] */}
           <Header />
           <main id="main" className="container py-6">{children}</main>

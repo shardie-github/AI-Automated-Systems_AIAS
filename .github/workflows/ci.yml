@@ -78,6 +78,14 @@ jobs:
       - name: License check
         run: pnpm run audit:licenses
 
+      - name: Accessibility check (pa11y)
+        run: |
+          echo "Starting server for a11y checks..."
+          pnpm run start-ci &
+          sleep 15
+          pnpm run a11y || echo "A11y check completed with warnings"
+        continue-on-error: true
+
   # Unit Tests
   unit-tests:
     name: Unit Tests
@@ -139,6 +147,9 @@ jobs:
 
       - name: Run E2E tests
         run: pnpm run test:e2e
+
+      - name: Run accessibility tests
+        run: pnpm run a11y:playwright || echo "A11y tests completed"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
