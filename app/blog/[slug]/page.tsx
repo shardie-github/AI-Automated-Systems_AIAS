@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CommentsSection } from "@/components/blog/comments-section";
+import { AffiliateDisclosure } from "@/components/monetization/affiliate-disclosure";
+import { AffiliateLink } from "@/components/monetization/affiliate-link";
 
 interface PageProps {
   params: {
@@ -85,17 +87,19 @@ export default function BlogArticlePage({ params }: PageProps) {
           </div>
         </header>
 
+        {/* Affiliate Disclosure */}
+        {(article.tags.includes("shopify") || article.tags.includes("wave") || article.tags.includes("stripe") || article.tags.includes("notion") || article.tags.includes("zapier")) && (
+          <div className="mb-6">
+            <AffiliateDisclosure />
+          </div>
+        )}
+
         {/* Article Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none mb-12">
-          {article.content || (
-            <div className="space-y-4">
-              <p className="text-muted-foreground">
-                Full article content will be displayed here. This is a placeholder for the article body.
-              </p>
-              <p className="text-muted-foreground">
-                The article will be fully formatted with proper headings, paragraphs, images, and formatting.
-              </p>
-            </div>
+          {article.content ? (
+            <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          ) : (
+            <ArticleContent article={article} />
           )}
 
           {/* Systems Thinking Callout */}
@@ -186,6 +190,99 @@ export default function BlogArticlePage({ params }: PageProps) {
             <Link href="/rss-news">AI & Tech News Feed</Link>
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Component to render article content with affiliate links
+function ArticleContent({ article }: { article: any }) {
+  // Check if article has affiliate-related tags
+  const hasAffiliateContent = article.tags.some((tag: string) => 
+    ["shopify", "wave", "stripe", "notion", "zapier", "make", "automation", "e-commerce", "accounting"].includes(tag.toLowerCase())
+  );
+
+  if (!hasAffiliateContent) {
+    return (
+      <div className="space-y-4">
+        <p className="text-muted-foreground">
+          Full article content will be displayed here. This is a placeholder for the article body.
+        </p>
+        <p className="text-muted-foreground">
+          The article will be fully formatted with proper headings, paragraphs, images, and formatting.
+        </p>
+      </div>
+    );
+  }
+
+  // Render content with affiliate links based on article tags
+  return (
+    <div className="space-y-6">
+      <p className="text-lg">
+        {article.excerpt}
+      </p>
+      
+      {article.tags.includes("shopify") && (
+        <div className="space-y-4">
+          <h2>E-Commerce Automation with Shopify</h2>
+          <p>
+            If you're running an e-commerce store, <AffiliateLink product="Shopify">Shopify</AffiliateLink> is one of the most powerful platforms 
+            for Canadian businesses. Automating your Shopify store can save you 10+ hours per week on order processing, 
+            inventory management, and customer support.
+          </p>
+        </div>
+      )}
+
+      {article.tags.includes("wave") && (
+        <div className="space-y-4">
+          <h2>Accounting Automation with Wave</h2>
+          <p>
+            <AffiliateLink product="Wave">Wave Accounting</AffiliateLink> is a Canadian-made accounting tool that's perfect for small businesses. 
+            Automating your bookkeeping with Wave can save you 5+ hours per week on invoicing, expense tracking, and financial reporting.
+          </p>
+        </div>
+      )}
+
+      {article.tags.includes("stripe") && (
+        <div className="space-y-4">
+          <h2>Payment Processing with Stripe</h2>
+          <p>
+            <AffiliateLink product="Stripe">Stripe</AffiliateLink> offers powerful payment processing with excellent Canadian support. 
+            Automating payment workflows can reduce manual errors and save time on reconciliation.
+          </p>
+        </div>
+      )}
+
+      {article.tags.includes("notion") && (
+        <div className="space-y-4">
+          <h2>Productivity with Notion</h2>
+          <p>
+            <AffiliateLink product="Notion">Notion</AffiliateLink> is an excellent tool for knowledge management and productivity. 
+            When combined with systems thinking, it becomes a powerful platform for organizing your business processes.
+          </p>
+        </div>
+      )}
+
+      {article.tags.includes("automation") && (
+        <div className="space-y-4">
+          <h2>Automation Tools</h2>
+          <p>
+            While tools like <AffiliateLink product="Zapier">Zapier</AffiliateLink> and <AffiliateLink product="Make">Make</AffiliateLink> are powerful, 
+            they require systems thinking to design effective workflows. Automation alone isn't enough — you need to understand 
+            the systems you're automating.
+          </p>
+        </div>
+      )}
+
+      <div className="bg-primary/10 border-l-4 border-primary p-6 rounded-r-lg">
+        <h3 className="font-semibold text-lg mb-2">Ready to Start Automating?</h3>
+        <p className="text-muted-foreground mb-4">
+          AIAS Platform helps Canadian businesses automate their workflows with AI agents. 
+          Connect Shopify, Wave, Stripe, and 100+ other tools. Start your free trial today.
+        </p>
+        <Button asChild>
+          <Link href="/signup">Start Free Trial</Link>
+        </Button>
       </div>
     </div>
   );

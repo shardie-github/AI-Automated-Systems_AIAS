@@ -102,6 +102,18 @@ export const articles: BlogArticle[] = [
     publishedDate: "2025-01-09",
   },
   {
+    slug: "10-ways-canadian-smbs-automate-ai",
+    title: "10 Ways Canadian SMBs Can Automate with AI (Save 10+ Hours/Week)",
+    excerpt: "Practical automation strategies for Canadian small businesses. Learn how to automate Shopify, Wave Accounting, customer support, and more. Real examples with ROI calculations.",
+    content: "",
+    category: "Automation",
+    tags: ["automation", "canadian smb", "ai", "shopify", "wave", "productivity", "roi"],
+    author: "AIAS Platform Team",
+    publishedDate: "2025-01-27",
+    featured: true,
+    seoKeywords: ["canadian business automation", "AI automation for SMBs", "Shopify automation", "Canadian small business"],
+  },
+  {
     slug: "pipeda-compliance-guide",
     title: "PIPEDA Compliance: What Canadian Businesses Need to Know",
     excerpt: "Understanding PIPEDA compliance for SaaS tools. How AIAS Platform keeps your data in Canada and complies with Canadian privacy laws while serving global clients.",

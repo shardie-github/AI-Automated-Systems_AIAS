@@ -135,18 +135,31 @@ export function generateAffiliateLink(
 }
 
 // Track affiliate click
-export function trackAffiliateClick(affiliateId: string, product: string) {
+export async function trackAffiliateClick(affiliateId: string, product: string) {
   // Track in analytics
   if (typeof window !== "undefined") {
-    // Google Analytics or custom tracking
-    console.log("Affiliate click tracked:", { affiliateId, product, timestamp: new Date() });
+    const sessionId = sessionStorage.getItem("analytics_session_id") || `session_${Date.now()}`;
     
     // Send to analytics endpoint
     fetch("/api/monetization/affiliate/click", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ affiliateId, product }),
+      body: JSON.stringify({ affiliateId, product, sessionId, referrerUrl: window.location.href }),
     }).catch(console.error);
+
+    // Also track in database
+    try {
+      const { databasePMFTracker } = await import("../analytics/database-integration");
+      await databasePMFTracker.trackAffiliateClick(
+        affiliateId,
+        product,
+        sessionId,
+        undefined, // userId if available
+        window.location.href
+      );
+    } catch (error) {
+      // Continue even if database fails
+    }
   }
 }
 
