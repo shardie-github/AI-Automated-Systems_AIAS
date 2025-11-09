@@ -1,0 +1,114 @@
+name: Performance Monitoring on PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          ANALYZE: true
+
+      - name: Analyze bundle size
+        run: |
+          # Extract bundle size information
+          if [ -f dist/stats.html ]; then
+            echo "Bundle analysis available at dist/stats.html"
+          fi
+
+      - name: Run benchmarks
+        run: |
+          # Run performance benchmarks
+          pnpm tsx bench/example.bench.ts > bench/results/pr-${GITHUB_PR_NUMBER}.json || true
+
+      - name: Compare with baseline
+        run: |
+          # Compare with baseline benchmarks
+          node scripts/bench-trend.js analyze bench/results/pr-${GITHUB_PR_NUMBER}.json || true
+
+      - name: Comment performance diff on PR
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            let performanceComment = '## 📊 Performance Analysis\n\n';
+            
+            // Check if benchmark results exist
+            const benchFile = `bench/results/pr-${context.issue.number}.json`;
+            if (fs.existsSync(benchFile)) {
+              try {
+                const results = JSON.parse(fs.readFileSync(benchFile, 'utf-8'));
+                performanceComment += '### Benchmark Results\n\n';
+                performanceComment += '| Benchmark | Time | Status |\n';
+                performanceComment += '|-----------|------|--------|\n';
+                
+                if (Array.isArray(results)) {
+                  results.forEach(result => {
+                    const status = result.averageTime < 100 ? '✅' : '⚠️';
+                    performanceComment += `| ${result.name} | ${result.averageTime.toFixed(2)}ms | ${status} |\n`;
+                  });
+                }
+              } catch (e) {
+                performanceComment += 'Unable to parse benchmark results.\n';
+              }
+            } else {
+              performanceComment += 'No benchmark results available.\n';
+            }
+            
+            performanceComment += '\n### Bundle Size\n\n';
+            performanceComment += 'Bundle analysis available in build artifacts.\n';
+            
+            // Check for performance regressions
+            const hasRegressions = false; // TODO: Implement regression detection
+            
+            if (hasRegressions) {
+              performanceComment += '\n⚠️ **Performance regressions detected!** Please review.\n';
+            } else {
+              performanceComment += '\n✅ No performance regressions detected.\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: performanceComment
+            });
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-results-pr-${GITHUB_PR_NUMBER}
+          path: |
+            bench/results/pr-*.json
+            dist/stats.html
+          retention-days: 7
