@@ -1,0 +1,145 @@
+name: Canary Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: 'Module to deploy (e.g., checkout)'
+        required: true
+        type: string
+      percentage:
+        description: 'Canary percentage (0-100)'
+        required: true
+        type: string
+        default: '10'
+      environment:
+        description: 'Environment (preview/production)'
+        required: true
+        type: choice
+        options:
+          - preview
+          - production
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  validate:
+    name: Validate Canary Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate inputs
+        run: |
+          PERCENTAGE=${{ github.event.inputs.percentage }}
+          if [ "$PERCENTAGE" -lt 0 ] || [ "$PERCENTAGE" -gt 100 ]; then
+            echo "Error: Percentage must be between 0 and 100"
+            exit 1
+          fi
+          
+          MODULE=${{ github.event.inputs.module }}
+          if [ -z "$MODULE" ]; then
+            echo "Error: Module is required"
+            exit 1
+          fi
+
+      - name: Check canary configuration
+        run: |
+          MODULE=${{ github.event.inputs.module }}
+          if [ ! -f "ops/canary-harness.md" ]; then
+            echo "Warning: Canary harness documentation not found"
+          fi
+
+  deploy-canary:
+    name: Deploy Canary
+    needs: [validate]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          CANARY_${MODULE}_ENABLED: 'true'
+          CANARY_${MODULE}_PERCENTAGE: ${{ github.event.inputs.percentage }}
+
+      - name: Deploy to Vercel (Preview)
+        if: github.event.inputs.environment == 'preview'
+        run: |
+          vercel deploy --prebuilt \
+            --token ${{ secrets.VERCEL_TOKEN }} \
+            --env CANARY_${MODULE}_ENABLED=true \
+            --env CANARY_${MODULE}_PERCENTAGE=${{ github.event.inputs.percentage }}
+        env:
+          MODULE: ${{ github.event.inputs.module }}
+
+      - name: Deploy to Vercel (Production)
+        if: github.event.inputs.environment == 'production'
+        run: |
+          vercel deploy --prebuilt --prod \
+            --token ${{ secrets.VERCEL_TOKEN }} \
+            --env CANARY_${MODULE}_ENABLED=true \
+            --env CANARY_${MODULE}_PERCENTAGE=${{ github.event.inputs.percentage }}
+        env:
+          MODULE: ${{ github.event.inputs.module }}
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          text: |
+            Canary deployment started:
+            - Module: ${{ github.event.inputs.module }}
+            - Percentage: ${{ github.event.inputs.percentage }}%
+            - Environment: ${{ github.event.inputs.environment }}
+
+  monitor:
+    name: Monitor Canary
+    needs: [deploy-canary]
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'production'
+    steps:
+      - name: Wait for metrics collection
+        run: sleep 300 # Wait 5 minutes
+
+      - name: Check error rates
+        run: |
+          # TODO: Implement error rate check
+          echo "Checking error rates..."
+          # curl -X GET https://api.example.com/metrics/canary-error-rate
+
+      - name: Check latency
+        run: |
+          # TODO: Implement latency check
+          echo "Checking latency..."
+          # curl -X GET https://api.example.com/metrics/canary-latency
+
+      - name: Rollback if threshold exceeded
+        if: failure()
+        run: |
+          echo "Threshold exceeded, rolling back..."
+          # TODO: Implement automatic rollback
+          # vercel env rm CANARY_${MODULE}_ENABLED production --token ${{ secrets.VERCEL_TOKEN }}

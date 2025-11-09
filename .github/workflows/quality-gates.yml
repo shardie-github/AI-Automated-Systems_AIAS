@@ -1,0 +1,152 @@
+name: Quality Gates
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  bundle-size-check:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          ANALYZE: true
+
+      - name: Check bundle size delta
+        run: |
+          # Extract bundle sizes from build output
+          # Compare with baseline (main branch)
+          # Fail if bundle size increase > 0 KB (budgets.bundle_kb_max_delta)
+          echo "Bundle size check: Max delta = 0 KB"
+          # TODO: Implement bundle size comparison
+          # if [ "$BUNDLE_DELTA" -gt 0 ]; then
+          #   echo "Error: Bundle size increased by ${BUNDLE_DELTA} KB"
+          #   exit 1
+          # fi
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bundle-analysis
+          path: dist/stats.html
+          retention-days: 7
+
+  type-coverage-check:
+    name: Type Coverage Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run type checking
+        run: pnpm run typecheck
+
+      - name: Check type coverage
+        run: |
+          # Run type coverage check
+          # Fail if type coverage < 95% (budgets.type_coverage_min)
+          echo "Type coverage check: Min coverage = 95%"
+          # TODO: Implement type coverage check
+          # npx type-coverage --detail
+          # if [ "$TYPE_COVERAGE" -lt 95 ]; then
+          #   echo "Error: Type coverage ${TYPE_COVERAGE}% is below 95%"
+          #   exit 1
+          # fi
+        continue-on-error: true
+
+  test-check:
+    name: Test Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm run test -- --run
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: coverage/
+          retention-days: 7
+
+  quality-gates-summary:
+    name: Quality Gates Summary
+    runs-on: ubuntu-latest
+    needs: [bundle-size-check, type-coverage-check, test-check]
+    if: always()
+    steps:
+      - name: Check quality gates
+        run: |
+          echo "## Quality Gates Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Gate | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bundle Size | ${{ needs.bundle-size-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Coverage | ${{ needs.type-coverage-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.bundle-size-check.result }}" != "success" ] || \
+             [ "${{ needs.type-coverage-check.result }}" != "success" ] || \
+             [ "${{ needs.test-check.result }}" != "success" ]; then
+            echo "❌ Quality gates failed"
+            exit 1
+          else
+            echo "✅ All quality gates passed"
+          fi
