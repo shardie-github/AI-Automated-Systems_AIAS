@@ -44,10 +44,29 @@ export function createRouteHandler(
   return async (request: NextRequest): Promise<NextResponse> => {
     const startTime = Date.now();
     
+    // Cache request body to avoid consuming it multiple times
+    let cachedBody: string | null = null;
+    let cachedBodyJson: unknown | null = null;
+    
+    const getBodyText = async (): Promise<string> => {
+      if (cachedBody === null) {
+        cachedBody = await request.text();
+      }
+      return cachedBody;
+    };
+    
+    const getBodyJson = async (): Promise<unknown> => {
+      if (cachedBodyJson === null) {
+        const bodyText = await getBodyText();
+        cachedBodyJson = JSON.parse(bodyText);
+      }
+      return cachedBodyJson;
+    };
+    
     try {
       // Check request size
       if (options.maxBodySize) {
-        const body = await request.text();
+        const body = await getBodyText();
         if (!checkRequestSize(body, options.maxBodySize)) {
           const error = new ValidationError('Request too large', undefined, { maxSize: options.maxBodySize });
           const formatted = formatError(error);
@@ -113,7 +132,7 @@ export function createRouteHandler(
       // Validate request body
       if (options.validateBody) {
         try {
-          const body = await request.json();
+          const body = await getBodyJson();
           const validation = validateInput(options.validateBody, body);
           
           if (!validation.success) {
@@ -143,7 +162,8 @@ export function createRouteHandler(
       
       // Check cache
       if (options.cache?.enabled) {
-        const cacheKey = `api:${request.nextUrl.pathname}:${await request.text()}`;
+        const bodyText = await getBodyText();
+        const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
         const cached = await cacheService.get(cacheKey, {
           ttl: options.cache.ttl,
           tenantId: tenantId || undefined,
@@ -178,7 +198,8 @@ export function createRouteHandler(
       if (options.cache?.enabled && response.status === 200) {
         try {
           const body = await response.clone().json();
-          const cacheKey = `api:${request.nextUrl.pathname}:${await request.text()}`;
+          const bodyText = await getBodyText();
+          const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
           await cacheService.set(cacheKey, body, {
             ttl: options.cache.ttl,
             tenantId: tenantId || undefined,
@@ -192,7 +213,25 @@ export function createRouteHandler(
       
       return response;
     } catch (error: unknown) {
+      const errorDuration = Date.now() - startTime;
       console.error('Route handler error:', maskSensitiveData(String(error)));
+      
+      // Track error performance
+      try {
+        const { telemetry } = await import('@/lib/monitoring/enhanced-telemetry');
+        telemetry.trackPerformance({
+          name: 'route_handler_error',
+          value: errorDuration,
+          unit: 'ms',
+          tags: {
+            path: request.nextUrl.pathname,
+            method: request.method,
+          },
+        });
+      } catch {
+        // Telemetry import failed, continue without tracking
+      }
+      
       const systemError = new SystemError(
         'Internal server error',
         error instanceof Error ? error : new Error(String(error))
@@ -206,7 +245,12 @@ export function createRouteHandler(
             ? (error instanceof Error ? error.message : String(error))
             : 'An error occurred processing your request',
         },
-        { status: formatted.statusCode }
+        { 
+          status: formatted.statusCode,
+          headers: {
+            'X-Response-Time': `${errorDuration}ms`,
+          },
+        }
       );
     }
   };

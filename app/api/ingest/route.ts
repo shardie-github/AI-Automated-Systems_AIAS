@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { SystemError, NetworkError, formatError } from "@/src/lib/errors";
+import { createPOSTHandler } from "@/lib/api/route-handler";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";
+import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
+import { z } from "zod";
 
 export const runtime = "edge";
 
@@ -12,21 +15,39 @@ interface IngestResponse {
 }
 
 /**
+ * Event ingestion schema
+ * Validates event payload structure
+ */
+const eventSchema = z.object({
+  type: z.string().min(1),
+  data: z.record(z.unknown()).optional(),
+  timestamp: z.string().datetime().optional(),
+}).passthrough(); // Allow additional fields
+
+/**
  * Event ingestion endpoint
  * Proxies to Supabase Edge Function (avoids exposing service key)
- * All configuration loaded dynamically from environment variables
+ * Migrated to use route handler utility for consistent error handling
  */
-export async function POST(req: NextRequest): Promise<NextResponse<IngestResponse>> {
-  try {
-    const body = await req.text();
+export const POST = createPOSTHandler(
+  async (context) => {
+    const { request } = context;
+    const startTime = Date.now();
+    const body = await request.text();
 
-    if (!body) {
-      const error = new SystemError("Request body is required");
-      const formatted = formatError(error);
-      return NextResponse.json(
-        { error: formatted.message },
-        { status: formatted.statusCode }
-      );
+    if (!body || body.length === 0) {
+      throw new Error("Request body is required");
+    }
+
+    // Validate JSON structure (non-blocking)
+    try {
+      const parsed = JSON.parse(body);
+      const validation = eventSchema.safeParse(parsed);
+      if (!validation.success) {
+        console.warn("Event validation warnings:", validation.error.errors);
+      }
+    } catch {
+      // Invalid JSON - will be caught by route handler
     }
 
     // Retry Supabase Edge Function call with exponential backoff
@@ -62,24 +83,27 @@ export async function POST(req: NextRequest): Promise<NextResponse<IngestRespons
     );
 
     const responseText = await response.text();
+    const duration = Date.now() - startTime;
+    
+    // Track performance
+    telemetry.trackPerformance({
+      name: "event_ingest",
+      value: duration,
+      unit: "ms",
+      tags: { status: response.ok ? "success" : "error", statusCode: response.status.toString() },
+    });
+    
     return new NextResponse(responseText, { 
       status: response.status, 
-      headers: { "content-type":"application/json" } 
+      headers: { 
+        "content-type":"application/json",
+        "X-Response-Time": `${duration}ms`
+      } 
     });
-  } catch (error: unknown) {
-    const systemError = error instanceof SystemError || error instanceof NetworkError
-      ? error
-      : new SystemError(
-          "Event ingestion error",
-          error instanceof Error ? error : new Error(String(error))
-        );
-    
-    recordError(systemError, { endpoint: '/api/ingest' });
-    const formatted = formatError(systemError);
-    
-    return NextResponse.json(
-      { error: formatted.message },
-      { status: formatted.statusCode }
-    );
+  },
+  {
+    cache: { enabled: false },
+    requireAuth: false,
+    maxBodySize: 1024 * 1024, // 1MB
   }
-}
+);

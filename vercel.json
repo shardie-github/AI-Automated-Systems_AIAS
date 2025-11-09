@@ -8,6 +8,24 @@
     "NODE_ENV": "production",
     "PRISMA_CLIENT_ENGINE_TYPE": "wasm"
   },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "preview": true
+    }
+  },
+  "github": {
+    "deploymentEnabled": {
+      "main": true,
+      "preview": true
+    },
+    "autoAlias": true,
+    "autoJobCancelation": true,
+    "silent": false
+  },
+  "preview": {
+    "automaticDeployment": true
+  },
   "headers": [
     {
       "source": "/(.*)",

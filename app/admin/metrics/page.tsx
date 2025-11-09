@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Note: AnalyticsDashboard removed - not used in this component
+// If needed in future, use dynamic import for code splitting
 
 interface MetricsData {
   performance: {
@@ -30,8 +34,17 @@ interface MetricsData {
   };
   status: "healthy" | "degraded" | "error";
   lastUpdated: string;
-  sources?: Record<string, any>;
-  trends?: Record<string, any>;
+  sources?: Record<string, {
+    latest: Record<string, unknown>;
+    count: number;
+    lastUpdated: string;
+  }>;
+  trends?: Record<string, {
+    average: number;
+    min: number;
+    max: number;
+    count: number;
+  }>;
 }
 
 export default function MetricsDashboard() {
@@ -55,8 +68,9 @@ export default function MetricsDashboard() {
       const data = await response.json();
       setMetrics(data);
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch metrics";
+      setError(errorMessage);
       console.error("Failed to fetch metrics:", err);
     } finally {
       setLoading(false);
@@ -264,29 +278,37 @@ export default function MetricsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(metrics.trends).map(([source, trend]: [string, any]) => (
+              {Object.entries(metrics.trends).map(([source, trend]) => {
+                const trendData = trend as {
+                  average?: number;
+                  min?: number;
+                  max?: number;
+                  count?: number;
+                };
+                return (
                 <div key={source} className="border-b pb-4 last:border-0">
                   <div className="font-semibold capitalize mb-2">{source}</div>
                   <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Average:</span>{" "}
-                      <span className="font-mono">{trend.average?.toFixed(2)}</span>
+                      <span className="font-mono">{trendData.average?.toFixed(2) ?? "—"}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Min:</span>{" "}
-                      <span className="font-mono">{trend.min?.toFixed(2)}</span>
+                      <span className="font-mono">{trendData.min?.toFixed(2) ?? "—"}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Max:</span>{" "}
-                      <span className="font-mono">{trend.max?.toFixed(2)}</span>
+                      <span className="font-mono">{trendData.max?.toFixed(2) ?? "—"}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Samples:</span>{" "}
-                      <span className="font-mono">{trend.count}</span>
+                      <span className="font-mono">{trendData.count ?? 0}</span>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

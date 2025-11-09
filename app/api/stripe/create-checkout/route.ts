@@ -1,7 +1,23 @@
+/**
+ * Legacy Pages API Route Handler
+ * 
+ * ⚠️ DEPRECATED: This file uses Next.js Pages API format
+ * 
+ * New App Router version available at: app/api/stripe/create-checkout-app/route.ts
+ * 
+ * Migration plan:
+ * 1. Update all clients to use /api/stripe/create-checkout-app
+ * 2. Add redirect from old endpoint to new endpoint
+ * 3. Remove this file after migration period
+ * 
+ * This file is kept for backward compatibility during migration.
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { supabase } from "@/lib/supabase/client";
 import { env } from "@/lib/env";
+import { z } from "zod";
 
 // Load environment variables dynamically - no hardcoded values
 const stripe = new Stripe(env.stripe.secretKey!, {
@@ -14,17 +30,36 @@ const XP_MULTIPLIERS: Record<string, number> = {
   enterprise: 2.0,
 };
 
+/**
+ * Checkout request schema
+ */
+const checkoutSchema = z.object({
+  priceId: z.string().min(1, "Price ID is required"),
+  userId: z.string().uuid("User ID must be a valid UUID"),
+  tier: z.enum(["starter", "pro", "enterprise"], {
+    errorMap: () => ({ message: "Tier must be one of: starter, pro, enterprise" }),
+  }),
+});
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { priceId, userId, tier } = req.body;
-
-    if (!priceId || !userId || !tier) {
-      return res.status(400).json({ error: "Missing required fields" });
+    // Validate input with Zod schema
+    const validation = checkoutSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({
+        error: "Invalid request body",
+        details: validation.error.errors.map((e) => ({
+          path: e.path.join('.'),
+          message: e.message,
+        })),
+      });
     }
+
+    const { priceId, userId, tier } = validation.data;
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -41,66 +76,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json({ sessionId: session.id });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Checkout error";
     console.error("Checkout error:", error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: errorMessage });
   }
 }
 
-// Webhook handler for subscription events
-export async function handleStripeWebhook(req: NextApiRequest, res: NextApiResponse) {
-  const sig = req.headers["stripe-signature"]!;
-  const webhookSecret = env.stripe.webhookSecret!;
-
-  let event: Stripe.Event;
-
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-  } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const userId = session.metadata?.userId;
-        const tier = session.metadata?.tier;
-
-        if (userId && tier) {
-          const expiresAt = new Date();
-          expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 month subscription
-
-          await supabase.from("subscription_tiers").upsert({
-            user_id: userId,
-            tier,
-            xp_multiplier: XP_MULTIPLIERS[tier] || 1.0,
-            expires_at: expiresAt.toISOString(),
-          });
-
-          // Update user's XP multiplier in localStorage cache
-          await supabase.from("profiles").update({
-            // Profile updates if needed
-          }).eq("id", userId);
-        }
-        break;
-      }
-
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        // Handle subscription updates/cancellations
-        break;
-      }
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
-    }
-
-    return res.status(200).json({ received: true });
-  } catch (error: any) {
-    console.error("Webhook handler error:", error);
-    return res.status(500).json({ error: error.message });
-  }
-}
+// Note: Webhook handler is in app/api/stripe/webhook/route.ts
+// This file only handles checkout session creation
+// 
+// Migration: Use app/api/stripe/create-checkout-app/route.ts for new App Router version

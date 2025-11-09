@@ -151,4 +151,100 @@
 
 ---
 
+---
+
+## ADR-006: Route Handler Utility Adoption
+
+**Date:** 2025-01-27  
+**Status:** Implemented  
+**Context:** Need for consistent error handling, security, caching across API routes
+
+**Decision:** Migrate all API routes to use `createRouteHandler` utility from `lib/api/route-handler.ts`
+
+**Rationale:**
+- Consistent error handling improves debugging
+- Built-in security (auth, tenant isolation, rate limiting)
+- Automatic caching reduces load
+- Input validation with Zod schemas
+- Performance tracking built-in
+
+**Alternatives Considered:**
+- Continue with ad-hoc route handlers (rejected - inconsistent)
+- Use external framework (rejected - unnecessary dependency)
+- Create wrapper per route (rejected - duplication)
+
+**Consequences:**
+- Positive: Consistent error handling, better security, improved performance
+- Negative: Migration effort for existing routes
+- Risk: Low - backward compatible, gradual migration
+
+**Implementation:**
+- Created route handler utility
+- Migrated telemetry/ingest, metrics, ingest endpoints
+- Created migration guide
+- Added tests
+
+---
+
+## ADR-007: Caching Strategy for Expensive Operations
+
+**Date:** 2025-01-27  
+**Status:** Implemented  
+**Context:** Trends calculation and metrics aggregation are expensive
+
+**Decision:** Use multi-layer caching (Redis + memory) with 60s TTL for expensive calculations
+
+**Rationale:**
+- Trends calculation queries 7 days of data
+- Metrics aggregation processes large datasets
+- Caching reduces database load
+- 60s TTL balances freshness and performance
+
+**Alternatives Considered:**
+- No caching (rejected - too slow)
+- Longer TTL (rejected - stale data)
+- Background jobs (considered - future enhancement)
+
+**Consequences:**
+- Positive: Faster response times, reduced DB load
+- Negative: Slight data staleness (60s)
+- Risk: Low - acceptable staleness for metrics
+
+**Implementation:**
+- Added caching to trends calculation
+- Added caching to metrics endpoint
+- Used cacheService from lib/performance/cache
+
+---
+
+## ADR-008: Error Taxonomy Implementation
+
+**Date:** 2025-01-27  
+**Status:** Implemented  
+**Context:** Need for structured error handling
+
+**Decision:** Use error classes from `src/lib/errors.ts` (ValidationError, SystemError, etc.)
+
+**Rationale:**
+- Consistent error responses
+- Better error tracking
+- Improved debugging
+- Type-safe error handling
+
+**Alternatives Considered:**
+- Ad-hoc error handling (rejected - inconsistent)
+- External error library (rejected - unnecessary)
+
+**Consequences:**
+- Positive: Consistent errors, better debugging
+- Negative: Migration effort
+- Risk: Low - additive change
+
+**Implementation:**
+- Error classes already exist
+- Migrated endpoints to use error classes
+- Added error tracking
+
+---
+
 **Next Entry:** Add new ADRs as major decisions are made

@@ -43,17 +43,20 @@ const rateLimitConfig = {
 };
 
 // In-memory rate limit store (fallback when Redis unavailable)
+// Note: In serverless environments, this is per-instance and will reset on cold start
+// For production, use Redis or Vercel KV for distributed rate limiting
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-// Cleanup expired rate limit entries
-setInterval(() => {
+// Cleanup expired rate limit entries (lazy cleanup on access, not via setInterval)
+// setInterval doesn't work reliably in serverless - cleanup happens during rate limit checks
+function cleanupExpiredEntries(): void {
   const now = Date.now();
   for (const [key, value] of rateLimitStore.entries()) {
     if (value.resetTime < now) {
       rateLimitStore.delete(key);
     }
   }
-}, 60000); // Cleanup every minute
+}
 
 /**
  * Get client IP address from request
@@ -82,6 +85,9 @@ function checkRateLimit(
   pathname: string,
   identifier: string
 ): { allowed: boolean; remaining: number; resetTime: number } {
+  // Cleanup expired entries on each check (lazy cleanup)
+  cleanupExpiredEntries();
+  
   const config = rateLimitConfig[pathname as keyof typeof rateLimitConfig] || rateLimitConfig.default;
   const key = `rate_limit:${pathname}:${identifier}`;
   const now = Date.now();
