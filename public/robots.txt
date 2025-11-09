@@ -1,7 +1,10 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /admin/
-Disallow: /account/
+# robots.txt
+# Production: Allow all crawlers
+# Preview: Disallow all (set via middleware or environment)
 
-Sitemap: https://aias-platform.com/sitemap.xml
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+
+# Allow preview environments to be blocked via environment variable
+# Set PREVIEW_DISALLOW_ROBOTS=true in Vercel preview environment
