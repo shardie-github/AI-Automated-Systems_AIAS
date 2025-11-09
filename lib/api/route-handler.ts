@@ -213,7 +213,25 @@ export function createRouteHandler(
       
       return response;
     } catch (error: unknown) {
+      const errorDuration = Date.now() - startTime;
       console.error('Route handler error:', maskSensitiveData(String(error)));
+      
+      // Track error performance
+      try {
+        const { telemetry } = await import('@/lib/monitoring/enhanced-telemetry');
+        telemetry.trackPerformance({
+          name: 'route_handler_error',
+          value: errorDuration,
+          unit: 'ms',
+          tags: {
+            path: request.nextUrl.pathname,
+            method: request.method,
+          },
+        });
+      } catch {
+        // Telemetry import failed, continue without tracking
+      }
+      
       const systemError = new SystemError(
         'Internal server error',
         error instanceof Error ? error : new Error(String(error))
@@ -227,7 +245,12 @@ export function createRouteHandler(
             ? (error instanceof Error ? error.message : String(error))
             : 'An error occurred processing your request',
         },
-        { status: formatted.statusCode }
+        { 
+          status: formatted.statusCode,
+          headers: {
+            'X-Response-Time': `${errorDuration}ms`,
+          },
+        }
       );
     }
   };

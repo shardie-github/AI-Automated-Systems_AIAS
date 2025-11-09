@@ -1,43 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { SystemError, ValidationError, formatError } from "@/src/lib/errors";
+import { createPOSTHandler } from "@/lib/api/route-handler";
+import { z } from "zod";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 
 export const runtime = "edge";
 
 /**
+ * Telemetry ingestion endpoint schema
+ * Validates telemetry payload structure
+ */
+const telemetrySchema = z.object({
+  app: z.string().optional(),
+  type: z.string().min(1),
+  path: z.string().optional(),
+  meta: z.record(z.unknown()).optional(),
+  ts: z.string().datetime().optional(),
+}).passthrough(); // Allow additional fields
+
+/**
  * Telemetry ingestion endpoint
  * Proxies to Supabase Edge Function
- * All configuration loaded dynamically from environment variables
+ * Migrated to use route handler utility for consistent error handling
  */
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  const startTime = Date.now();
-  
-  try {
-    const body = await req.text();
+export const POST = createPOSTHandler(
+  async (context) => {
+    const { request } = context;
+    const body = await request.text();
     
-    // Validate body is not empty
-    if (!body || body.length === 0) {
-      const error = new ValidationError("Request body is required");
-      const formatted = formatError(error);
-      return NextResponse.json(
-        { error: formatted.message },
-        { status: formatted.statusCode }
-      );
-    }
-    
-    // Validate JSON format
+    // Validate JSON format and structure
+    let parsedBody: unknown;
     try {
-      JSON.parse(body);
+      parsedBody = JSON.parse(body);
     } catch {
-      const error = new ValidationError("Invalid JSON in request body");
-      const formatted = formatError(error);
-      return NextResponse.json(
-        { error: formatted.message },
-        { status: formatted.statusCode }
-      );
+      throw new Error("Invalid JSON in request body");
     }
     
+    // Validate against schema (non-blocking, log if invalid but don't fail)
+    const validation = telemetrySchema.safeParse(parsedBody);
+    if (!validation.success) {
+      // Log validation errors but don't block ingestion
+      console.warn("Telemetry validation warnings:", validation.error.errors);
+    }
+    
+    const startTime = Date.now();
+    
+    // Proxy to Supabase Edge Function
     const r = await fetch(`${env.supabase.url}/functions/v1/ingest-telemetry`, {
       method: "POST", 
       headers: { 
@@ -65,24 +73,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         "X-Response-Time": `${duration}ms`
       } 
     });
-  } catch (error: unknown) {
-    const systemError = new SystemError(
-      "Telemetry ingestion failed",
-      error instanceof Error ? error : new Error(String(error))
-    );
-    const formatted = formatError(systemError);
-    
-    // Track error
-    telemetry.trackPerformance({
-      name: "telemetry_ingest",
-      value: Date.now() - startTime,
-      unit: "ms",
-      tags: { status: "error" },
-    });
-    
-    return NextResponse.json(
-      { error: formatted.message },
-      { status: formatted.statusCode }
-    );
+  },
+  {
+    // Don't cache POST requests
+    cache: { enabled: false },
+    // No auth required for telemetry ingestion
+    requireAuth: false,
+    // Max body size: 1MB
+    maxBodySize: 1024 * 1024,
   }
-}
+);

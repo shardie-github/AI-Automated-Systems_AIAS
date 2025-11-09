@@ -4,6 +4,7 @@ import { env } from "@/lib/env";
 import { SystemError, formatError } from "@/src/lib/errors";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { cacheService } from "@/lib/performance/cache";
+import { createGETHandler } from "@/lib/api/route-handler";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -37,11 +38,13 @@ interface MetricsResponse {
  * Performance Metrics API Endpoint
  * Returns aggregated performance metrics from all sources
  * Used by /admin/metrics dashboard
+ * Migrated to use route handler utility for consistent error handling and caching
  */
-export async function GET(req: NextRequest): Promise<NextResponse<MetricsResponse>> {
-  const startTime = Date.now();
-  
-  try {
+export const GET = createGETHandler(
+  async (context) => {
+    const { request } = context;
+    const startTime = Date.now();
+    
     const supabase = createClient(
       env.supabase.url,
       env.supabase.serviceRoleKey,
@@ -53,19 +56,35 @@ export async function GET(req: NextRequest): Promise<NextResponse<MetricsRespons
       }
     );
 
-    // Get latest metrics from each source using SQL aggregation (avoid N+1)
-    // Use DISTINCT ON to get the latest metric per source efficiently
-    const { data: latestMetrics, error } = await supabase
-      .from("metrics_log")
-      .select("source, metric, ts")
-      .order("ts", { ascending: false })
-      .limit(100);
+    // Get latest metrics from each source using optimized RPC function
+    // This uses SQL DISTINCT ON for optimal performance (avoids N+1)
+    let latestMetrics: Array<{ source: string; metric: Record<string, unknown>; ts: string }> | null = null;
+    let error: { message: string } | null = null;
     
-    // If we have many sources, consider using a more efficient query:
-    // SELECT DISTINCT ON (source) source, metric, ts 
-    // FROM metrics_log 
-    // ORDER BY source, ts DESC
-    // This would require raw SQL or a Supabase RPC function for optimal performance
+    const { data: rpcData, error: rpcError } = await supabase
+      .rpc("get_latest_metrics_per_source", { limit_count: 100 });
+    
+    if (rpcError) {
+      // Fallback to regular query if RPC function doesn't exist
+      if (rpcError.message.includes("function") && rpcError.message.includes("does not exist")) {
+        console.warn("RPC function not available, using fallback query");
+        const { data: fallbackMetrics, error: fallbackError } = await supabase
+          .from("metrics_log")
+          .select("source, metric, ts")
+          .order("ts", { ascending: false })
+          .limit(100);
+        
+        if (fallbackError) {
+          error = fallbackError;
+        } else {
+          latestMetrics = fallbackMetrics || [];
+        }
+      } else {
+        error = rpcError;
+      }
+    } else {
+      latestMetrics = rpcData || [];
+    }
 
     if (error) {
       console.error("Error fetching metrics:", error);
@@ -75,21 +94,12 @@ export async function GET(req: NextRequest): Promise<NextResponse<MetricsRespons
         { details: error.message }
       );
       const formatted = formatError(systemError);
-      return NextResponse.json(
-        {
-          error: formatted.message,
-          performance: {
-            webVitals: {},
-            supabase: {},
-            expo: {},
-            ci: {},
-          },
-          status: "error" as const,
-          lastUpdated: new Date().toISOString(),
-          sources: {},
-        },
-        { status: formatted.statusCode }
-      );
+      throw systemError; // Let route handler catch and format
+    }
+    
+    if (!latestMetrics || latestMetrics.length === 0) {
+      // No metrics available, return empty response
+      latestMetrics = [];
     }
 
     // Aggregate metrics by source
@@ -140,15 +150,16 @@ export async function GET(req: NextRequest): Promise<NextResponse<MetricsRespons
     const sourceLatest = new Map<string, MetricEntry>();
     
     // Single pass: group and track latest per source
-    for (const metric of latestMetrics || []) {
+    // RPC function already returns latest per source, so we can simplify
+    for (const metric of latestMetrics) {
       const source = metric.source;
       
-      // Track latest (first one encountered due to DESC order)
+      // Track latest (RPC function already returns latest per source)
       if (!sourceLatest.has(source)) {
         sourceLatest.set(source, metric);
       }
       
-      // Group all metrics
+      // Group all metrics (for count)
       if (!sourceGroups.has(source)) {
         sourceGroups.set(source, []);
       }
@@ -193,7 +204,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<MetricsRespons
       aggregated.status = "degraded";
     }
 
-    // Calculate trends (7-day moving average) - cache this expensive operation
+    // Calculate trends (7-day moving average) - use optimized RPC function and cache
     const trendsCacheKey = "metrics:trends:7day";
     let trends = await cacheService.get<Record<string, {
       average: number;
@@ -203,19 +214,39 @@ export async function GET(req: NextRequest): Promise<NextResponse<MetricsRespons
     }>>(trendsCacheKey, { ttl: 60 }); // Cache for 60 seconds
     
     if (!trends) {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-      const { data: trendData } = await supabase
-        .from("metrics_log")
-        .select("source, metric, ts")
-        .gte("ts", sevenDaysAgo.toISOString())
-        .order("ts", { ascending: true });
-
-      if (trendData && trendData.length > 0) {
-        trends = calculateTrends(trendData);
+      // Try optimized RPC function first
+      const { data: rpcTrends, error: rpcError } = await supabase
+        .rpc("get_metrics_trends", { days_back: 7 });
+      
+      if (!rpcError && rpcTrends && rpcTrends.length > 0) {
+        // Convert RPC result to expected format
+        trends = {};
+        for (const row of rpcTrends) {
+          trends[row.source] = {
+            average: Number(row.average),
+            min: Number(row.min_value),
+            max: Number(row.max_value),
+            count: Number(row.count_samples),
+          };
+        }
         // Cache the result
         await cacheService.set(trendsCacheKey, trends, { ttl: 60 });
+      } else {
+        // Fallback to client-side calculation
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const { data: trendData } = await supabase
+          .from("metrics_log")
+          .select("source, metric, ts")
+          .gte("ts", sevenDaysAgo.toISOString())
+          .order("ts", { ascending: true });
+
+        if (trendData && trendData.length > 0) {
+          trends = calculateTrends(trendData);
+          // Cache the result
+          await cacheService.set(trendsCacheKey, trends, { ttl: 60 });
+        }
       }
     }
     
@@ -240,46 +271,18 @@ export async function GET(req: NextRequest): Promise<NextResponse<MetricsRespons
         "X-Response-Time": `${duration}ms`,
       },
     });
-  } catch (error: unknown) {
-    const duration = Date.now() - startTime;
-    
-    // Track error
-    telemetry.trackPerformance({
-      name: "metrics_api",
-      value: duration,
-      unit: "ms",
-      tags: { status: "error" },
-    });
-    
-    console.error("Metrics API error:", error);
-    const systemError = new SystemError(
-      "Internal server error",
-      error instanceof Error ? error : new Error(String(error))
-    );
-    const formatted = formatError(systemError);
-    return NextResponse.json(
-      {
-        error: formatted.message,
-        message: error instanceof Error ? error.message : String(error),
-        performance: {
-          webVitals: {},
-          supabase: {},
-          expo: {},
-          ci: {},
-        },
-        status: "error" as const,
-        lastUpdated: new Date().toISOString(),
-        sources: {},
-      },
-      { 
-        status: formatted.statusCode,
-        headers: {
-          "X-Response-Time": `${duration}ms`,
-        },
-      }
-    );
+  },
+  {
+    // Cache metrics for 60 seconds
+    cache: {
+      enabled: true,
+      ttl: 60,
+      tags: ["metrics", "performance"],
+    },
+    // Require auth for admin metrics
+    requireAuth: false, // Set to true if you want to restrict access
   }
-}
+);
 
 interface TrendMetric {
   source: string;

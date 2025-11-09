@@ -200,7 +200,9 @@
     "lint:unused": "eslint . --report-unused-disable-directives --format json > reports/eslint-unused-disables.json 2>&1 || true",
     "hygiene": "pnpm typecheck && pnpm lint && pnpm prune:exports && pnpm scan:usage && pnpm audit:deps",
     "type:coverage": "npx type-coverage --detail --at-least 95 || true",
-    "obs:check": "tsx scripts/check-telemetry.ts || true"
+    "obs:check": "tsx scripts/check-telemetry.ts || true",
+    "regenerate-types": "tsx scripts/regenerate-supabase-types.ts",
+    "test:critical": "vitest run tests/api/telemetry-ingest.test.ts tests/lib/route-handler.test.ts tests/api/healthz.test.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.2",

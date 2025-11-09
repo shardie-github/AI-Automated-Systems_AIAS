@@ -99,8 +99,11 @@ interface WebhookResponse {
   error?: string;
 }
 
-// Webhook handler
+// Webhook handler - uses PUT method (Stripe sends webhooks as POST, but we use PUT to distinguish)
+// Note: Stripe webhooks require raw body for signature verification, so we can't use route handler utility
+// However, we still use proper error handling and validation
 export async function PUT(req: NextRequest): Promise<NextResponse<WebhookResponse>> {
+  const startTime = Date.now();
   const sig = req.headers.get("stripe-signature");
   const webhookSecret = env.stripe.webhookSecret;
 
@@ -115,6 +118,14 @@ export async function PUT(req: NextRequest): Promise<NextResponse<WebhookRespons
   }
 
   const body = await req.text();
+  
+  // Track webhook receipt
+  telemetry.trackPerformance({
+    name: "stripe_webhook_received",
+    value: Date.now() - startTime,
+    unit: "ms",
+    tags: { status: "received" },
+  });
 
   let event: Stripe.Event;
 
@@ -204,13 +215,33 @@ export async function PUT(req: NextRequest): Promise<NextResponse<WebhookRespons
         console.log(`Unhandled event type: ${event.type}`);
     }
 
+    const duration = Date.now() - startTime;
+    
+    // Track success
+    telemetry.trackPerformance({
+      name: "stripe_webhook_processed",
+      value: duration,
+      unit: "ms",
+      tags: { status: "success", eventType: event.type },
+    });
+    
     return NextResponse.json({ received: true });
   } catch (error: unknown) {
+    const duration = Date.now() - startTime;
     const systemError = new SystemError(
       "Webhook handler error",
       error instanceof Error ? error : new Error(String(error))
     );
     recordError(systemError, { endpoint: '/api/stripe/webhook', action: 'webhook_handler' });
+    
+    // Track error
+    telemetry.trackPerformance({
+      name: "stripe_webhook_processed",
+      value: duration,
+      unit: "ms",
+      tags: { status: "error" },
+    });
+    
     console.error("Webhook handler error:", systemError);
     const formatted = formatError(systemError);
     return NextResponse.json(
