@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
+import { SystemError, formatError } from "@/src/lib/errors";
 
 // Load environment variables dynamically
 const supabaseUrl = env.supabase.url;
@@ -12,7 +13,41 @@ const databaseUrl = env.database.url;
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+interface HealthCheckResult {
+  ok: boolean;
+  timestamp: string;
+  db?: {
+    ok: boolean;
+    latency_ms: number | null;
+    error: string | null;
+  };
+  rest?: {
+    ok: boolean;
+    latency_ms: number | null;
+    error: string | null;
+  };
+  auth?: {
+    ok: boolean;
+    latency_ms: number | null;
+    error: string | null;
+  };
+  rls?: {
+    ok: boolean;
+    note?: string;
+    error?: string;
+  };
+  storage?: {
+    ok: boolean;
+    latency_ms: number | null;
+    buckets_count?: number;
+    error: string | null;
+  };
+  total_latency_ms?: number;
+  error?: string;
+  checks?: Record<string, boolean>;
+}
+
+export async function GET(): Promise<NextResponse<HealthCheckResult>> {
   const startTime = Date.now();
   const checks: Record<string, any> = {
     ok: true,
@@ -21,18 +56,24 @@ export async function GET() {
 
   // Check required env vars
   if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey || !databaseUrl) {
+    const error = new SystemError(
+      "Missing required environment variables",
+      undefined,
+      {
+        supabase_url: !!supabaseUrl,
+        supabase_anon_key: !!supabaseAnonKey,
+        supabase_service_key: !!supabaseServiceKey,
+        database_url: !!databaseUrl,
+      }
+    );
+    const formatted = formatError(error);
     return NextResponse.json(
       {
         ok: false,
-        error: "Missing required environment variables",
-        checks: {
-          supabase_url: !!supabaseUrl,
-          supabase_anon_key: !!supabaseAnonKey,
-          supabase_service_key: !!supabaseServiceKey,
-          database_url: !!databaseUrl,
-        },
+        error: formatted.message,
+        checks: formatted.details as Record<string, boolean>,
       },
-      { status: 500 }
+      { status: formatted.statusCode }
     );
   }
 

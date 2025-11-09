@@ -27,7 +27,7 @@ export function MobileNav() {
             Systems Thinking
           </Link>
           <Link href="/genai-content-engine" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
-            GenAI Engine
+            GenAI Content Engine
           </Link>
           <Link href="/integrations" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
             Integrations

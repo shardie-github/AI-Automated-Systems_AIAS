@@ -1,17 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
+import { SystemError, formatError } from "@/src/lib/errors";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 export const revalidate = 60; // Cache for 60 seconds
+
+interface MetricsResponse {
+  performance: {
+    webVitals: Record<string, unknown>;
+    supabase: Record<string, unknown>;
+    expo: Record<string, unknown>;
+    ci: Record<string, unknown>;
+  };
+  status: "healthy" | "degraded" | "error";
+  lastUpdated: string;
+  sources: Record<string, {
+    latest: Record<string, unknown>;
+    count: number;
+    lastUpdated: string;
+  }>;
+  trends?: Record<string, {
+    average: number;
+    min: number;
+    max: number;
+    count: number;
+  }>;
+  error?: string;
+  message?: string;
+}
 
 /**
  * Performance Metrics API Endpoint
  * Returns aggregated performance metrics from all sources
  * Used by /admin/metrics dashboard
  */
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse<MetricsResponse>> {
   try {
     const supabase = createClient(
       env.supabase.url,
@@ -33,9 +58,26 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error("Error fetching metrics:", error);
+      const systemError = new SystemError(
+        "Failed to fetch metrics",
+        error instanceof Error ? error : new Error(String(error)),
+        { details: error.message }
+      );
+      const formatted = formatError(systemError);
       return NextResponse.json(
-        { error: "Failed to fetch metrics", details: error.message },
-        { status: 500 }
+        {
+          error: formatted.message,
+          performance: {
+            webVitals: {},
+            supabase: {},
+            expo: {},
+            ci: {},
+          },
+          status: "error" as const,
+          lastUpdated: new Date().toISOString(),
+          sources: {},
+        },
+        { status: formatted.statusCode }
       );
     }
 
@@ -119,27 +161,38 @@ export async function GET(req: NextRequest) {
         "Content-Type": "application/json",
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Metrics API error:", error);
+    const systemError = new SystemError(
+      "Internal server error",
+      error instanceof Error ? error : new Error(String(error))
+    );
+    const formatted = formatError(systemError);
     return NextResponse.json(
       {
-        error: "Internal server error",
-        message: error.message,
+        error: formatted.message,
+        message: error instanceof Error ? error.message : String(error),
         performance: {
           webVitals: {},
           supabase: {},
           expo: {},
           ci: {},
         },
-        status: "error",
+        status: "error" as const,
         lastUpdated: new Date().toISOString(),
+        sources: {},
       },
-      { status: 500 }
+      { status: formatted.statusCode }
     );
   }
 }
 
-function calculateTrends(metrics: any[]): Record<string, any> {
+function calculateTrends(metrics: Array<{ source: string; metric: Record<string, unknown>; ts: string }>): Record<string, {
+  average: number;
+  min: number;
+  max: number;
+  count: number;
+}> {
   const trends: Record<string, any> = {};
   const sourceGroups: Record<string, any[]> = {};
 

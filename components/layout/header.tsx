@@ -22,7 +22,7 @@ export function Header() {
             Systems Thinking
           </Link>
           <Link href="/genai-content-engine" className="px-3 py-2 hover:underline text-sm">
-            GenAI Engine
+            GenAI Content Engine
           </Link>
           <Link href="/integrations" className="px-3 py-2 hover:underline text-sm">
             Integrations

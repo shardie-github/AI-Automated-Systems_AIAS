@@ -24,7 +24,7 @@ export function Hero() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="text-base" asChild>
-              <Link href="/genai-content-engine">Try GenAI Engine</Link>
+              <Link href="/genai-content-engine">Try GenAI Content Engine</Link>
             </Button>
             <Button size="lg" variant="outline" className="text-base" asChild>
               <Link href="/demo">Book Demo</Link>

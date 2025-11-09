@@ -8,6 +8,7 @@ import { validateInput, sanitizeObject, checkRequestSize, maskSensitiveData } fr
 import { tenantIsolation } from '../security/tenant-isolation';
 import { cacheService } from '../performance/cache';
 import { z } from 'zod';
+import { SystemError, ValidationError, AuthenticationError, AuthorizationError, formatError } from '@/src/lib/errors';
 
 export interface RouteHandlerOptions {
   requireAuth?: boolean;
@@ -39,7 +40,7 @@ export interface RouteContext {
 export function createRouteHandler(
   handler: (context: RouteContext) => Promise<NextResponse>,
   options: RouteHandlerOptions = {}
-) {
+): (request: NextRequest) => Promise<NextResponse> {
   return async (request: NextRequest): Promise<NextResponse> => {
     const startTime = Date.now();
     
@@ -48,9 +49,11 @@ export function createRouteHandler(
       if (options.maxBodySize) {
         const body = await request.text();
         if (!checkRequestSize(body, options.maxBodySize)) {
+          const error = new ValidationError('Request too large', undefined, { maxSize: options.maxBodySize });
+          const formatted = formatError(error);
           return NextResponse.json(
-            { error: 'Request too large' },
-            { status: 413 }
+            { error: formatted.message },
+            { status: formatted.statusCode }
           );
         }
       }
@@ -65,9 +68,11 @@ export function createRouteHandler(
         }
         
         if (options.requireAuth && !userId) {
+          const error = new AuthenticationError('Authentication required');
+          const formatted = formatError(error);
           return NextResponse.json(
-            { error: 'Unauthorized' },
-            { status: 401 }
+            { error: formatted.message },
+            { status: formatted.statusCode }
           );
         }
       }
@@ -78,9 +83,11 @@ export function createRouteHandler(
         tenantId = request.headers.get('x-tenant-id') || null;
         
         if (!tenantId) {
+          const error = new ValidationError('Tenant ID required');
+          const formatted = formatError(error);
           return NextResponse.json(
-            { error: 'Tenant ID required' },
-            { status: 400 }
+            { error: formatted.message },
+            { status: formatted.statusCode }
           );
         }
         
@@ -93,9 +100,11 @@ export function createRouteHandler(
           );
           
           if (!access.allowed) {
+            const error = new AuthorizationError('Insufficient permissions');
+            const formatted = formatError(error);
             return NextResponse.json(
-              { error: 'Forbidden' },
-              { status: 403 }
+              { error: formatted.message },
+              { status: formatted.statusCode }
             );
           }
         }
@@ -108,15 +117,26 @@ export function createRouteHandler(
           const validation = validateInput(options.validateBody, body);
           
           if (!validation.success) {
+            const error = new ValidationError(
+              'Invalid request body',
+              validation.error?.map(e => ({ path: e.path, message: e.message }))
+            );
+            const formatted = formatError(error);
             return NextResponse.json(
-              { error: 'Invalid request body', details: validation.error },
-              { status: 400 }
+              { error: formatted.message, details: formatted.details },
+              { status: formatted.statusCode }
             );
           }
         } catch (error) {
+          const validationError = new ValidationError(
+            'Invalid JSON body',
+            undefined,
+            { originalError: error instanceof Error ? error.message : String(error) }
+          );
+          const formatted = formatError(validationError);
           return NextResponse.json(
-            { error: 'Invalid JSON body' },
-            { status: 400 }
+            { error: formatted.message },
+            { status: formatted.statusCode }
           );
         }
       }
@@ -171,17 +191,22 @@ export function createRouteHandler(
       }
       
       return response;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Route handler error:', maskSensitiveData(String(error)));
+      const systemError = new SystemError(
+        'Internal server error',
+        error instanceof Error ? error : new Error(String(error))
+      );
+      const formatted = formatError(systemError);
       
       return NextResponse.json(
         {
-          error: 'Internal server error',
+          error: formatted.message,
           message: process.env.NODE_ENV === 'development' 
-            ? String(error) 
+            ? (error instanceof Error ? error.message : String(error))
             : 'An error occurred processing your request',
         },
-        { status: 500 }
+        { status: formatted.statusCode }
       );
     }
   };
@@ -193,7 +218,7 @@ export function createRouteHandler(
 export function createGETHandler(
   handler: (context: RouteContext) => Promise<NextResponse>,
   options: RouteHandlerOptions = {}
-) {
+): (request: NextRequest) => Promise<NextResponse> {
   return createRouteHandler(handler, {
     ...options,
     cache: options.cache ?? { enabled: true, ttl: 300 },
@@ -206,7 +231,7 @@ export function createGETHandler(
 export function createPOSTHandler(
   handler: (context: RouteContext) => Promise<NextResponse>,
   options: RouteHandlerOptions = {}
-) {
+): (request: NextRequest) => Promise<NextResponse> {
   return createRouteHandler(handler, {
     ...options,
     cache: { enabled: false }, // Don't cache POST requests
