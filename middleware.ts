@@ -22,7 +22,7 @@ const securityHeaders = {
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.supabase.in",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "img-src 'self' data: https: blob:",
+    "img-src 'self' data: https: blob: https://images.unsplash.com https://cdn.shopify.com",
     "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in",
     "frame-src 'self'",
     "object-src 'none'",
@@ -224,6 +224,23 @@ function checkAdminAccess(request: NextRequest): boolean {
 }
 
 /**
+ * Check if current deployment is a preview environment
+ */
+function isPreviewEnvironment(request: NextRequest): boolean {
+  const hostname = request.headers.get('host') || '';
+  const url = request.url;
+  
+  // Vercel preview deployments have specific hostname patterns
+  return (
+    hostname.includes('-git-') ||
+    hostname.includes('-vercel.app') ||
+    hostname.includes('.vercel.app') ||
+    process.env.VERCEL_ENV === 'preview' ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+  );
+}
+
+/**
  * Get user ID from request (JWT or session)
  */
 async function getUserId(request: NextRequest): Promise<string | null> {
@@ -280,15 +297,42 @@ export async function middleware(request: NextRequest) {
   }
   
   // Health check endpoint - minimal processing
-  if (pathname === '/api/healthz') {
+  if (pathname === '/api/healthz' || pathname === '/api/health') {
     return NextResponse.next();
   }
   
+  // Preview environment detection
+  const isPreview = isPreviewEnvironment(request);
+  
+  // Handle robots.txt for preview environments
+  if (pathname === '/robots.txt' && isPreview) {
+    const robotsContent = `User-agent: *
+Disallow: /
+# Preview deployment - indexing disabled`;
+    return new NextResponse(robotsContent, {
+      headers: {
+        'Content-Type': 'text/plain',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+  
   // Admin dashboard protection
-  if (pathname.startsWith('/admin/')) {
+  if (pathname.startsWith('/admin/') || pathname === '/admin') {
     const hasAdminAccess = checkAdminAccess(request);
     
     if (!hasAdminAccess) {
+      // In preview environments, enforce stricter protection
+      if (isPreview && process.env.PREVIEW_REQUIRE_AUTH !== 'false') {
+        return new NextResponse('Protected in preview environment', {
+          status: 401,
+          headers: {
+            'WWW-Authenticate': 'Basic realm="Admin Dashboard"',
+            'X-Preview-Env': 'true',
+          },
+        });
+      }
+      
       // Return 401 Unauthorized with WWW-Authenticate header for Basic Auth
       return new NextResponse('Unauthorized', {
         status: 401,
@@ -297,6 +341,13 @@ export async function middleware(request: NextRequest) {
         },
       });
     }
+  }
+  
+  // Add preview banner header for frontend detection
+  if (isPreview) {
+    const response = NextResponse.next();
+    response.headers.set('X-Preview-Env', 'true');
+    return response;
   }
   
   // Get client identifier
@@ -383,6 +434,11 @@ export async function middleware(request: NextRequest) {
   Object.entries(securityHeaders).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
+  
+  // Add preview environment header if applicable
+  if (isPreview) {
+    response.headers.set('X-Preview-Env', 'true');
+  }
   
   // Add rate limit headers for API routes
   if (pathname.startsWith('/api/')) {
