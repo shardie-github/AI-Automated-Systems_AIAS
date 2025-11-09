@@ -135,6 +135,8 @@
     "orchestrator:run": "tsx ai/orchestrator.ts",
     "orchestrator:hourly": "tsx scripts/orchestrator-scheduled.ts hourly",
     "orchestrator:daily": "tsx scripts/orchestrator-scheduled.ts daily",
+    "agent:unified": "tsx ai/unified_agent.ts",
+    "agent:run": "tsx ai/unified_agent.ts",
     "watchers:db": "tsx watchers/db_integrity.watcher.ts",
     "watchers:api": "tsx watchers/api_contract.watcher.ts",
     "watchers:ai": "tsx watchers/ai_performance.watcher.ts",

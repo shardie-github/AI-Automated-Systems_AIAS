@@ -1,0 +1,122 @@
+{
+  "agentMode": "hardonia-global",
+  "autoRun": true,
+  "repoType": "nextjs-webapp",
+  "detectedStack": {
+    "frontend": "Next.js 14",
+    "backend": "Supabase",
+    "deployment": "Vercel",
+    "mobile": null,
+    "library": false
+  },
+  "operatingModes": {
+    "webapp": {
+      "enabled": true,
+      "vercelOptimization": true,
+      "nextjsAudit": true
+    },
+    "mobile": {
+      "enabled": false
+    },
+    "backend": {
+      "enabled": true,
+      "supabaseEdgeValidation": true,
+      "schemaSync": true
+    },
+    "library": {
+      "enabled": false
+    }
+  },
+  "modules": {
+    "reliability": {
+      "enabled": true,
+      "interval": "hourly",
+      "thresholds": {
+        "uptime": 99.9,
+        "latency_p95": 2000,
+        "error_rate": 1.0
+      }
+    },
+    "cost": {
+      "enabled": true,
+      "interval": "daily",
+      "budget": 75,
+      "alertThreshold": 10
+    },
+    "security": {
+      "enabled": true,
+      "interval": "daily",
+      "sbomGeneration": true,
+      "licenseScan": true,
+      "vulnerabilityScan": true
+    },
+    "documentation": {
+      "enabled": true,
+      "autoUpdate": true,
+      "intentLogging": true
+    },
+    "planning": {
+      "enabled": true,
+      "todoExtraction": true,
+      "issueCreation": false,
+      "sprintPlanning": true
+    },
+    "observability": {
+      "enabled": true,
+      "metricsEndpoint": "/api/metrics",
+      "telemetryLogging": true
+    },
+    "autoImprovement": {
+      "enabled": true,
+      "interval": "daily",
+      "selfEvaluation": true
+    }
+  },
+  "artifacts": {
+    "reliability": {
+      "json": "/admin/reliability.json",
+      "md": "/admin/reliability.md"
+    },
+    "compliance": {
+      "json": "/admin/compliance.json"
+    },
+    "metrics": {
+      "dashboard": "/admin/metrics.jsx"
+    },
+    "sbom": {
+      "json": "/security/sbom.json"
+    },
+    "intentLog": {
+      "md": "/docs/intent-log.md"
+    },
+    "roadmap": {
+      "sprint": "/roadmap/current-sprint.md"
+    },
+    "autoImprovement": {
+      "nextSteps": "/auto/next-steps.md"
+    }
+  },
+  "integrations": {
+    "supabase": {
+      "projectRef": "ghqyxhbyyirveptgwoqm",
+      "metricsTable": "metrics_log",
+      "reportsTable": "orchestrator_reports"
+    },
+    "vercel": {
+      "enabled": true,
+      "projectId": null
+    },
+    "github": {
+      "enabled": true,
+      "owner": "your-org",
+      "repo": "aias-platform",
+      "autoPR": false
+    }
+  },
+  "safety": {
+    "neverExposeSecrets": true,
+    "skipMajorUpgrades": true,
+    "preferPR": true,
+    "retainAuditSnapshots": 3
+  }
+}

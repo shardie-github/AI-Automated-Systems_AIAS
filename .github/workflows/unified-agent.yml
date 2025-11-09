@@ -1,0 +1,102 @@
+name: Unified Hardonia Agent
+
+on:
+  schedule:
+    # Run every 12 hours
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Agent mode'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - quick
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**.ts'
+      - '**.tsx'
+      - '**.js'
+      - '**.jsx'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
+
+jobs:
+  unified-agent:
+    name: Unified Hardonia Agent
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run Unified Agent
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm run agent:unified || echo "Agent run completed with warnings"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --exit-code || echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit artifacts
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add admin/ security/ docs/intent-log.md roadmap/ auto/ .cursor/config/master-agent.json
+          git commit -m "🤖 Autonomous improvement cycle: Update artifacts and recommendations" || echo "No changes to commit"
+          git push || echo "Push failed (may be branch protection)"
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## Unified Agent Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "admin/reliability.json" ]; then
+            echo "### Reliability" >> $GITHUB_STEP_SUMMARY
+            echo "- Artifacts generated successfully" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f "security/sbom.json" ]; then
+            echo "### SBOM" >> $GITHUB_STEP_SUMMARY
+            echo "- Software Bill of Materials generated" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f "auto/next-steps.md" ]; then
+            echo "### Recommendations" >> $GITHUB_STEP_SUMMARY
+            echo "- Auto-improvement recommendations available" >> $GITHUB_STEP_SUMMARY
+          fi
