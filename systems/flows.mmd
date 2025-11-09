@@ -1,0 +1,41 @@
+graph LR
+    subgraph "Reinforcing Loops R"
+        R1[Feature Throughput] -->|More Features| R2[User Value]
+        R2 -->|More Users| R3[Revenue]
+        R3 -->|More Resources| R1
+        
+        R4[Telemetry Data] -->|More Data| R5[Better Insights]
+        R5 -->|Better Fixes| R6[Higher Quality]
+        R6 -->|More Telemetry| R4
+    end
+
+    subgraph "Balancing Loops B"
+        B1[Tech Debt] -->|Slows Development| B2[Reduced Throughput]
+        B2 -->|Focus on Debt| B3[Debt Reduction]
+        B3 -->|Less Debt| B1
+        
+        B4[Incident Response] -->|Fixes Issues| B5[System Stability]
+        B5 -->|Fewer Incidents| B4
+        
+        B6[Performance Monitoring] -->|Identifies Issues| B7[Optimization]
+        B7 -->|Better Performance| B8[Fewer Issues]
+        B8 -->|Less Monitoring Needed| B6
+    end
+
+    subgraph "Feedback Loops"
+        F1[PR Review] -->|Feedback| F2[Code Quality]
+        F2 -->|Better Code| F3[Faster Reviews]
+        F3 -->|More Reviews| F1
+        
+        F4[Error Tracking] -->|Error Data| F5[Root Cause Analysis]
+        F5 -->|Fixes| F6[Fewer Errors]
+        F6 -->|Less Tracking| F4
+    end
+
+    style R1 fill:#ffebee
+    style R4 fill:#ffebee
+    style B1 fill:#e3f2fd
+    style B4 fill:#e3f2fd
+    style B6 fill:#e3f2fd
+    style F1 fill:#f3e5f5
+    style F4 fill:#f3e5f5

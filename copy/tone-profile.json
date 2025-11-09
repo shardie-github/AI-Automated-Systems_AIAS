@@ -1,0 +1,104 @@
+{
+  "persona": {
+    "primary": "calm, authoritative, minimal",
+    "characteristics": [
+      "Measured and confident",
+      "No urgency language",
+      "Declarative statements",
+      "Short, focused sentences",
+      "One clear message per section"
+    ]
+  },
+  "banPhrases": [
+    "click here",
+    "please note"
+  ],
+  "cta": {
+    "standard": "Add to Cart",
+    "alternatives": [
+      "Get Started",
+      "Learn More",
+      "Try Now",
+      "Book Demo",
+      "Contact Sales"
+    ],
+    "guidelines": [
+      "Use action verbs",
+      "Avoid passive voice",
+      "No exclamation marks",
+      "Keep under 3 words when possible"
+    ]
+  },
+  "toneRules": {
+    "calm": {
+      "do": [
+        "Use measured language",
+        "Present facts confidently",
+        "Avoid urgency"
+      ],
+      "avoid": [
+        "Urgent language",
+        "Exclamation marks in CTAs",
+        "Pressure tactics"
+      ]
+    },
+    "authoritative": {
+      "do": [
+        "Use declarative statements",
+        "Present facts confidently",
+        "Avoid hedging"
+      ],
+      "avoid": [
+        "Maybe, might, perhaps",
+        "Uncertain language",
+        "Hedging phrases"
+      ]
+    },
+    "minimal": {
+      "do": [
+        "Short sentences",
+        "Remove unnecessary words",
+        "One message per section"
+      ],
+      "avoid": [
+        "Long paragraphs",
+        "Redundant phrases",
+        "Multiple messages"
+      ]
+    }
+  },
+  "terminology": {
+    "standardized": {
+      "genai": "GenAI Content Engine",
+      "systemsThinking": "Systems Thinking",
+      "ai": "AI"
+    },
+    "variations": {
+      "genai": ["GenAI Engine", "GenAI Content Engine"],
+      "systemsThinking": ["systems thinking", "Systems Thinking"]
+    }
+  },
+  "icuPlaceholders": {
+    "preserve": true,
+    "format": "ICU MessageFormat",
+    "examples": [
+      "{count}",
+      "{name}",
+      "{date}"
+    ]
+  },
+  "examples": {
+    "good": [
+      "Systems thinking is THE skill needed more than ever in the AI age.",
+      "Get Started with AI Automation Today",
+      "Try GenAI Content Engine"
+    ],
+    "avoid": [
+      "Click here to get started!",
+      "Please note that systems thinking is important.",
+      "Maybe you should try our product?"
+    ]
+  },
+  "lastUpdated": "2025-01-27",
+  "version": "1.0.0"
+}

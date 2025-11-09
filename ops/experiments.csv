@@ -1,0 +1,6 @@
+name,hypothesis,metric,owner,start,end,guardrails,rollback
+Pre-Merge Preview Validation,Adding type checking and linting to pre-merge will reduce CI failures and rework,CI failure rate < 2%,TBD,2025-02-01,2025-02-15,Monitor for blocking development,Remove checks if blocking
+CI Concurrency Tuning,Parallelizing CI jobs will reduce feedback time without increasing failures,CI duration < 8min,TBD,2025-02-01,2025-02-08,Monitor for stability issues,Revert to sequential if issues
+Canary Deployment for Heaviest API,Canary deployments will reduce risk and enable faster rollbacks,Deployment failure rate < 1%,TBD,2025-02-15,2025-03-01,Monitor error rates,Automatic rollback on error spike
+Review Queue Optimization,Adding review assignments and SLAs will reduce review lead time,Review lead time < 8h,TBD,2025-02-15,2025-03-15,Monitor review quality,Remove assignments if quality drops
+Performance Monitoring on PRs,Auto-commenting performance diffs on PRs will prevent regressions,Performance regressions -80%,TBD,2025-02-01,2025-02-08,Monitor for noise,Disable if too noisy

@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "thresholds": {
+    "typeCoverage": {
+      "target": 95,
+      "current": 87,
+      "tolerance": 2,
+      "autoAdjust": true,
+      "lastRuns": [],
+      "adjustmentStrategy": "±1% based on last 2 runs"
+    },
+    "testCoverage": {
+      "target": 80,
+      "current": 0,
+      "tolerance": 5
+    },
+    "bundleSize": {
+      "target": 500,
+      "unit": "KB",
+      "current": 0,
+      "tolerance": 50
+    },
+    "performance": {
+      "p95Latency": {
+        "target": 200,
+        "unit": "ms",
+        "current": 0
+      },
+      "lighthouseScore": {
+        "target": 90,
+        "current": 0
+      }
+    }
+  },
+  "exclusions": {
+    "typeCoverage": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/*.bench.ts",
+      "scripts/**",
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**"
+    ],
+    "linting": [
+      "**/generated/**",
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**"
+    ],
+    "testing": [
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**"
+    ]
+  },
+  "autoAdjustment": {
+    "enabled": true,
+    "typeCoverage": {
+      "enabled": true,
+      "minTarget": 90,
+      "maxTarget": 98,
+      "adjustmentStep": 1
+    }
+  },
+  "metrics": {
+    "lastTypeCoverageRun": null,
+    "lastTypeCoverageResult": null,
+    "typeCoverageHistory": []
+  },
+  "lastUpdated": "2025-01-27T00:00:00Z"
+}

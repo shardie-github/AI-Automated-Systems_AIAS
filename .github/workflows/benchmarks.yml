@@ -1,0 +1,68 @@
+name: Weekly Benchmarks
+
+on:
+  schedule:
+    # Every Monday at 04:20 UTC
+    - cron: '20 4 * * 1'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  benchmarks:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run benchmarks
+        run: |
+          # Create benchmark results directory
+          mkdir -p bench/results
+          
+          # Run benchmarks (example - adjust based on actual benchmark files)
+          # pnpm tsx bench/example.bench.ts > bench/results/latest.json || true
+          
+          # For now, create placeholder result
+          echo '[]' > bench/results/latest.json
+
+      - name: Analyze trends
+        run: |
+          node scripts/bench-trend.js analyze bench/results/latest.json || true
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            bench/results/*.json
+          retention-days: 90
+
+      - name: Comment on PR if regression detected
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Performance regression detected in benchmarks. Please review.'
+            })

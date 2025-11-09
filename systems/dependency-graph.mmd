@@ -1,0 +1,57 @@
+graph TB
+    subgraph "Frontend"
+        A[Next.js App] --> B[React Components]
+        A --> C[API Routes]
+        B --> D[UI Components]
+        B --> E[Business Logic]
+    end
+
+    subgraph "Backend Services"
+        C --> F[Supabase Functions]
+        C --> G[API Handlers]
+        F --> H[Database]
+        G --> H
+    end
+
+    subgraph "AI Agents"
+        I[Orchestrator] --> J[Security Auditor]
+        I --> K[Cost Forecaster]
+        I --> L[Dependency Health]
+        I --> M[PR Automation]
+    end
+
+    subgraph "Infrastructure"
+        N[CI/CD Pipeline] --> O[Docker Build]
+        O --> P[Vercel Deploy]
+        O --> Q[Staging]
+        Q --> R[Production]
+    end
+
+    subgraph "Monitoring"
+        S[Telemetry] --> T[Analytics]
+        S --> U[Error Tracking]
+        S --> V[Performance Monitoring]
+    end
+
+    A --> S
+    F --> S
+    G --> S
+    I --> S
+
+    subgraph "External Services"
+        W[GitHub API]
+        X[Stripe API]
+        Y[OpenAI API]
+        Z[Supabase]
+    end
+
+    I --> W
+    C --> X
+    I --> Y
+    F --> Z
+    G --> Z
+
+    style A fill:#e1f5ff
+    style I fill:#fff4e1
+    style S fill:#e8f5e9
+    style H fill:#fce4ec

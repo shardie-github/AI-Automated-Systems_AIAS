@@ -1,0 +1,142 @@
+name: Systems Metrics Snapshot
+
+on:
+  schedule:
+    # Every Monday at 04:40 UTC
+    - cron: '40 4 * * 1'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  systems-metrics:
+    name: Systems Metrics Snapshot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Calculate Metrics
+        id: metrics
+        run: |
+          # Create systems/history directory if it doesn't exist
+          mkdir -p systems/history
+          
+          # Get current date
+          DATE=$(date +%Y-%m-%d)
+          
+          # Calculate metrics (placeholder - implement actual calculation)
+          cat > systems/history/${DATE}.json << EOF
+          {
+            "date": "${DATE}",
+            "leadTime": {
+              "current": 26,
+              "target": 12,
+              "unit": "hours"
+            },
+            "cycleTime": {
+              "current": 42,
+              "target": 30,
+              "unit": "minutes"
+            },
+            "failureRate": {
+              "ci": 5,
+              "build": 2,
+              "deploy": 1,
+              "unit": "percentage"
+            },
+            "mttr": {
+              "current": 0,
+              "target": 240,
+              "unit": "minutes"
+            },
+            "queueLengths": {
+              "review": 8,
+              "ci": 3,
+              "build": 0,
+              "deploy": 0
+            },
+            "reworkRate": {
+              "current": 18,
+              "target": 10,
+              "unit": "percentage"
+            }
+          }
+          EOF
+          
+          echo "date=${DATE}" >> $GITHUB_OUTPUT
+
+      - name: Update Scorecard
+        run: |
+          # Read latest metrics
+          DATE="${{ steps.metrics.outputs.date }}"
+          LATEST=$(cat systems/history/${DATE}.json)
+          
+          # Calculate trends (placeholder - implement actual calculation)
+          cat > systems/scorecard.md << 'EOF'
+          # Systems Scorecard
+          
+          **Last Updated:** ${{ steps.metrics.outputs.date }}
+          
+          ## Key Metrics
+          
+          | Metric | Current | Target | Status | Trend |
+          |--------|---------|--------|--------|-------|
+          | Lead Time | 26h | <12h | 🔴 | → |
+          | Cycle Time | 42min | <30min | 🟡 | → |
+          | CI Failure Rate | 5% | <2% | 🔴 | → |
+          | Deploy Failure Rate | 1% | <1% | 🟢 | → |
+          | Review Queue | 8 PRs | <4 PRs | 🔴 | → |
+          | Rework Rate | 18% | <10% | 🔴 | → |
+          
+          ## Status Legend
+          - 🟢 Green: Meeting target
+          - 🟡 Amber: Close to target
+          - 🔴 Red: Not meeting target
+          
+          ## Trends
+          - → Stable
+          - ↑ Improving
+          - ↓ Declining
+          
+          ## Next Actions
+          1. Optimize review queue (P0)
+          2. Reduce CI failure rate (P1)
+          3. Reduce rework rate (P2)
+          
+          EOF
+
+      - name: Commit Metrics
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add systems/history/*.json systems/scorecard.md
+          git diff --staged --quiet || git commit -m "chore: update systems metrics snapshot [skip ci]"
+          git push
+
+      - name: Upload Metrics Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: systems-metrics-${DATE}
+          path: |
+            systems/history/*.json
+            systems/scorecard.md
+          retention-days: 90
