@@ -1,27 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { databasePMFTracker } from "@/lib/analytics/database-integration";
 
-// Track affiliate click
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { affiliateId, product } = body;
+    const { affiliateId, product, sessionId, referrerUrl } = body;
 
-    if (!affiliateId || !product) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    // Track affiliate click in database
+    await databasePMFTracker.trackAffiliateClick(
+      affiliateId,
+      product,
+      sessionId || "unknown",
+      undefined, // userId if available from auth
+      referrerUrl
+    );
 
-    // TODO: Store in database
-    // Track: affiliateId, product, timestamp, user IP, referrer, etc.
-
-    return NextResponse.json({
-      success: true,
-      tracked: true,
-      message: "Affiliate click tracked",
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Affiliate click tracking error:", error);
     return NextResponse.json(
       { error: "Failed to track affiliate click" },
       { status: 500 }

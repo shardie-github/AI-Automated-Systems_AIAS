@@ -54,8 +54,21 @@ export class PMFTracker {
   }
 
   async calculateMetrics(): Promise<PMFMetrics> {
-    // This would fetch from database/analytics
-    // For now, returns mock data structure
+    // Try to fetch from database first
+    try {
+      const { databasePMFTracker } = await import("./database-integration");
+      const dbMetrics = await databasePMFTracker.getMetricsFromDatabase();
+      
+      // If database has data, use it
+      if (dbMetrics.monthlyActiveUsers > 0) {
+        this.metrics = dbMetrics;
+        return dbMetrics;
+      }
+    } catch (error) {
+      console.log("Using default metrics (database not connected)");
+    }
+    
+    // Fallback to default/mock data
     return {
       activationRate: 45, // Example: 45% activation rate
       sevenDayRetention: 65, // Example: 65% retention

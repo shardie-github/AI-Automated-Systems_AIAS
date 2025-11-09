@@ -36,7 +36,7 @@ export class ConversionTracker {
     return ConversionTracker.instance;
   }
 
-  track(event: string, properties?: Record<string, any>) {
+  async track(event: string, properties?: Record<string, any>) {
     const conversionEvent: ConversionEvent = {
       event,
       sessionId: this.getSessionId(),
@@ -53,6 +53,19 @@ export class ConversionTracker {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(conversionEvent),
       }).catch(console.error);
+    }
+
+    // Also track in database if available
+    try {
+      const { databasePMFTracker } = await import("./database-integration");
+      await databasePMFTracker.trackConversionEvent(
+        event,
+        properties?.userId,
+        this.getSessionId(),
+        properties
+      );
+    } catch (error) {
+      // Database not available, continue with in-memory tracking
     }
   }
 
