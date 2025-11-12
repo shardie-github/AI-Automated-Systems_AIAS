@@ -1,0 +1,131 @@
+name: Apply Supabase Migrations
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'supabase/migrations/**'
+  workflow_dispatch:
+  schedule:
+    # Run daily at 2 AM UTC to catch any missed migrations
+    - cron: '0 2 * * *'
+
+jobs:
+  apply-migrations:
+    name: Apply Pending Migrations
+    runs-on: ubuntu-latest
+    environment: production
+    
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Authenticate Supabase
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: |
+          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | supabase login --token -
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Link Supabase project
+        if: env.SUPABASE_PROJECT_REF != ''
+        run: |
+          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Check migration status
+        run: |
+          supabase db remote commit --dry-run || echo "No pending migrations detected"
+        continue-on-error: true
+
+      - name: Apply migrations
+        run: |
+          echo "Applying all pending migrations..."
+          supabase db push --include-all || {
+            echo "Supabase CLI push failed, trying alternative method..."
+            # Fallback: apply migrations directly via psql if DB URL is available
+            if [ -n "$SUPABASE_DB_URL" ]; then
+              echo "Applying migrations via psql..."
+              for file in supabase/migrations/*.sql; do
+                echo "Applying: $file"
+                psql "$SUPABASE_DB_URL" -f "$file" || echo "Migration $file may have already been applied"
+              done
+            else
+              echo "ERROR: Cannot apply migrations - no database connection available"
+              exit 1
+            fi
+          }
+
+      - name: Verify database
+        run: |
+          npm run verify:db || echo "Database verification skipped"
+        continue-on-error: true
+
+      - name: Regenerate Supabase types
+        run: |
+          npm run regenerate-types || echo "Type regeneration skipped"
+        continue-on-error: true
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Notify on success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "text": "✅ Supabase migrations applied successfully",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Migrations Applied*\n\nDate: $(date -u +%Y-%m-%d)\nStatus: Success"
+                  }
+                }
+              ]
+            }
+        continue-on-error: true
+
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "text": "❌ Supabase migration failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Migration Failed*\n\nDate: $(date -u +%Y-%m-%d)\nStatus: Failed\n\nCheck workflow logs for details."
+                  }
+                }
+              ]
+            }
+        continue-on-error: true

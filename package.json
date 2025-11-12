@@ -206,6 +206,8 @@
     "preflight": "tsx scripts/agents/preflight.ts",
     "verify:db": "tsx scripts/agents/verify_db.ts",
     "delta:migrate": "tsx scripts/agents/generate_delta_migration.ts",
+    "migrate:apply": "tsx scripts/apply-migrations-direct.ts",
+    "migrate:apply-all": "tsx scripts/apply-all-pending-changes.ts",
     "etl:events": "tsx scripts/etl/pull_events.ts",
     "etl:source-a": "tsx scripts/etl/pull_ads_source_a.ts",
     "etl:source-b": "tsx scripts/etl/pull_ads_source_b.ts",

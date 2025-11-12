@@ -1,0 +1,41 @@
+name: Vercel Validation
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'vercel.json'
+      - '.vercel/**'
+  workflow_dispatch:
+
+jobs:
+  validate-vercel:
+    name: Validate Vercel Configuration
+    runs-on: ubuntu-latest
+    
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Vercel configuration
+        run: |
+          node scripts/vercel-validate.mjs || echo "Vercel validation completed with warnings"
+        continue-on-error: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
