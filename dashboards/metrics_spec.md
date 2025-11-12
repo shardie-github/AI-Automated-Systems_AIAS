@@ -1,129 +1,96 @@
 # Metrics Dashboard Specification
 
-**Last Updated:** 2025-01-29
+**Last Updated:** 2025-01-29  
+**Owner:** Data Team
 
----
+## KPIs + Data Quality Tiles
 
-## Overview
+### Primary KPIs
 
-Unified business intelligence dashboard pulling from `metrics_daily`, `orders`, `spend`, and `events` tables.
+1. **Revenue Metrics**
+   - Total Revenue (MRR)
+   - Revenue by Stream (SaaS, API, Marketplace, Partnerships)
+   - Revenue Growth Rate (MoM)
+   - Target: $30K MRR by Month 3
 
----
+2. **Cost Metrics**
+   - Total Costs (Infrastructure, Team, Marketing, CAC)
+   - CAC by Channel
+   - LTV:CAC Ratio
+   - Target: LTV:CAC > 3:1
 
-## Key Metrics
+3. **Growth Metrics**
+   - New Customers (MoM)
+   - Churn Rate
+   - Upgrade Rate
+   - Target: Churn < 5%, Upgrade Rate > 15%
 
-### Revenue Metrics
-- **MRR** (Monthly Recurring Revenue) - from orders + subscriptions
-- **ARR** (Annual Recurring Revenue) - MRR × 12
-- **Revenue Trend** - 30/90/365 day views
-- **Revenue by Source** - Shopify, API, Marketplace, Partnerships
+4. **Product Metrics**
+   - Active Users (DAU, MAU)
+   - Feature Adoption Rate
+   - API Calls/Day
+   - Target: 1000+ API calls/day
 
-### Growth Metrics
-- **New Customers** - Count of new orders/users
-- **Churn Rate** - Monthly churn percentage
-- **LTV** (Lifetime Value) - Average customer lifetime value
-- **CAC** (Customer Acquisition Cost) - from spend table
+### Data Quality Tiles
 
-### Conversion Metrics
-- **Conversion Rate** - Orders / Sessions
-- **AOV** (Average Order Value) - Revenue / Orders
-- **Add-to-Cart Rate** - Add-to-carts / Sessions
-- **Cart Abandonment Rate** - (Add-to-carts - Orders) / Add-to-carts
+1. **Freshness Check**
+   - Last ETL Run Time
+   - Metrics Last Updated
+   - Status: ✅ Fresh / ⚠️ Stale / ❌ Missing
+   - Threshold: < 24 hours old
 
-### Marketing Metrics
-- **Ad Spend** - Total spend from Meta + TikTok
-- **ROAS** (Return on Ad Spend) - Revenue / Ad Spend
-- **CPC** (Cost Per Click) - Spend / Clicks
-- **CPA** (Cost Per Acquisition) - Spend / Conversions
+2. **Completeness Check**
+   - Missing Data Points
+   - Null Values Count
+   - Status: ✅ Complete / ⚠️ Partial / ❌ Incomplete
+   - Threshold: < 1% missing
 
-### Operational Metrics
-- **Traffic** - Sessions from events table
-- **API Usage** - API calls from events table
-- **Active Users** - DAU/MAU from events table
-- **Gross Margin** - Revenue - COGS (from metrics_daily)
+3. **Accuracy Check**
+   - Duplicate Records
+   - Negative Amounts
+   - Future Dates
+   - Status: ✅ Valid / ⚠️ Warnings / ❌ Errors
+   - Threshold: 0 violations
 
----
+4. **Consistency Check**
+   - Schema Validation
+   - Data Type Mismatches
+   - Status: ✅ Consistent / ⚠️ Inconsistent / ❌ Broken
+   - Threshold: 100% consistent
 
-## Dashboard Views
+## Dashboard Layout
 
-### 1. Executive Summary
-- MRR, ARR, Growth Rate
-- Top 5 metrics at a glance
-- 30-day trend chart
+```
+┌─────────────────────────────────────────────────────────┐
+│  Revenue Metrics          │  Cost Metrics               │
+│  - MRR: $X               │  - Total Costs: $X          │
+│  - Growth: X%            │  - CAC: $X                  │
+│  - By Stream (chart)     │  - LTV:CAC: X:1            │
+├─────────────────────────────────────────────────────────┤
+│  Growth Metrics          │  Product Metrics            │
+│  - New Customers: X      │  - Active Users: X         │
+│  - Churn Rate: X%        │  - API Calls: X/day        │
+│  - Upgrade Rate: X%      │  - Feature Adoption: X%     │
+├─────────────────────────────────────────────────────────┤
+│  Data Quality Status                                     │
+│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐                  │
+│  │Fresh │ │Complete│ │Accurate│ │Consistent│            │
+│  │ ✅   │ │ ✅     │ │ ✅     │ │ ✅       │            │
+│  └──────┘ └──────┘ └──────┘ └──────┘                  │
+└─────────────────────────────────────────────────────────┘
+```
 
-### 2. Revenue Deep Dive
-- Revenue by source (pie chart)
-- Revenue trend (line chart)
-- AOV trend
-- Refunds/chargebacks
+## Implementation
 
-### 3. Marketing Performance
-- Ad spend by platform
-- ROAS by campaign
-- CAC trend
-- Conversion funnel
+- **Frontend:** React + Recharts
+- **Backend:** Supabase queries
+- **Refresh:** Real-time (Supabase Realtime) or 5-minute polling
+- **Alerts:** Slack notifications on DQ failures
 
-### 4. Product Metrics
-- API usage trends
-- Feature adoption
-- User engagement
-- Retention cohorts
+## Next Steps
 
-### 5. Financial Health
-- Gross margin
-- Operating expenses
-- Runway calculation
-- Break-even projection
-
----
-
-## Data Sources
-
-| Metric | Source Table | Aggregation |
-|--------|--------------|-------------|
-| MRR | orders, subscriptions | SUM(total_cents) / 100, monthly |
-| Sessions | events | COUNT(DISTINCT user_id), daily |
-| Orders | orders | COUNT(*), daily |
-| Revenue | orders | SUM(total_cents) / 100, daily |
-| Ad Spend | spend | SUM(spend_cents) / 100, daily |
-| CAC | spend, orders | SUM(spend_cents) / SUM(conv), daily |
-| AOV | orders | AVG(total_cents) / 100, daily |
-| Conversion Rate | events, orders | Orders / Sessions, daily |
-
----
-
-## Implementation Notes
-
-- Use `metrics_daily` for pre-aggregated daily metrics
-- Real-time metrics from `events` and `orders` tables
-- Cache expensive aggregations (30-day, 90-day, 365-day)
-- Update dashboard every hour (or real-time for key metrics)
-
----
-
-## Visualization Recommendations
-
-- **Line Charts:** Trends over time (revenue, traffic, CAC)
-- **Bar Charts:** Comparisons (revenue by source, platform spend)
-- **Pie Charts:** Composition (revenue breakdown, traffic sources)
-- **Funnel Charts:** Conversion funnel
-- **Cohort Tables:** Retention analysis
-- **Gauge Charts:** KPI targets (MRR, churn rate)
-
----
-
-## Alert Thresholds
-
-- **MRR Drop:** >5% month-over-month
-- **Churn Rate:** >8% monthly
-- **CAC Spike:** >50% increase week-over-week
-- **API Errors:** >1% error rate
-- **Ad Spend:** >$10K/day without corresponding revenue
-
----
-
-**Next Steps:**
-1. Build dashboard UI (React + Recharts)
-2. Create API endpoints for metrics
-3. Set up real-time updates (Supabase Realtime)
-4. Configure alerts (Slack/email)
+1. Build dashboard components
+2. Connect to Supabase
+3. Set up real-time subscriptions
+4. Add alerting logic
+5. Deploy to production

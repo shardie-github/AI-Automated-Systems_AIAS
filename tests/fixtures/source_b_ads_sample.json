@@ -1,0 +1,28 @@
+[
+  {
+    "platform": "source_b",
+    "amount": 175.25,
+    "currency": "CAD",
+    "date": "2025-01-29",
+    "metadata": {
+      "campaign_id": "camp_789",
+      "ad_set_id": "set_012",
+      "impressions": 12000,
+      "clicks": 280,
+      "conversions": 6
+    }
+  },
+  {
+    "platform": "source_b",
+    "amount": 225.00,
+    "currency": "CAD",
+    "date": "2025-01-28",
+    "metadata": {
+      "campaign_id": "camp_790",
+      "ad_set_id": "set_013",
+      "impressions": 18000,
+      "clicks": 350,
+      "conversions": 10
+    }
+  }
+]

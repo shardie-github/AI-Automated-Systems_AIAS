@@ -1,11 +1,6 @@
-# ETL Cron Schedule
-# Runs nightly at 01:10 America/Toronto (06:10 UTC)
-# Format: minute hour day month weekday
+# Nightly ETL Cron Job
+# Runs at 1 AM UTC (8 PM ET previous day)
+# Install: crontab -e
+# Add: 0 1 * * * cd /path/to/project && TZ=America/Toronto tsx scripts/etl/pull_events.ts && tsx scripts/etl/pull_ads_source_a.ts && tsx scripts/etl/pull_ads_source_b.ts && tsx scripts/etl/compute_metrics.ts --cron
 
-10 6 * * * cd /workspace && TZ=America/Toronto node scripts/etl/pull_ads_meta.ts
-15 6 * * * cd /workspace && TZ=America/Toronto node scripts/etl/pull_ads_tiktok.ts
-20 6 * * * cd /workspace && TZ=America/Toronto node scripts/etl/pull_shopify_orders.ts
-25 6 * * * cd /workspace && TZ=America/Toronto node scripts/etl/compute_metrics.ts --cron
-
-# Note: This cron file is for reference. Actual execution happens via GitHub Actions.
-# See: infra/gh-actions/nightly-etl.yml
+0 1 * * * cd /workspace && TZ=America/Toronto tsx scripts/etl/pull_events.ts && tsx scripts/etl/pull_ads_source_a.ts && tsx scripts/etl/pull_ads_source_b.ts && tsx scripts/etl/compute_metrics.ts --cron
