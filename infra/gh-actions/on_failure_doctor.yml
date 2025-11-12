@@ -1,0 +1,28 @@
+name: On-Failure Doctor (Auto-Heal)
+on:
+  workflow_run:
+    workflows:
+      - "Supabase Delta Migrate & Verify"
+      - "Post-Deploy Verify (Supabase & DQ)"
+      - "Data Quality (Nightly)"
+      - "Orchestrate (Diagnose → Fix → Deploy)"
+    types: [completed]
+jobs:
+  heal:
+    if: ${{ github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci || true
+      - name: Doctor
+        env: { SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }} }
+        run: node scripts/agents/system_doctor.ts
+      - name: Write status.json
+        if: always()
+        env:
+          TZ: America/Toronto
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN || github.token }}
+        run: node scripts/agents/write_status_json.ts || true

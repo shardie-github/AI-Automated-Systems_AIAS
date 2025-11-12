@@ -1,264 +1,150 @@
--- ===========================================
--- SELF-HEALING SQL PACK
--- ===========================================
--- This migration creates core tables, functions, and indexes needed for
--- ETL automation, metrics computation, and system health checks.
--- All statements are idempotent (IF NOT EXISTS) and safe to re-run.
--- ===========================================
-
--- ===========================================
--- EXTENSIONS (IF NOT EXISTS)
--- ===========================================
-
+-- Extensions
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- ===========================================
--- CORE TABLES (IF NOT EXISTS)
--- ===========================================
-
--- Events table (generic event tracking)
-CREATE TABLE IF NOT EXISTS public.events (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    properties JSONB DEFAULT '{}'::jsonb,
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+-- Core tables
+CREATE TABLE IF NOT EXISTS public.events(
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  occurred_at timestamptz NOT NULL DEFAULT now(),
+  user_id uuid,
+  event_name text NOT NULL,
+  props jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+CREATE TABLE IF NOT EXISTS public.spend(
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  platform text NOT NULL,
+  campaign_id text,
+  adset_id text,
+  date date NOT NULL,
+  spend_cents integer NOT NULL DEFAULT 0,
+  clicks integer NOT NULL DEFAULT 0,
+  impressions integer NOT NULL DEFAULT 0,
+  conv integer NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS public.metrics_daily(
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  day date NOT NULL,
+  sessions integer NOT NULL DEFAULT 0,
+  add_to_carts integer NOT NULL DEFAULT 0,
+  orders integer NOT NULL DEFAULT 0,
+  revenue_cents integer NOT NULL DEFAULT 0,
+  refunds_cents integer NOT NULL DEFAULT 0,
+  aov_cents integer NOT NULL DEFAULT 0,
+  cac_cents integer NOT NULL DEFAULT 0,
+  conversion_rate numeric NOT NULL DEFAULT 0,
+  gross_margin_cents integer NOT NULL DEFAULT 0,
+  traffic integer NOT NULL DEFAULT 0
 );
 
--- Spend table (advertising spend tracking)
-CREATE TABLE IF NOT EXISTS public.spend (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    platform TEXT NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    currency TEXT NOT NULL DEFAULT 'CAD',
-    date DATE NOT NULL,
-    metadata JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE(platform, date)
-);
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_events_name_time ON public.events(event_name, occurred_at);
+CREATE INDEX IF NOT EXISTS idx_spend_platform_dt ON public.spend(platform, date);
+CREATE INDEX IF NOT EXISTS idx_metrics_day       ON public.metrics_daily(day);
 
--- Metrics daily table (aggregated daily metrics)
-CREATE TABLE IF NOT EXISTS public.metrics_daily (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    date DATE NOT NULL UNIQUE,
-    revenue DECIMAL(10, 2) DEFAULT 0,
-    spend DECIMAL(10, 2) DEFAULT 0,
-    events_count INTEGER DEFAULT 0,
-    users_count INTEGER DEFAULT 0,
-    metadata JSONB DEFAULT '{}'::jsonb,
-    computed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (id)
-);
-
--- ===========================================
--- INDEXES (IF NOT EXISTS)
--- ===========================================
-
-CREATE INDEX IF NOT EXISTS idx_events_name_time ON public.events(name, timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_spend_platform_dt ON public.spend(platform, date DESC);
-CREATE INDEX IF NOT EXISTS idx_metrics_day ON public.metrics_daily(date DESC);
-
--- ===========================================
--- ENABLE RLS
--- ===========================================
-
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.spend ENABLE ROW LEVEL SECURITY;
+-- RLS + basic policy
+ALTER TABLE public.events        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.spend         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.metrics_daily ENABLE ROW LEVEL SECURITY;
-
--- ===========================================
--- RLS POLICIES (Guarded in DO block)
--- ===========================================
-
 DO $$
 BEGIN
-    -- Events: Service role can insert/select, authenticated users can select
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies 
-        WHERE schemaname = 'public' 
-        AND tablename = 'events' 
-        AND policyname = 'events_service_role_all'
-    ) THEN
-        CREATE POLICY "events_service_role_all" ON public.events
-            FOR ALL USING (current_setting('request.jwt.claims', true)::json->>'role' = 'service_role');
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies 
-        WHERE schemaname = 'public' 
-        AND tablename = 'events' 
-        AND policyname = 'events_authenticated_select'
-    ) THEN
-        CREATE POLICY "events_authenticated_select" ON public.events
-            FOR SELECT USING (auth.role() = 'authenticated');
-    END IF;
-
-    -- Spend: Service role can insert/select, authenticated users can select
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies 
-        WHERE schemaname = 'public' 
-        AND tablename = 'spend' 
-        AND policyname = 'spend_service_role_all'
-    ) THEN
-        CREATE POLICY "spend_service_role_all" ON public.spend
-            FOR ALL USING (current_setting('request.jwt.claims', true)::json->>'role' = 'service_role');
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies 
-        WHERE schemaname = 'public' 
-        AND tablename = 'spend' 
-        AND policyname = 'spend_authenticated_select'
-    ) THEN
-        CREATE POLICY "spend_authenticated_select" ON public.spend
-            FOR SELECT USING (auth.role() = 'authenticated');
-    END IF;
-
-    -- Metrics daily: Service role can insert/select, authenticated users can select
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies 
-        WHERE schemaname = 'public' 
-        AND tablename = 'metrics_daily' 
-        AND policyname = 'metrics_daily_service_role_all'
-    ) THEN
-        CREATE POLICY "metrics_daily_service_role_all" ON public.metrics_daily
-            FOR ALL USING (current_setting('request.jwt.claims', true)::json->>'role' = 'service_role');
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies 
-        WHERE schemaname = 'public' 
-        AND tablename = 'metrics_daily' 
-        AND policyname = 'metrics_daily_authenticated_select'
-    ) THEN
-        CREATE POLICY "metrics_daily_authenticated_select" ON public.metrics_daily
-            FOR SELECT USING (auth.role() = 'authenticated');
-    END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='events' AND policyname='events_select_all_srv') THEN
+    CREATE POLICY events_select_all_srv ON public.events FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='spend' AND policyname='spend_select_all_srv') THEN
+    CREATE POLICY spend_select_all_srv ON public.spend FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='metrics_daily' AND policyname='metrics_select_all_srv') THEN
+    CREATE POLICY metrics_select_all_srv ON public.metrics_daily FOR SELECT USING (true);
+  END IF;
 END $$;
 
--- ===========================================
--- UPSERT FUNCTIONS
--- ===========================================
-
--- Upsert events function
-CREATE OR REPLACE FUNCTION public.upsert_events(event_data JSONB)
-RETURNS UUID
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-    event_id UUID;
+-- Upserts
+CREATE OR REPLACE FUNCTION public.upsert_events(_rows jsonb)
+RETURNS integer LANGUAGE plpgsql AS $$
+DECLARE _r jsonb; _ins int := 0;
 BEGIN
-    INSERT INTO public.events (name, properties, timestamp)
+  FOR _r IN SELECT * FROM jsonb_array_elements(_rows)
+  LOOP
+    INSERT INTO public.events AS e(id, occurred_at, user_id, event_name, props)
     VALUES (
-        event_data->>'name',
-        COALESCE(event_data->'properties', '{}'::jsonb),
-        COALESCE((event_data->>'timestamp')::timestamptz, now())
+      COALESCE((_r->>'id')::uuid, gen_random_uuid()),
+      COALESCE((_r->>'occurred_at')::timestamptz, now()),
+      NULLIF(_r->>'user_id','')::uuid,
+      _r->>'event_name',
+      COALESCE((_r->'props')::jsonb, '{}'::jsonb)
     )
-    RETURNING id INTO event_id;
-    
-    RETURN event_id;
-END;
-$$;
+    ON CONFLICT (id) DO UPDATE
+      SET occurred_at = EXCLUDED.occurred_at,
+          user_id     = EXCLUDED.user_id,
+          event_name  = EXCLUDED.event_name,
+          props       = EXCLUDED.props;
+    _ins := _ins + 1;
+  END LOOP;
+  RETURN COALESCE(_ins,0);
+END $$;
 
--- Upsert spend function
-CREATE OR REPLACE FUNCTION public.upsert_spend(spend_data JSONB)
-RETURNS UUID
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-    spend_id UUID;
+CREATE OR REPLACE FUNCTION public.upsert_spend(_rows jsonb)
+RETURNS integer LANGUAGE plpgsql AS $$
+DECLARE _r jsonb; _ins int := 0;
 BEGIN
-    INSERT INTO public.spend (platform, amount, currency, date, metadata)
+  FOR _r IN SELECT * FROM jsonb_array_elements(_rows)
+  LOOP
+    INSERT INTO public.spend AS s(id, platform, campaign_id, adset_id, date, spend_cents, clicks, impressions, conv)
     VALUES (
-        spend_data->>'platform',
-        (spend_data->>'amount')::decimal,
-        COALESCE(spend_data->>'currency', 'CAD'),
-        (spend_data->>'date')::date,
-        COALESCE(spend_data->'metadata', '{}'::jsonb)
+      COALESCE((_r->>'id')::uuid, gen_random_uuid()),
+      _r->>'platform',
+      _r->>'campaign_id',
+      _r->>'adset_id',
+      (_r->>'date')::date,
+      COALESCE((_r->>'spend_cents')::int,0),
+      COALESCE((_r->>'clicks')::int,0),
+      COALESCE((_r->>'impressions')::int,0),
+      COALESCE((_r->>'conv')::int,0)
     )
-    ON CONFLICT (platform, date) 
-    DO UPDATE SET
-        amount = EXCLUDED.amount,
-        currency = EXCLUDED.currency,
-        metadata = EXCLUDED.metadata
-    RETURNING id INTO spend_id;
-    
-    RETURN spend_id;
-END;
-$$;
+    ON CONFLICT (id) DO UPDATE
+      SET platform    = EXCLUDED.platform,
+          campaign_id = EXCLUDED.campaign_id,
+          adset_id    = EXCLUDED.adset_id,
+          date        = EXCLUDED.date,
+          spend_cents = EXCLUDED.spend_cents,
+          clicks      = EXCLUDED.clicks,
+          impressions = EXCLUDED.impressions,
+          conv        = EXCLUDED.conv;
+    _ins := _ins + 1;
+  END LOOP;
+  RETURN COALESCE(_ins,0);
+END $$;
 
--- Recompute metrics daily function
-CREATE OR REPLACE FUNCTION public.recompute_metrics_daily(
-    start_date DATE,
-    end_date DATE
-)
-RETURNS INTEGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-    rec RECORD;
-    days_processed INTEGER := 0;
+-- Rollup + healthcheck
+CREATE OR REPLACE FUNCTION public.recompute_metrics_daily(_start date, _end date)
+RETURNS void LANGUAGE plpgsql AS $$
 BEGIN
-    FOR rec IN 
-        SELECT 
-            date_series::date AS day,
-            COALESCE(SUM(s.amount), 0) AS total_spend,
-            COUNT(DISTINCT e.id) AS events_count
-        FROM generate_series(start_date, end_date, '1 day'::interval) AS date_series
-        LEFT JOIN public.spend s ON s.date = date_series::date
-        LEFT JOIN public.events e ON DATE(e.timestamp) = date_series::date
-        GROUP BY date_series::date
-    LOOP
-        INSERT INTO public.metrics_daily (date, spend, events_count, computed_at)
-        VALUES (rec.day, rec.total_spend, rec.events_count, now())
-        ON CONFLICT (date) 
-        DO UPDATE SET
-            spend = EXCLUDED.spend,
-            events_count = EXCLUDED.events_count,
-            computed_at = now();
-        
-        days_processed := days_processed + 1;
-    END LOOP;
-    
-    RETURN days_processed;
-END;
-$$;
+  DELETE FROM public.metrics_daily WHERE day BETWEEN _start AND _end;
+  INSERT INTO public.metrics_daily(day, sessions, add_to_carts, orders, revenue_cents, refunds_cents, aov_cents, cac_cents, conversion_rate, gross_margin_cents, traffic)
+  SELECT d::date, 0,0,
+    COALESCE((SELECT count(*) FROM public.events e WHERE e.event_name='order_completed' AND e.occurred_at::date=d),0),
+    COALESCE((SELECT sum((e.props->>'revenue_cents')::int) FROM public.events e WHERE e.event_name='order_completed' AND e.occurred_at::date=d),0),
+    COALESCE((SELECT sum((e.props->>'refunds_cents')::int) FROM public.events e WHERE e.event_name='order_refunded'  AND e.occurred_at::date=d),0),
+    0,
+    COALESCE((SELECT sum(spend_cents) FROM public.spend s WHERE s.date=d),0),
+    0,
+    0,
+    COALESCE((SELECT sum(clicks) FROM public.spend s WHERE s.date=d),0)
+  FROM generate_series(_start, _end, '1 day') d;
+  UPDATE public.metrics_daily
+     SET aov_cents = CASE WHEN orders>0 THEN revenue_cents/GREATEST(orders,1) ELSE 0 END,
+         conversion_rate = CASE WHEN traffic>0 THEN orders::numeric/traffic ELSE 0 END
+   WHERE day BETWEEN _start AND _end;
+END $$;
 
--- System healthcheck function
 CREATE OR REPLACE FUNCTION public.system_healthcheck()
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-    health JSONB;
+RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE v jsonb;
 BEGIN
-    SELECT jsonb_build_object(
-        'status', 'healthy',
-        'timestamp', now(),
-        'tables', (
-            SELECT jsonb_agg(jsonb_build_object(
-                'name', table_name,
-                'exists', true
-            ))
-            FROM information_schema.tables
-            WHERE table_schema = 'public'
-            AND table_name IN ('events', 'spend', 'metrics_daily')
-        ),
-        'events_count', (SELECT COUNT(*) FROM public.events),
-        'spend_count', (SELECT COUNT(*) FROM public.spend),
-        'metrics_count', (SELECT COUNT(*) FROM public.metrics_daily),
-        'latest_metric_date', (SELECT MAX(date) FROM public.metrics_daily)
-    ) INTO health;
-    
-    RETURN health;
-END;
-$$;
+  SELECT jsonb_build_object(
+    'events', (SELECT count(*) FROM public.events),
+    'spend_days', (SELECT count(DISTINCT date) FROM public.spend),
+    'metrics_days', (SELECT count(*) FROM public.metrics_daily)
+  ) INTO v;
+  RETURN v;
+END $$;
