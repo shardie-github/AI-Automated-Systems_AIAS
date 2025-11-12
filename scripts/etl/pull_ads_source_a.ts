@@ -1,85 +1,12 @@
-#!/usr/bin/env tsx
-/**
- * Pull Ads Source A ETL Script
- * Generic ads platform ingestion with dry-run support and retries
- * Idempotent upserts
- */
-
-import { query } from '../lib/db.js';
-import { retry } from '../lib/retry.js';
-import { info, error } from '../lib/logger.js';
-import { closePool } from '../lib/db.js';
-
-const DRY_RUN = process.argv.includes('--dry-run');
-const PLATFORM = 'source_a';
-
-async function pullAdsSourceA(startDate?: string, endDate?: string): Promise<number> {
-  info('Starting Source A ads ETL pull', { dryRun: DRY_RUN, startDate, endDate });
-
-  // In a real implementation, this would fetch from Source A API
-  // For now, this is a stub that demonstrates the pattern
-  const token = process.env.GENERIC_SOURCE_A_TOKEN;
-  if (!token && !DRY_RUN) {
-    throw new Error('GENERIC_SOURCE_A_TOKEN environment variable required');
-  }
-
-  const mockSpend = [
-    {
-      platform: PLATFORM,
-      amount: 150.50,
-      currency: 'CAD',
-      date: new Date().toISOString().split('T')[0],
-      metadata: { campaign_id: 'camp_123', ad_set_id: 'set_456' },
-    },
-    {
-      platform: PLATFORM,
-      amount: 200.75,
-      currency: 'CAD',
-      date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-      metadata: { campaign_id: 'camp_124', ad_set_id: 'set_457' },
-    },
-  ];
-
-  if (DRY_RUN) {
-    info(`[DRY RUN] Would insert ${mockSpend.length} spend records`);
-    return mockSpend.length;
-  }
-
-  let inserted = 0;
-  for (const spend of mockSpend) {
-    try {
-      await retry(async () => {
-        await query(
-          `SELECT public.upsert_spend($1::jsonb)`,
-          [JSON.stringify(spend)]
-        );
-      });
-      inserted++;
-    } catch (err) {
-      error('Failed to insert spend', { spend, error: err });
-    }
-  }
-
-  info(`Inserted ${inserted} spend records for ${PLATFORM}`);
-  return inserted;
-}
-
-async function main() {
-  const startDate = process.env.BACKFILL_START;
-  const endDate = process.env.BACKFILL_END;
-
-  try {
-    const count = await pullAdsSourceA(startDate, endDate);
-    console.log(`✅ Source A ads ETL completed: ${count} records processed`);
-    process.exit(0);
-  } catch (err) {
-    error('Source A ads ETL failed', { error: err });
-    process.exit(1);
-  } finally {
-    await closePool();
-  }
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
-}
+#!/usr/bin/env node
+import fs from "fs"; import { withDb } from "../lib/db"; import { retry } from "../lib/retry"; import { log, err } from "../lib/logger";
+const args=process.argv.slice(2); const dry=args.includes("--dry-run");
+const input=args.includes("--input")?args[args.indexOf("--input")+1]:undefined;
+(async()=>{
+  if(!input||!fs.existsSync(input)) throw new Error("Provide --input ./tests/fixtures/source_a_ads_sample.json");
+  const payload=JSON.parse(fs.readFileSync(input,"utf8"));
+  const flat=payload.map((r:any)=>({platform:"source_a",campaign_id:r.campaign_id??null,adset_id:r.adset_id??null,date:r.date,spend_cents:r.spend_cents??0,clicks:r.clicks??0,impressions:r.impressions??0,conv:r.conv??0}));
+  log(`Source A rows: ${flat.length} (dry=${dry})`); if(dry) return;
+  await withDb(async c=>{ await retry(async()=>{ await c.query("select public.upsert_spend($1::jsonb)",[JSON.stringify(flat)]); }); });
+  log("Source A spend upsert done.");
+})().catch(e=>{ err(e); process.exit(1); });

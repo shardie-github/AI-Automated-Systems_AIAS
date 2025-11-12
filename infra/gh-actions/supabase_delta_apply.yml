@@ -1,62 +1,46 @@
-name: Supabase Delta Migration
-
+name: Supabase Delta Migrate & Verify
 on:
-  push:
-    branches: [main, master]
-    paths:
-      - 'supabase/migrations/**'
   workflow_dispatch:
-
+  push:
+    branches: [ main ]
+    paths:
+      - "scripts/agents/generate_delta_migration.ts"
+      - "supabase/migrations/**.sql"
 jobs:
-  delta-migration:
+  migrate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Supabase CLI
-        run: npm install -g supabase
-
-      - name: Generate delta migration
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: tsx scripts/agents/generate_delta_migration.ts
-
-      - name: Apply migrations (Supabase CLI)
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci || true
+      - name: Build Delta
+        env: { SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }} }
+        run: node scripts/agents/generate_delta_migration.ts
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - name: Apply via Supabase CLI
+        env: { SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }} }
+        run: supabase db push --db-url "$SUPABASE_DB_URL" --include-all
+      - name: Fallback psql per-file if CLI fails
+        if: failure()
+        env: { SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }} }
         run: |
-          supabase db push --include-all || {
-            echo "Supabase CLI failed, attempting psql fallback..."
-            for file in supabase/migrations/*.sql; do
-              psql "$SUPABASE_DB_URL" -f "$file" || true
-            done
-          }
-
-      - name: Verify database
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: tsx scripts/agents/verify_db.ts
-
-      - name: Run system doctor
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: tsx scripts/agents/system_doctor.ts
-
-      - name: Notify
+          for f in $(ls -1 supabase/migrations/*.sql | sort); do
+            echo "Applying $f"
+            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$f"
+          done
+      - name: Verify
+        env: { DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }} }
+        run: node scripts/agents/verify_db.ts
+      - name: System Doctor
+        env: { SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }} }
+        run: node scripts/agents/system_doctor.ts
+      - name: Write status.json
         if: always()
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          if [ ${{ job.status }} == 'success' ]; then
-            tsx scripts/agents/notify.ts "Migration Applied" "Delta migration applied successfully." info
-          else
-            tsx scripts/agents/notify.ts "Migration Failed" "Delta migration failed. Check logs." error
-          fi
+          TZ: America/Toronto
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN || github.token }}
+        run: node scripts/agents/write_status_json.ts || true

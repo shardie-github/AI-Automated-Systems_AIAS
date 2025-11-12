@@ -1,35 +1,22 @@
-name: Preflight Checks
-
-on:
-  pull_request:
-    branches: [main, master]
-  workflow_dispatch:
-
+name: Preflight
+on: [workflow_dispatch, pull_request]
 jobs:
-  preflight:
+  run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run preflight checks
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci || true
+      - name: Preflight
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TZ: America/Toronto
-        run: tsx scripts/agents/preflight.ts
-
-      - name: Upload preflight report
+        run: node scripts/agents/preflight.ts
+      - name: Write status.json
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preflight-report
-          path: reports/exec/preflight_report.md
+        env:
+          TZ: America/Toronto
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN || github.token }}
+        run: node scripts/agents/write_status_json.ts || true

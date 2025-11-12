@@ -1,33 +1,33 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
  * Database Verification Script
  * Verifies presence of tables, columns, indexes, RLS, and policies
  * Exits non-zero on failure
  */
 
-import { query, queryOne, getPool, closePool } from '../lib/db.js';
-import { info, error } from '../lib/logger.js';
+import { withDb } from "../lib/db";
+import { log, err } from "../lib/logger";
 
-const REQUIRED_TABLES = ['events', 'spend', 'metrics_daily'];
+const REQUIRED_TABLES = ["events", "spend", "metrics_daily"];
 const REQUIRED_COLUMNS: Record<string, string[]> = {
-  events: ['id', 'name', 'properties', 'timestamp'],
-  spend: ['id', 'platform', 'amount', 'date'],
-  metrics_daily: ['id', 'date', 'spend', 'events_count'],
+  events: ["id", "occurred_at", "user_id", "event_name", "props"],
+  spend: ["id", "platform", "campaign_id", "adset_id", "date", "spend_cents", "clicks", "impressions", "conv"],
+  metrics_daily: ["id", "day", "sessions", "add_to_carts", "orders", "revenue_cents", "refunds_cents", "aov_cents", "cac_cents", "conversion_rate", "gross_margin_cents", "traffic"],
 };
 const REQUIRED_INDEXES = [
-  { name: 'idx_events_name_time', table: 'events' },
-  { name: 'idx_spend_platform_dt', table: 'spend' },
-  { name: 'idx_metrics_day', table: 'metrics_daily' },
+  { name: "idx_events_name_time", table: "events" },
+  { name: "idx_spend_platform_dt", table: "spend" },
+  { name: "idx_metrics_day", table: "metrics_daily" },
 ];
 const REQUIRED_FUNCTIONS = [
-  'upsert_events',
-  'upsert_spend',
-  'recompute_metrics_daily',
-  'system_healthcheck',
+  "upsert_events",
+  "upsert_spend",
+  "recompute_metrics_daily",
+  "system_healthcheck",
 ];
 
-async function verifyTable(tableName: string): Promise<void> {
-  const exists = await queryOne<{ exists: boolean }>(
+async function verifyTable(c: any, tableName: string): Promise<void> {
+  const result = await c.query(
     `SELECT EXISTS (
       SELECT 1 FROM information_schema.tables 
       WHERE table_schema = 'public' 
@@ -36,17 +36,14 @@ async function verifyTable(tableName: string): Promise<void> {
     [tableName]
   );
 
-  if (!exists?.exists) {
+  if (!result.rows[0]?.exists) {
     throw new Error(`Missing table: ${tableName}`);
   }
-  info(`✓ Table exists: ${tableName}`);
+  log(`✓ Table exists: ${tableName}`);
 }
 
-async function verifyColumn(
-  tableName: string,
-  columnName: string
-): Promise<void> {
-  const exists = await queryOne<{ exists: boolean }>(
+async function verifyColumn(c: any, tableName: string, columnName: string): Promise<void> {
+  const result = await c.query(
     `SELECT EXISTS (
       SELECT 1 FROM information_schema.columns 
       WHERE table_schema = 'public' 
@@ -56,13 +53,13 @@ async function verifyColumn(
     [tableName, columnName]
   );
 
-  if (!exists?.exists) {
+  if (!result.rows[0]?.exists) {
     throw new Error(`Missing column: ${tableName}.${columnName}`);
   }
 }
 
-async function verifyIndex(indexName: string, tableName: string): Promise<void> {
-  const exists = await queryOne<{ exists: boolean }>(
+async function verifyIndex(c: any, indexName: string, tableName: string): Promise<void> {
+  const result = await c.query(
     `SELECT EXISTS (
       SELECT 1 FROM pg_indexes 
       WHERE schemaname = 'public' 
@@ -71,14 +68,14 @@ async function verifyIndex(indexName: string, tableName: string): Promise<void> 
     [indexName]
   );
 
-  if (!exists?.exists) {
+  if (!result.rows[0]?.exists) {
     throw new Error(`Missing index: ${indexName} on ${tableName}`);
   }
-  info(`✓ Index exists: ${indexName}`);
+  log(`✓ Index exists: ${indexName}`);
 }
 
-async function verifyRLS(tableName: string): Promise<void> {
-  const rls = await queryOne<{ relrowsecurity: boolean }>(
+async function verifyRLS(c: any, tableName: string): Promise<void> {
+  const result = await c.query(
     `SELECT c.relrowsecurity
      FROM pg_class c
      JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -87,14 +84,14 @@ async function verifyRLS(tableName: string): Promise<void> {
     [tableName]
   );
 
-  if (!rls?.relrowsecurity) {
+  if (!result.rows[0]?.relrowsecurity) {
     throw new Error(`RLS not enabled on ${tableName}`);
   }
-  info(`✓ RLS enabled: ${tableName}`);
+  log(`✓ RLS enabled: ${tableName}`);
 }
 
-async function verifyPolicies(tableName: string): Promise<void> {
-  const policies = await query<{ count: string }>(
+async function verifyPolicies(c: any, tableName: string): Promise<void> {
+  const result = await c.query(
     `SELECT COUNT(*)::text AS count
      FROM pg_policies 
      WHERE schemaname = 'public' 
@@ -102,15 +99,15 @@ async function verifyPolicies(tableName: string): Promise<void> {
     [tableName]
   );
 
-  const count = parseInt(policies[0]?.count || '0', 10);
+  const count = parseInt(result.rows[0]?.count || "0", 10);
   if (count < 1) {
     throw new Error(`No policies found on ${tableName} (need at least 1)`);
   }
-  info(`✓ Policies exist: ${tableName} (${count} policies)`);
+  log(`✓ Policies exist: ${tableName} (${count} policies)`);
 }
 
-async function verifyFunction(functionName: string): Promise<void> {
-  const exists = await queryOne<{ exists: boolean }>(
+async function verifyFunction(c: any, functionName: string): Promise<void> {
+  const result = await c.query(
     `SELECT EXISTS (
       SELECT 1 FROM pg_proc p
       JOIN pg_namespace n ON p.pronamespace = n.oid
@@ -120,57 +117,53 @@ async function verifyFunction(functionName: string): Promise<void> {
     [functionName]
   );
 
-  if (!exists?.exists) {
+  if (!result.rows[0]?.exists) {
     throw new Error(`Missing function: ${functionName}`);
   }
-  info(`✓ Function exists: ${functionName}`);
+  log(`✓ Function exists: ${functionName}`);
 }
 
 async function verifyDatabase(): Promise<void> {
-  info('Starting database verification');
+  log("Starting database verification");
 
-  // Verify tables
-  for (const table of REQUIRED_TABLES) {
-    await verifyTable(table);
+  await withDb(async (c) => {
+    // Verify tables
+    for (const table of REQUIRED_TABLES) {
+      await verifyTable(c, table);
 
-    // Verify columns
-    const columns = REQUIRED_COLUMNS[table] || [];
-    for (const column of columns) {
-      await verifyColumn(table, column);
+      // Verify columns
+      const columns = REQUIRED_COLUMNS[table] || [];
+      for (const column of columns) {
+        await verifyColumn(c, table, column);
+      }
+
+      // Verify RLS
+      await verifyRLS(c, table);
+
+      // Verify policies
+      await verifyPolicies(c, table);
     }
 
-    // Verify RLS
-    await verifyRLS(table);
+    // Verify indexes
+    for (const idx of REQUIRED_INDEXES) {
+      await verifyIndex(c, idx.name, idx.table);
+    }
 
-    // Verify policies
-    await verifyPolicies(table);
-  }
+    // Verify functions
+    for (const func of REQUIRED_FUNCTIONS) {
+      await verifyFunction(c, func);
+    }
+  });
 
-  // Verify indexes
-  for (const idx of REQUIRED_INDEXES) {
-    await verifyIndex(idx.name, idx.table);
-  }
-
-  // Verify functions
-  for (const func of REQUIRED_FUNCTIONS) {
-    await verifyFunction(func);
-  }
-
-  info('✅ Database verification passed');
+  log("✅ Database verification passed");
 }
 
-async function main() {
+(async () => {
   try {
     await verifyDatabase();
     process.exit(0);
-  } catch (err) {
-    error('Database verification failed', { error: err });
+  } catch (e: any) {
+    err("Database verification failed", e);
     process.exit(1);
-  } finally {
-    await closePool();
   }
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
-}
+})();
