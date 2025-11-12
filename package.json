@@ -202,7 +202,19 @@
     "type:coverage": "npx type-coverage --detail --at-least 95 || true",
     "obs:check": "tsx scripts/check-telemetry.ts || true",
     "regenerate-types": "tsx scripts/regenerate-supabase-types.ts",
-    "test:critical": "vitest run tests/api/telemetry-ingest.test.ts tests/lib/route-handler.test.ts tests/api/healthz.test.ts"
+    "test:critical": "vitest run tests/api/telemetry-ingest.test.ts tests/lib/route-handler.test.ts tests/api/healthz.test.ts",
+    "preflight": "tsx scripts/agents/preflight.ts",
+    "verify:db": "tsx scripts/agents/verify_db.ts",
+    "delta:migrate": "tsx scripts/agents/generate_delta_migration.ts",
+    "etl:events": "tsx scripts/etl/pull_events.ts",
+    "etl:source-a": "tsx scripts/etl/pull_ads_source_a.ts",
+    "etl:source-b": "tsx scripts/etl/pull_ads_source_b.ts",
+    "etl:metrics": "tsx scripts/etl/compute_metrics.ts",
+    "etl:all": "npm run etl:events && npm run etl:source-a && npm run etl:source-b && npm run etl:metrics",
+    "dq:check": "tsx scripts/agents/run_data_quality.ts",
+    "system:doctor": "tsx scripts/agents/system_doctor.ts",
+    "system:health": "tsx scripts/agents/system_health.ts",
+    "orchestrate": "tsx scripts/orchestrate_master.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.2",

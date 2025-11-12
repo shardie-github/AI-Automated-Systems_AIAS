@@ -1,29 +1,48 @@
 name: Nightly ETL
+
 on:
   schedule:
-    - cron: '10 1 * * *'  # 01:10 America/Toronto
+    - cron: '0 1 * * *' # 1 AM UTC daily (8 PM ET previous day)
+  workflow_dispatch:
+
 jobs:
-  run:
+  etl:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - name: Install deps
-        run: npm ci || true
-      - name: Run ETL
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pull events
         env:
-          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
-          META_TOKEN: ${{ secrets.META_TOKEN }}
-          META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
-          TIKTOK_TOKEN: ${{ secrets.TIKTOK_TOKEN }}
-          TIKTOK_ADVERTISER_ID: ${{ secrets.TIKTOK_ADVERTISER_ID }}
-          SHOPIFY_API_KEY: ${{ secrets.SHOPIFY_API_KEY }}
-          SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
-          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
-          TZ: America/Toronto
-        run: |
-          node scripts/etl/pull_ads_meta.ts || echo "Meta ETL failed"
-          node scripts/etl/pull_ads_tiktok.ts || echo "TikTok ETL failed"
-          node scripts/etl/pull_shopify_orders.ts || echo "Shopify ETL failed"
-          node scripts/etl/compute_metrics.ts --cron || echo "Metrics computation failed"
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: tsx scripts/etl/pull_events.ts
+
+      - name: Pull Source A ads
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          GENERIC_SOURCE_A_TOKEN: ${{ secrets.GENERIC_SOURCE_A_TOKEN }}
+        run: tsx scripts/etl/pull_ads_source_a.ts
+
+      - name: Pull Source B ads
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          GENERIC_SOURCE_B_TOKEN: ${{ secrets.GENERIC_SOURCE_B_TOKEN }}
+        run: tsx scripts/etl/pull_ads_source_b.ts
+
+      - name: Compute metrics
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: tsx scripts/etl/compute_metrics.ts --cron
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: tsx scripts/agents/notify.ts "ETL Failed" "Nightly ETL job failed. Check logs." error

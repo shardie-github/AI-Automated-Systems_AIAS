@@ -1,0 +1,30 @@
+[
+  {
+    "name": "page_view",
+    "properties": {
+      "path": "/dashboard",
+      "user_id": "user_123",
+      "session_id": "session_456"
+    },
+    "timestamp": "2025-01-29T10:00:00Z"
+  },
+  {
+    "name": "button_click",
+    "properties": {
+      "button": "signup",
+      "user_id": "user_123",
+      "session_id": "session_456"
+    },
+    "timestamp": "2025-01-29T10:05:00Z"
+  },
+  {
+    "name": "conversion",
+    "properties": {
+      "event_type": "purchase",
+      "user_id": "user_123",
+      "value": 99.99,
+      "currency": "CAD"
+    },
+    "timestamp": "2025-01-29T10:10:00Z"
+  }
+]
