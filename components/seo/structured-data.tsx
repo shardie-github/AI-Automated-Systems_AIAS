@@ -154,3 +154,47 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
     />
   );
 }
+
+interface ServiceSchemaProps {
+  name?: string;
+  description?: string;
+  provider?: { name: string; url: string };
+  areaServed?: string;
+  serviceType?: string;
+}
+
+export function ServiceSchema({
+  name = "Custom AI Platform Development",
+  description = "We architect and build custom AI platforms from the ground up",
+  provider = {
+    name: "AIAS Consultancy",
+    url: "https://aias-platform.com",
+  },
+  areaServed = "Worldwide",
+  serviceType = "Consulting",
+}: ServiceSchemaProps) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name,
+    description,
+    provider: {
+      "@type": "Organization",
+      name: provider.name,
+      url: provider.url,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: areaServed,
+    },
+    serviceType,
+  };
+
+  return (
+    <Script
+      id="service-schema"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}

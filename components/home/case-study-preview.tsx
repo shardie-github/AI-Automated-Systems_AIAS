@@ -53,14 +53,14 @@ export function CaseStudyPreview() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
               <Rocket className="h-4 w-4" />
-              AIAS Consultancy — Custom Builds & Client Success
+              Platforms Built by AIAS Consultancy
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Our Builds & Client Results
+              Custom AI Platforms We've Built
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              AIAS Consultancy builds custom AI platforms and automation systems. 
-              See platforms we've built (TokPulse, Hardonia Suite) and how clients use AIAS Platform to save 10+ hours/week.
+              These aren't integrations — they're complete platforms we architected and built. 
+              See TokPulse (TikTok analytics) and Hardonia Suite (e-commerce automation), plus client success stories.
             </p>
           </div>
 
