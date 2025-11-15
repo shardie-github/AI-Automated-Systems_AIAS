@@ -15,6 +15,9 @@ export function Header() {
           <Link href="/services" className="px-3 py-2 hover:underline text-sm">
             Services
           </Link>
+          <Link href="/portfolio" className="px-3 py-2 hover:underline text-sm">
+            Portfolio
+          </Link>
           <Link href="/tasks" className="px-3 py-2 hover:underline text-sm">
             Our Builds
           </Link>

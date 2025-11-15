@@ -160,6 +160,20 @@ export default function CaseStudiesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
+                {/* Visual placeholder for platform screenshot/demo */}
+                <div className="mb-6 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 p-8 border border-primary/20">
+                  <div className="aspect-video rounded-lg bg-muted/50 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-4xl mb-2">📊</div>
+                      <div className="text-sm text-muted-foreground font-medium">
+                        Platform Dashboard Preview
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Interactive demo available on request
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-center gap-2 mb-2">

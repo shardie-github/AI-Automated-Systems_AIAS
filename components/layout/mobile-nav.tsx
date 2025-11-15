@@ -20,6 +20,9 @@ export function MobileNav() {
           <Link href="/services" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
             Services
           </Link>
+          <Link href="/portfolio" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+            Portfolio
+          </Link>
           <Link href="/tasks" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
             Our Builds
           </Link>

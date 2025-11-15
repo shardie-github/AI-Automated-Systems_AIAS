@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { StickyCTA } from "@/components/layout/sticky-cta";
 import { Toaster } from "@/components/ui/toaster";
 import { PWARegistration } from "@/components/pwa-registration";
 import { PerformanceHUD } from "@/components/dev/performance-hud";
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Header />
               <main id="main" className="container py-6">{children}</main>
               <Footer />
+              <StickyCTA />
               <Toaster />
               <PWARegistration />
               <PerformanceHUD />

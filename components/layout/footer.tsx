@@ -14,13 +14,13 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-2">
-              <li><a href="/features" className="hover:underline">Features</a></li>
-              <li><a href="/pricing" className="hover:underline">Pricing</a></li>
-              <li><a href="/systems-thinking" className="hover:underline">Systems Thinking</a></li>
-              <li><a href="/genai-content-engine" className="hover:underline">GenAI Content Engine</a></li>
-              <li><a href="/integrations" className="hover:underline">Integrations</a></li>
+              <li><a href="/services" className="hover:underline">Services</a></li>
+              <li><a href="/portfolio" className="hover:underline">Portfolio</a></li>
+              <li><a href="/process" className="hover:underline">Our Process</a></li>
               <li><a href="/case-studies" className="hover:underline">Case Studies</a></li>
               <li><a href="/tasks" className="hover:underline">Our Builds</a></li>
+              <li><a href="/pricing" className="hover:underline">Platform Pricing</a></li>
+              <li><a href="/features" className="hover:underline">Features</a></li>
             </ul>
           </div>
           <div>
