@@ -4,6 +4,7 @@ import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { SystemError, formatError } from "@/src/lib/errors";
+import { validateEnvOnStartup } from "@/lib/env-validation";
 
 // Load environment variables dynamically
 const supabaseUrl = env.supabase.url;
@@ -53,6 +54,16 @@ export async function GET(): Promise<NextResponse<HealthCheckResult>> {
     ok: true,
     timestamp: new Date().toISOString(),
   };
+
+  // Validate environment variables
+  try {
+    validateEnvOnStartup();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    checks.ok = false;
+    checks.error = `Environment validation failed: ${errorMessage}`;
+    return NextResponse.json(checks as HealthCheckResult, { status: 503 });
+  }
 
   // Check required env vars
   if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey || !databaseUrl) {

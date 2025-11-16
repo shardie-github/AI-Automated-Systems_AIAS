@@ -1,61 +1,77 @@
 # API Documentation
 
-Complete API reference for the AIAS Platform.
+## Overview
+
+This document provides comprehensive API documentation for the AIAS Platform. All API endpoints follow RESTful conventions and return JSON responses.
 
 ## Base URL
 
-- **Production**: `https://aias-platform.com/api`
-- **Development**: `http://localhost:3000/api`
+- **Production:** `https://aias-platform.com/api`
+- **Development:** `http://localhost:3000/api`
 
 ## Authentication
 
-Most endpoints require authentication. Include the access token in one of the following ways:
+Most API endpoints require authentication. Include the authentication token in one of the following ways:
 
-1. **Authorization Header** (Recommended):
+1. **Authorization Header:**
    ```
-   Authorization: Bearer <access_token>
+   Authorization: Bearer <token>
    ```
 
-2. **Cookie**:
+2. **Cookie:**
    ```
-   Cookie: sb-access-token=<access_token>
+   Cookie: sb-access-token=<token>
    ```
 
 ## Multi-Tenant Support
 
 For multi-tenant endpoints, include the tenant ID:
 
-1. **Header**:
-   ```
-   X-Tenant-ID: <tenant_id>
-   ```
-
-2. **Query Parameter**:
-   ```
-   ?tenant_id=<tenant_id>
-   ```
+- **Header:** `X-Tenant-ID: <tenant-id>`
+- **Query Parameter:** `?tenant_id=<tenant-id>`
 
 ## Rate Limiting
 
-Rate limits are applied per endpoint:
-
-- **Auth endpoints**: 5 requests/minute
-- **Stripe endpoints**: 20 requests/minute
-- **Telemetry endpoints**: 100 requests/minute
-- **Default**: 100 requests/minute
+API endpoints are rate-limited per user/IP:
+- **Auth endpoints:** 5 requests/minute
+- **Stripe endpoints:** 20 requests/minute
+- **Telemetry endpoints:** 100 requests/minute
+- **Default:** 100 requests/minute
 
 Rate limit headers are included in responses:
-- `X-RateLimit-Limit`: Maximum requests allowed
-- `X-RateLimit-Remaining`: Remaining requests in window
-- `X-RateLimit-Reset`: Unix timestamp when limit resets
+- `X-RateLimit-Limit`: Maximum requests per window
+- `X-RateLimit-Remaining`: Remaining requests in current window
+- `X-RateLimit-Reset`: Unix timestamp when the limit resets
+
+## Error Handling
+
+All errors follow a consistent format:
+
+```json
+{
+  "error": "Error type",
+  "message": "Human-readable error message",
+  "details": {}
+}
+```
+
+Common HTTP status codes:
+- `200`: Success
+- `201`: Created
+- `400`: Bad Request (validation error)
+- `401`: Unauthorized
+- `403`: Forbidden
+- `404`: Not Found
+- `429`: Too Many Requests
+- `500`: Internal Server Error
+- `503`: Service Unavailable
 
 ## Endpoints
 
-### Health Check
+### Health & Status
 
 #### GET /api/healthz
-
-Check system health and connectivity.
+Comprehensive health check endpoint.
 
 **Response:**
 ```json
@@ -64,15 +80,15 @@ Check system health and connectivity.
   "timestamp": "2025-01-30T12:00:00Z",
   "db": {
     "ok": true,
-    "latency_ms": 15
+    "latency_ms": 45
   },
   "rest": {
     "ok": true,
-    "latency_ms": 20
+    "latency_ms": 32
   },
   "auth": {
     "ok": true,
-    "latency_ms": 25
+    "latency_ms": 28
   },
   "rls": {
     "ok": true,
@@ -80,81 +96,76 @@ Check system health and connectivity.
   },
   "storage": {
     "ok": true,
-    "latency_ms": 30,
+    "latency_ms": 15,
     "buckets_count": 3
   },
-  "total_latency_ms": 90
+  "total_latency_ms": 120
 }
 ```
 
-### Settings
+#### GET /api/status
+System status and health information.
+
+**Response:**
+```json
+{
+  "status": "operational",
+  "timestamp": "2025-01-30T12:00:00Z",
+  "version": "1.0.0",
+  "environment": "production",
+  "services": {
+    "database": "operational",
+    "auth": "operational",
+    "storage": "operational",
+    "api": "operational"
+  },
+  "uptime": 86400,
+  "memory": {
+    "used": 125.5,
+    "total": 256.0,
+    "unit": "MB"
+  }
+}
+```
+
+### User Settings
 
 #### GET /api/settings
-
-Get user settings and preferences.
+Get user settings.
 
 **Headers:**
-- `Authorization: Bearer <token>` (required)
-- `X-Tenant-ID: <tenant_id>` (optional)
-
-**Query Parameters:**
-- `tenant_id` (optional): Tenant ID
+- `Authorization: Bearer <token>`
+- `X-Tenant-ID: <tenant-id>` (optional)
 
 **Response:**
 ```json
 {
   "settings": {
-    "id": "uuid",
     "user_id": "uuid",
     "email_notifications_enabled": true,
     "push_notifications_enabled": true,
-    "sms_notifications_enabled": false,
-    "notification_types": {
-      "system": true,
-      "security": true,
-      "marketing": false,
-      "product_updates": true,
-      "community": true,
-      "billing": true
-    },
-    "theme": "system",
+    "theme": "dark",
     "language": "en",
-    "timezone": "UTC",
-    "date_format": "YYYY-MM-DD",
-    "time_format": "24h",
-    "profile_visibility": "private",
-    "analytics_opt_in": true,
-    "data_sharing_enabled": false,
-    "beta_features_enabled": false,
-    "experimental_features_enabled": false,
-    "custom_settings": {},
-    "created_at": "2025-01-30T12:00:00Z",
-    "updated_at": "2025-01-30T12:00:00Z"
+    "timezone": "America/Toronto"
   }
 }
 ```
 
 #### PUT /api/settings
-
 Update user settings.
 
 **Headers:**
-- `Authorization: Bearer <token>` (required)
-- `Content-Type: application/json` (required)
-- `X-Tenant-ID: <tenant_id>` (optional)
+- `Authorization: Bearer <token>`
+- `X-Tenant-ID: <tenant-id>` (optional)
 
-**Request Body:**
+**Body:**
 ```json
 {
   "email_notifications_enabled": true,
-  "push_notifications_enabled": true,
-  "theme": "dark",
-  "language": "en",
-  "timezone": "America/Toronto",
-  "time_format": "24h",
-  "profile_visibility": "private",
-  "analytics_opt_in": true,
-  "beta_features_enabled": false
+  "push_notifications_enabled": false,
+  "theme": "light",
+  "language": "fr",
+  "timezone": "America/Toronto"
 }
 ```
 
@@ -162,240 +173,322 @@ Update user settings.
 ```json
 {
   "settings": {
-    // Updated settings object
+    "user_id": "uuid",
+    "email_notifications_enabled": true,
+    "push_notifications_enabled": false,
+    "theme": "light",
+    "language": "fr",
+    "timezone": "America/Toronto"
   }
 }
 ```
 
-### Notifications
+### Workflows (v1)
 
-#### GET /api/notifications
-
-Get user notifications.
+#### GET /api/v1/workflows
+List workflows for the authenticated user.
 
 **Headers:**
-- `Authorization: Bearer <token>` (required)
-- `X-Tenant-ID: <tenant_id>` (optional)
+- `Authorization: Bearer <token>`
+- `X-Tenant-ID: <tenant-id>` (optional)
 
 **Query Parameters:**
-- `type` (optional): Filter by notification type (`system`, `security`, `marketing`, `product_updates`, `community`, `billing`, `achievement`, `reminder`, `alert`)
-- `read` (optional): Filter by read status (`true`/`false`)
-- `archived` (optional): Filter by archived status (`true`/`false`)
-- `limit` (optional): Number of results (default: 20, max: 100)
-- `offset` (optional): Pagination offset (default: 0)
-- `tenant_id` (optional): Tenant ID
+- `tenant_id` (optional): Filter by tenant ID
 
 **Response:**
 ```json
 {
-  "notifications": [
+  "workflows": [
     {
       "id": "uuid",
-      "user_id": "uuid",
-      "tenant_id": "uuid",
-      "type": "system",
-      "title": "Welcome!",
-      "message": "Welcome to AIAS Platform",
-      "action_url": "https://example.com/action",
-      "action_label": "Get Started",
-      "read": false,
-      "archived": false,
-      "priority": "normal",
-      "created_at": "2025-01-30T12:00:00Z",
-      "updated_at": "2025-01-30T12:00:00Z"
-    }
-  ],
-  "unread_count": 5,
-  "pagination": {
-    "limit": 20,
-    "offset": 0,
-    "total": 1
-  }
-}
-```
-
-#### POST /api/notifications
-
-Create a notification (admin/service role only).
-
-**Headers:**
-- `Authorization: Bearer <service_role_token>` (required)
-- `Content-Type: application/json` (required)
-
-**Request Body:**
-```json
-{
-  "user_id": "uuid",
-  "tenant_id": "uuid",
-  "type": "system",
-  "title": "Notification Title",
-  "message": "Notification message",
-  "action_url": "https://example.com/action",
-  "action_label": "View",
-  "priority": "normal",
-  "expires_at": "2025-12-31T23:59:59Z",
-  "metadata": {}
-}
-```
-
-**Response:**
-```json
-{
-  "notification": {
-    // Created notification object
-  }
-}
-```
-
-#### PATCH /api/notifications/[id]
-
-Update a notification (mark as read, archive, etc.).
-
-**Headers:**
-- `Authorization: Bearer <token>` (required)
-- `Content-Type: application/json` (required)
-
-**Request Body:**
-```json
-{
-  "read": true,
-  "archived": false
-}
-```
-
-**Response:**
-```json
-{
-  "notification": {
-    // Updated notification object
-  }
-}
-```
-
-#### DELETE /api/notifications/[id]
-
-Delete a notification.
-
-**Headers:**
-- `Authorization: Bearer <token>` (required)
-
-**Response:**
-```json
-{
-  "success": true
-}
-```
-
-#### POST /api/notifications/mark-read
-
-Mark notifications as read.
-
-**Headers:**
-- `Authorization: Bearer <token>` (required)
-- `Content-Type: application/json` (required)
-
-**Request Body:**
-```json
-{
-  "notification_ids": ["uuid1", "uuid2"],
-  "all": false
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "count": 2
-}
-```
-
-### Stripe
-
-#### POST /api/stripe/create-checkout
-
-Create a Stripe checkout session.
-
-**Headers:**
-- `Authorization: Bearer <token>` (required)
-- `Content-Type: application/json` (required)
-
-**Request Body:**
-```json
-{
-  "price_id": "price_xxx",
-  "success_url": "https://example.com/success",
-  "cancel_url": "https://example.com/cancel"
-}
-```
-
-**Response:**
-```json
-{
-  "checkout_url": "https://checkout.stripe.com/..."
-}
-```
-
-#### POST /api/stripe/webhook
-
-Stripe webhook endpoint (no authentication required, uses Stripe signature verification).
-
-### Telemetry
-
-#### POST /api/telemetry/ingest
-
-Ingest telemetry data.
-
-**Headers:**
-- `Authorization: Bearer <token>` (optional)
-- `Content-Type: application/json` (required)
-
-**Request Body:**
-```json
-{
-  "events": [
-    {
-      "name": "page_view",
-      "properties": {},
-      "timestamp": "2025-01-30T12:00:00Z"
+      "name": "Daily Report Automation",
+      "description": "Generates daily reports",
+      "steps": [],
+      "enabled": true,
+      "created_at": "2025-01-30T12:00:00Z"
     }
   ]
 }
 ```
 
+#### POST /api/v1/workflows
+Create a new workflow.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `X-Tenant-ID: <tenant-id>` (optional)
+
+**Body:**
+```json
+{
+  "name": "Daily Report Automation",
+  "description": "Generates daily reports",
+  "steps": [
+    {
+      "id": "step-1",
+      "type": "trigger",
+      "config": {}
+    }
+  ],
+  "enabled": true
+}
+```
+
+**Response:**
+```json
+{
+  "workflow": {
+    "id": "uuid",
+    "name": "Daily Report Automation",
+    "description": "Generates daily reports",
+    "steps": [],
+    "enabled": true,
+    "created_at": "2025-01-30T12:00:00Z"
+  }
+}
+```
+
+### Agents (v1)
+
+#### GET /api/v1/agents
+List agents for the authenticated user.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `X-Tenant-ID: <tenant-id>` (optional)
+
+**Query Parameters:**
+- `tenant_id` (optional): Filter by tenant ID
+
+**Response:**
+```json
+{
+  "agents": [
+    {
+      "id": "uuid",
+      "name": "Customer Support Bot",
+      "description": "Handles customer inquiries",
+      "type": "chatbot",
+      "config": {},
+      "enabled": true,
+      "created_at": "2025-01-30T12:00:00Z"
+    }
+  ]
+}
+```
+
+#### POST /api/v1/agents
+Create a new agent.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `X-Tenant-ID: <tenant-id>` (optional)
+
+**Body:**
+```json
+{
+  "name": "Customer Support Bot",
+  "description": "Handles customer inquiries",
+  "type": "chatbot",
+  "config": {
+    "model": "gpt-4",
+    "temperature": 0.7
+  },
+  "enabled": true
+}
+```
+
+**Response:**
+```json
+{
+  "agent": {
+    "id": "uuid",
+    "name": "Customer Support Bot",
+    "description": "Handles customer inquiries",
+    "type": "chatbot",
+    "config": {},
+    "enabled": true,
+    "created_at": "2025-01-30T12:00:00Z"
+  }
+}
+```
+
+### Feature Flags
+
+#### GET /api/flags/trust
+Get trust-related feature flags.
+
+**Response:**
+```json
+{
+  "trust_audit_enabled": true,
+  "trust_ledger_enabled": true,
+  "trust_scoring_enabled": false,
+  "trust_badges_enabled": true,
+  "trust_verification_enabled": false,
+  "timestamp": "2025-01-30T12:00:00Z"
+}
+```
+
+### Telemetry
+
+#### POST /api/telemetry/ingest
+Ingest telemetry data.
+
+**Headers:**
+- `Content-Type: application/json`
+
+**Body:**
+```json
+{
+  "event": "page_view",
+  "properties": {
+    "path": "/dashboard",
+    "user_id": "uuid"
+  },
+  "timestamp": "2025-01-30T12:00:00Z"
+}
+```
+
 **Response:**
 ```json
 {
   "success": true,
-  "ingested": 1
+  "event_id": "uuid"
 }
 ```
 
-## Error Responses
+### Analytics
 
-All errors follow a consistent format:
+#### POST /api/analytics/track
+Track analytics event.
 
+**Headers:**
+- `Authorization: Bearer <token>` (optional)
+- `Content-Type: application/json`
+
+**Body:**
 ```json
 {
-  "error": "Error Type",
-  "message": "Human-readable error message",
-  "details": {}
+  "event": "conversion",
+  "properties": {
+    "value": 49.99,
+    "currency": "CAD"
+  }
 }
 ```
 
-### Status Codes
+**Response:**
+```json
+{
+  "success": true,
+  "event_id": "uuid"
+}
+```
 
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request (validation error)
-- `401` - Unauthorized
-- `403` - Forbidden
-- `404` - Not Found
-- `429` - Too Many Requests (rate limit exceeded)
-- `500` - Internal Server Error
-- `503` - Service Unavailable
+### Admin
 
-## Examples
+#### GET /api/admin/compliance
+Get compliance status (admin only).
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Response:**
+```json
+{
+  "compliance": {
+    "gdpr": true,
+    "ccpa": true,
+    "pipeda": true,
+    "soc2": false
+  }
+}
+```
+
+#### GET /api/admin/reliability
+Get reliability dashboard data (admin only).
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Response:**
+```json
+{
+  "timestamp": "2025-01-30T12:00:00Z",
+  "uptime": {
+    "current": 99.95,
+    "target": 99.9,
+    "status": "healthy",
+    "trend": "stable"
+  },
+  "performance": {
+    "latency_p95": 250,
+    "error_rate": 0.01,
+    "throughput": 1000
+  }
+}
+```
+
+### Metrics
+
+#### GET /api/metrics
+Get system metrics (admin only).
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Response:**
+```json
+{
+  "metrics": {
+    "requests_per_minute": 150,
+    "error_rate": 0.01,
+    "average_latency_ms": 200
+  }
+}
+```
+
+## Webhooks
+
+### Stripe Webhook
+
+#### POST /api/stripe/webhook
+Stripe webhook endpoint for payment events.
+
+**Headers:**
+- `stripe-signature: <signature>`
+
+**Body:** Stripe webhook payload
+
+## SDK Examples
+
+### JavaScript/TypeScript
+
+```typescript
+const API_BASE = 'https://aias-platform.com/api';
+
+async function getSettings(token: string) {
+  const response = await fetch(`${API_BASE}/settings`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  return response.json();
+}
+
+async function createWorkflow(token: string, workflow: any) {
+  const response = await fetch(`${API_BASE}/v1/workflows`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(workflow),
+  });
+  return response.json();
+}
+```
 
 ### cURL
 
@@ -404,47 +497,20 @@ All errors follow a consistent format:
 curl -X GET https://aias-platform.com/api/settings \
   -H "Authorization: Bearer <token>"
 
-# Update settings
-curl -X PUT https://aias-platform.com/api/settings \
+# Create workflow
+curl -X POST https://aias-platform.com/api/v1/workflows \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
-  -d '{"theme": "dark"}'
-
-# Get notifications
-curl -X GET "https://aias-platform.com/api/notifications?limit=10&read=false" \
-  -H "Authorization: Bearer <token>"
-```
-
-### JavaScript/TypeScript
-
-```typescript
-// Get settings
-const response = await fetch('/api/settings', {
-  headers: {
-    'Authorization': `Bearer ${token}`
-  }
-});
-const data = await response.json();
-
-// Update settings
-const response = await fetch('/api/settings', {
-  method: 'PUT',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    theme: 'dark',
-    language: 'en'
-  })
-});
-const data = await response.json();
+  -d '{
+    "name": "Daily Report",
+    "enabled": true
+  }'
 ```
 
 ## Changelog
 
-### 2025-01-30
-- Added `/api/settings` endpoints
-- Added `/api/notifications` endpoints
-- Enhanced error handling
-- Added rate limiting headers
+### v1.0.0 (2025-01-30)
+- Initial API documentation
+- Added workflows and agents endpoints
+- Added feature flags endpoint
+- Added status and health check endpoints
