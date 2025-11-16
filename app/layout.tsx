@@ -65,8 +65,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   // [STAKE+TRUST:BEGIN:i18n_layout]
   // TODO: Replace with dynamic locale detection when i18n is implemented
-  // const locale = detectLocale(); // e.g., from cookie, header, or user preference
-  // const isRTL = isRTLLocale(locale);
+  // Implementation: Use i18next/react-i18next (already in dependencies)
+  // Example:
+  // import { useTranslation } from 'react-i18next';
+  // const { i18n } = useTranslation();
+  // const locale = i18n.language || detectLocaleFromCookie() || detectLocaleFromHeader() || 'en';
+  // const isRTL = ['ar', 'he', 'fa', 'ur'].includes(locale);
+  // Note: i18next and react-i18next are already installed in package.json
   const locale = "en";
   const isRTL = false;
   // [STAKE+TRUST:END:i18n_layout]

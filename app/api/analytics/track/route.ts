@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { conversionTracker } from "@/lib/analytics/conversion-tracking";
 import { databasePMFTracker } from "@/lib/analytics/database-integration";
+import { logger } from "@/lib/logging/structured-logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     } catch (dbError) {
       // Continue even if database fails
-      console.log("Database tracking failed, using in-memory only");
+      logger.warn("Database tracking failed, using in-memory only", { error: dbError instanceof Error ? dbError.message : "Unknown error" });
     }
     
     return NextResponse.json({ success: true });

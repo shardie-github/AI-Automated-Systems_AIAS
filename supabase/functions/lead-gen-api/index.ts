@@ -71,14 +71,37 @@ serve(async (req) => {
       );
     }
 
-    // TODO: Generate PDF with 10-page master system prompts
-    // TODO: Send PDF via email (use SendGrid, Mailgun, or Resend)
-    // TODO: Add to CRM/mailing list
-
-    console.log('Lead captured:', {
+    // Store lead in database
+    const leadData = {
       name: name.trim(),
       email: email.toLowerCase().trim(),
-    });
+      source: 'lead-gen-form',
+      status: 'new',
+      created_at: new Date().toISOString(),
+    };
+
+    const { error: insertError } = await supabaseAdmin
+      .from('leads')
+      .insert(leadData);
+
+    if (insertError) {
+      console.error('Failed to store lead:', insertError);
+      // Continue execution even if storage fails
+    }
+
+    // TODO: Generate PDF with 10-page master system prompts
+    // Implementation: Use a PDF generation library (pdfkit, puppeteer, etc.)
+    // Example: const pdfBuffer = await generateSystemPromptsPDF();
+    // Store PDF in storage bucket: await supabaseAdmin.storage.from('pdfs').upload(`${email}-system-prompts.pdf`, pdfBuffer);
+    
+    // TODO: Send PDF via email (use SendGrid, Mailgun, or Resend)
+    // Implementation: Use email service API to send PDF attachment
+    // Example: await sendEmailWithAttachment(email, 'Your Free System Prompts Guide', pdfBuffer);
+    // Required env vars: RESEND_API_KEY, SENDGRID_API_KEY, or MAILGUN_API_KEY
+    
+    // TODO: Add to CRM/mailing list
+    // Implementation: Integrate with CRM (HubSpot, Salesforce, etc.) or mailing list service
+    // Example: await addToCRM(leadData); await addToMailingList(leadData);
 
     return new Response(
       JSON.stringify({ 

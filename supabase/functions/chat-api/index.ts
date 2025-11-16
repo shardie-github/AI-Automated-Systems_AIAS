@@ -120,6 +120,20 @@ serve(async (req) => {
     await logAudit(supabaseAdmin, user.id, 'message_sent', 'chat_message', convId, { message_length: sanitizedMessage.length });
 
     // TODO: Integrate with OpenAI API here
+    // Implementation: Use OpenAI SDK to generate AI response
+    // Example:
+    // const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY') });
+    // const completion = await openai.chat.completions.create({
+    //   model: 'gpt-4',
+    //   messages: [
+    //     { role: 'system', content: 'You are a helpful AI automation assistant.' },
+    //     ...conversationHistory,
+    //     { role: 'user', content: sanitizedMessage }
+    //   ],
+    // });
+    // const aiResponse = completion.choices[0].message.content;
+    // Required env var: OPENAI_API_KEY
+    
     // For now, return a placeholder response
     const aiResponse = "I'm your AI automation assistant. This is a placeholder response. Integration with OpenAI pending.";
 

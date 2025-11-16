@@ -77,20 +77,41 @@ serve(async (req) => {
       );
     }
 
-    // TODO: Integrate with booking system (Calendly, Cal.com, or custom)
-    // TODO: Send confirmation email
-    // TODO: Store in CRM
-
-    console.log('Booking request:', {
+    // Store booking request in database for processing
+    const bookingData = {
       name: name.trim(),
       email: email.toLowerCase().trim(),
-      phone,
-      company,
-      meetingType,
-      date,
-      time,
-      notes: notes?.substring(0, 200),
-    });
+      phone: phone || null,
+      company: company || null,
+      meeting_type: meetingType,
+      requested_date: date,
+      requested_time: time,
+      notes: notes?.substring(0, 200) || null,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+    };
+
+    // Store in database (bookings table)
+    const { error: insertError } = await supabaseAdmin
+      .from('bookings')
+      .insert(bookingData);
+
+    if (insertError) {
+      console.error('Failed to store booking:', insertError);
+      // Continue execution even if storage fails
+    }
+
+    // TODO: Integrate with booking system (Calendly, Cal.com, or custom)
+    // Implementation: Use Calendly API or Cal.com webhook to create actual calendar event
+    // Example: await createCalendlyEvent(bookingData);
+    
+    // TODO: Send confirmation email
+    // Implementation: Use Resend/SendGrid/Mailgun to send confirmation
+    // Example: await sendBookingConfirmationEmail(bookingData);
+    
+    // TODO: Store in CRM
+    // Implementation: Integrate with CRM (HubSpot, Salesforce, etc.)
+    // Example: await createCRMLead(bookingData);
 
     return new Response(
       JSON.stringify({ 

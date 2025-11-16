@@ -6,6 +6,7 @@ import { SystemError, ValidationError, formatError } from "@/src/lib/errors";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
+import { logger } from "@/lib/logging/structured-logger";
 import { z } from "zod";
 
 // Load environment variables dynamically - no hardcoded values
@@ -213,7 +214,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<WebhookRespons
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.info(`Unhandled event type: ${event.type}`, { eventType: event.type });
     }
 
     const duration = Date.now() - startTime;
