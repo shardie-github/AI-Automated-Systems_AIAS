@@ -8,7 +8,6 @@ import { tenantIsolation } from '@/lib/security/tenant-isolation';
 import { queryOptimizer } from '@/lib/performance/query-optimizer';
 import { securityMonitor } from '@/lib/monitoring/security-monitor';
 import { z } from 'zod';
-import { NextResponse } from 'next/server';
 
 // Validation schema
 const createWorkflowSchema = z.object({

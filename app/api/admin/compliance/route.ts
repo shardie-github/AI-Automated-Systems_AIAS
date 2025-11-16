@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
-export const config = { runtime: 'edge' };
+export const runtime = 'nodejs'; // Requires Node.js runtime for fs operations
 
 export async function GET() {
   try {

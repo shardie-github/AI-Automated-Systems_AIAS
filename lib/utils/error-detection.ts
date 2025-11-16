@@ -3,7 +3,7 @@
  * Monitors errors and sends alerts when thresholds are exceeded
  */
 
-import { SystemError, formatError } from '@/src/lib/errors';
+import { SystemError, formatError } from '@/src/lib/errors'; // Using src/lib/errors.ts as source of truth
 
 export interface ErrorAlert {
   id: string;

@@ -8,7 +8,7 @@ import { validateInput, sanitizeObject, checkRequestSize, maskSensitiveData } fr
 import { tenantIsolation } from '../security/tenant-isolation';
 import { cacheService } from '../performance/cache';
 import { z } from 'zod';
-import { SystemError, ValidationError, AuthenticationError, AuthorizationError, formatError } from '@/src/lib/errors';
+import { SystemError, ValidationError, AuthenticationError, AuthorizationError, formatError } from '@/src/lib/errors'; // Using src/lib/errors.ts as source of truth
 
 export interface RouteHandlerOptions {
   requireAuth?: boolean;

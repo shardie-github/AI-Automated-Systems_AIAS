@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { logger } from "@/lib/logging/structured-logger";
 
+export const runtime = 'nodejs'; // Requires Node.js runtime for fs operations
 export const dynamic = "force-dynamic";
 
 /**
