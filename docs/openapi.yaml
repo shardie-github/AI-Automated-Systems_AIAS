@@ -1,0 +1,518 @@
+openapi: 3.0.3
+info:
+  title: AIAS Platform API
+  description: Enterprise-grade AI consultancy platform API
+  version: 1.0.0
+  contact:
+    name: AIAS Platform Support
+    email: support@aias-platform.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://aias-platform.com/api
+    description: Production
+  - url: http://localhost:3000/api
+    description: Development
+
+tags:
+  - name: Health
+    description: Health and status endpoints
+  - name: Settings
+    description: User settings management
+  - name: Workflows
+    description: Workflow automation management
+  - name: Agents
+    description: AI agent management
+  - name: Feature Flags
+    description: Feature flag management
+  - name: Telemetry
+    description: Telemetry and analytics
+  - name: Admin
+    description: Admin endpoints
+
+security:
+  - BearerAuth: []
+
+paths:
+  /healthz:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Comprehensive health check endpoint
+      security: []
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+
+  /status:
+    get:
+      tags: [Health]
+      summary: System status
+      description: Get system status and health information
+      security: []
+      responses:
+        '200':
+          description: Status information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get user settings
+      responses:
+        '200':
+          description: User settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/UserSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags: [Settings]
+      summary: Update user settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSettingsUpdate'
+      responses:
+        '200':
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/UserSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/workflows:
+    get:
+      tags: [Workflows]
+      summary: List workflows
+      parameters:
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by tenant ID
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workflow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Workflows]
+      summary: Create workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowCreate'
+      responses:
+        '201':
+          description: Created workflow
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow:
+                    $ref: '#/components/schemas/Workflow'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/agents:
+    get:
+      tags: [Agents]
+      summary: List agents
+      parameters:
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by tenant ID
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Agent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Agents]
+      summary: Create agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentCreate'
+      responses:
+        '201':
+          description: Created agent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /flags/trust:
+    get:
+      tags: [Feature Flags]
+      summary: Get trust feature flags
+      security: []
+      responses:
+        '200':
+          description: Trust feature flags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustFlags'
+
+  /telemetry/ingest:
+    post:
+      tags: [Telemetry]
+      summary: Ingest telemetry data
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryEvent'
+      responses:
+        '200':
+          description: Telemetry ingested
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  event_id:
+                    type: string
+                    format: uuid
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthCheck:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+        db:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+            error:
+              type: string
+              nullable: true
+        rest:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+            error:
+              type: string
+              nullable: true
+        auth:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+            error:
+              type: string
+              nullable: true
+        total_latency_ms:
+          type: number
+
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [operational, degraded, down]
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        environment:
+          type: string
+        services:
+          type: object
+          properties:
+            database:
+              type: string
+            auth:
+              type: string
+            storage:
+              type: string
+            api:
+              type: string
+        uptime:
+          type: number
+        memory:
+          type: object
+          properties:
+            used:
+              type: number
+            total:
+              type: number
+            unit:
+              type: string
+
+    UserSettings:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email_notifications_enabled:
+          type: boolean
+        push_notifications_enabled:
+          type: boolean
+        theme:
+          type: string
+          enum: [light, dark, system]
+        language:
+          type: string
+        timezone:
+          type: string
+
+    UserSettingsUpdate:
+      type: object
+      properties:
+        email_notifications_enabled:
+          type: boolean
+        push_notifications_enabled:
+          type: boolean
+        theme:
+          type: string
+          enum: [light, dark, system]
+        language:
+          type: string
+        timezone:
+          type: string
+
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        steps:
+          type: array
+          items:
+            type: object
+        enabled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    WorkflowCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        steps:
+          type: array
+          items:
+            type: object
+        enabled:
+          type: boolean
+          default: true
+
+    Agent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [chatbot, automation, analytics, custom]
+        config:
+          type: object
+        enabled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    AgentCreate:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        type:
+          type: string
+          enum: [chatbot, automation, analytics, custom]
+        config:
+          type: object
+        enabled:
+          type: boolean
+          default: true
+
+    TrustFlags:
+      type: object
+      properties:
+        trust_audit_enabled:
+          type: boolean
+        trust_ledger_enabled:
+          type: boolean
+        trust_scoring_enabled:
+          type: boolean
+        trust_badges_enabled:
+          type: boolean
+        trust_verification_enabled:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+
+    TelemetryEvent:
+      type: object
+      required:
+        - event
+      properties:
+        event:
+          type: string
+        properties:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

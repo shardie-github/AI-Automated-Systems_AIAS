@@ -223,7 +223,11 @@
     "omega:validate-schema": "tsx scripts/master-omega-prime/validate-schema.ts",
     "omega:brand-audit": "tsx scripts/master-omega-prime/brand-audit.ts",
     "omega:brand-fix": "tsx scripts/master-omega-prime/brand-audit.ts --fix",
-    "omega:full-diagnostic": "npm run omega:validate-env && npm run omega:validate-schema && npm run omega:brand-audit"
+    "omega:full-diagnostic": "npm run omega:validate-env && npm run omega:validate-schema && npm run omega:brand-audit",
+    "db:validate-schema": "tsx scripts/db-schema-validator.ts",
+    "db:validate-migrations": "tsx scripts/db-schema-validator.ts migrations",
+    "startup:validate": "tsx scripts/startup-validation.ts",
+    "test:api-contract": "vitest run tests/api/contract.test.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.2",
@@ -277,7 +281,8 @@
     "vite-plugin-pwa": "^0.17.4",
     "vitest": "^1.0.4",
     "wait-on": "^7.2.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "js-yaml": "^4.1.0"
   },
   "engines": {
     "node": ">=18.17.0",
