@@ -1,180 +1,185 @@
-# 30-Day Sprint: Quick Start Guide
+# Sprint Quick Start Guide
 
-**Sprint Goal:** AI Agent Marketplace MVP  
-**Full Plan:** See `docs/30_DAY_SPRINT_PLAN.md`
+**Current Sprint:** User Activation & Onboarding MVP  
+**Sprint Period:** 2025-01-31 to 2025-03-01 (30 days)  
+**Last Updated:** 2025-01-30
 
 ---
 
 ## 🎯 Sprint Goal
 
-> By the end of this 30-day sprint, a user can reliably browse a curated marketplace of AI agents, deploy one to their workspace, configure it with their credentials, and have it responding to queries via chat interface within 5 minutes. We can measure agent deployments, active conversations, and user satisfaction scores.
+> **By the end of this 30-day sprint, a new user can reliably sign up, complete a 5-step onboarding flow, connect their first integration (Shopify or Wave Accounting), create their first workflow from a pre-built template, and see it execute successfully. We can measure activation rate (target >60%), time-to-activation (target <24 hours), and Day 7 retention (target >40%).**
 
 ---
 
-## 📅 Week Overview
+## 📊 Sprint Health: Last 30 Days
 
-| Week | Focus | Key Deliverable |
-|------|-------|----------------|
-| **Week 1** | Foundations & Architecture | Database schema, API endpoints, UI skeleton |
-| **Week 2** | Core Functionality | End-to-end flow: browse → deploy → chat |
-| **Week 3** | Hardening & Observability | Error handling, analytics, performance |
-| **Week 4** | Polish & Rollout | Documentation, accessibility, final testing |
+**Overall Score: 2.8/5** (Adequate but Fragile)
 
----
+| Dimension | Score | Status |
+|-----------|-------|--------|
+| Product Clarity | 3/5 | Adequate but Fragile |
+| Architecture & Code Quality | 4/5 | Strong and Compounding |
+| Execution Velocity | 2/5 | Very Weak / Chaotic |
+| Reliability & Observability | 3/5 | Adequate but Fragile |
+| Learning & Validation | 2/5 | Very Weak / Chaotic |
 
-## 🚀 First 72 Hours Checklist
-
-### Day 1 (Foundation)
-- [ ] Create sprint branch: `feature/marketplace-sprint-week-1`
-- [ ] Design database schema (marketplace_agents, agent_deployments, conversations)
-- [ ] Create migration file: `supabase/migrations/[timestamp]_marketplace_agents.sql`
-- [ ] Set up OPENAI_API_KEY environment variable
-- [ ] Complete OpenAI integration in `supabase/functions/chat-api/index.ts`
-- [ ] Create API routes: `app/api/marketplace/agents/route.ts`, `app/api/marketplace/deploy/route.ts`
-- [ ] **PR #1:** Database schema (open for review)
-
-### Day 2 (API & UI Foundation)
-- [ ] Implement marketplace API endpoints (GET/POST)
-- [ ] Create agent execution router: `lib/agents/executor.ts`
-- [ ] Seed database with 5-10 sample agents
-- [ ] Create marketplace page: `app/marketplace/page.tsx`
-- [ ] Create agent card component: `components/marketplace/AgentCard.tsx`
-- [ ] Create deployment modal: `components/marketplace/DeployAgentModal.tsx`
-- [ ] **PR #2:** Marketplace API & UI foundation (open for review)
-
-### Day 3 (End-to-End Flow)
-- [ ] Complete deployment form with validation
-- [ ] Create chat API endpoint: `app/api/agents/[id]/chat/route.ts`
-- [ ] Create chat interface: `components/agent/ChatInterface.tsx`
-- [ ] Connect chat to deployed agents
-- [ ] Add telemetry tracking
-- [ ] Test complete flow: browse → deploy → chat
-- [ ] **PR #3:** Complete end-to-end flow (open for review)
-
-**End of Day 3 Goal:** Working demo of marketplace → deployment → chat
+**Key Finding:** Strong foundational work completed, but sprint goal (marketplace MVP) not achieved. No user-facing features shipped.
 
 ---
 
-## 📋 Task Breakdown by Week
+## 🚀 First 72 Hours Action Plan
 
-### Week 1 Tasks (8 tasks)
-- **Backend:** Database schema, Marketplace API, OpenAI integration
-- **Frontend:** Marketplace page, Agent cards, Deployment modal, Chat UI skeleton
-- **Data:** Telemetry events
+### Day 1: Foundation Setup
+- [ ] Create sprint branch: `feature/onboarding-sprint-week-1`
+- [ ] Create GitHub project board with Week 1 tasks
+- [ ] Design database schema for onboarding and integrations
+- [ ] Create migration file: `supabase/migrations/[timestamp]_onboarding_schema.sql`
+- [ ] Set up environment variables (Shopify, Wave OAuth)
+- [ ] Create onboarding API endpoints skeleton
+- [ ] **PR #1:** Database schema
 
-### Week 2 Tasks (8 tasks)
-- **Backend:** Agent executor, Config validation, Conversation API
-- **Frontend:** Search/filters, Enhanced chat, Agent management, Form improvements
-- **Data:** Performance metrics
+### Day 2: OAuth Integration & Onboarding UI
+- [ ] Complete Shopify OAuth integration
+- [ ] Complete Wave Accounting OAuth integration
+- [ ] Create onboarding page (`app/onboarding/page.tsx`)
+- [ ] Create onboarding wizard component
+- [ ] Create step indicator component
+- [ ] Create integration connection component
+- [ ] **PR #2:** Onboarding API & OAuth
 
-### Week 3 Tasks (7 tasks)
-- **Backend:** Rate limiting, Retry logic, Analytics API
-- **Frontend:** Error handling, Loading states, Admin dashboard
-- **Data:** Analytics queries, Error tracking
+### Day 3: Complete Onboarding Flow & Telemetry
+- [ ] Complete onboarding wizard (all 5 steps)
+- [ ] Add telemetry tracking (onboarding events)
+- [ ] End-to-end testing
+- [ ] Error handling improvements
+- [ ] UI polish
+- [ ] **PR #3:** Complete onboarding flow
 
-### Week 4 Tasks (8 tasks)
-- **Backend:** Performance optimization, API docs
-- **Frontend:** Onboarding, Mobile responsiveness, Accessibility, Performance
-- **Docs:** User guide, API docs, Demo video
-
----
-
-## 🔑 Key Files
-
-### Database
-- `supabase/migrations/[timestamp]_marketplace_agents.sql`
-
-### API Routes
-- `app/api/marketplace/agents/route.ts`
-- `app/api/marketplace/deploy/route.ts`
-- `app/api/agents/[id]/chat/route.ts`
-- `supabase/functions/chat-api/index.ts`
-
-### Components
-- `app/marketplace/page.tsx`
-- `components/marketplace/AgentCard.tsx`
-- `components/marketplace/DeployAgentModal.tsx`
-- `components/agent/ChatInterface.tsx`
-
-### Logic
-- `lib/agents/executor.ts`
-- `lib/agents/config-validator.ts`
-- `lib/agents/rate-limiter.ts`
+**End of Day 3:** Should have 3 PRs open, onboarding flow functional, OAuth integrations working.
 
 ---
 
-## ✅ Success Criteria
+## 📅 Week-by-Week Overview
 
-1. ✅ User can browse 10+ agents in marketplace
-2. ✅ User can deploy agent in ≤3 clicks
-3. ✅ User can configure agent in <2 minutes
-4. ✅ User can chat with agent (<500ms response time)
-5. ✅ OpenAI integration working with error handling
-6. ✅ 99%+ uptime for chat endpoints
-7. ✅ All conversations persist correctly
-8. ✅ Telemetry tracks all key events
-9. ✅ Admin dashboard shows metrics
-10. ✅ 5+ users successfully test and provide feedback
-11. ✅ Average response time <2s, error rate <1%
+### Week 1: Foundations & Onboarding Flow
+**Goal:** Complete onboarding flow skeleton and integration connection infrastructure.
 
----
+**Key Deliverables:**
+- Database schema for onboarding and integrations
+- Onboarding API endpoints
+- Shopify OAuth integration
+- Wave OAuth integration
+- Onboarding page and wizard UI
 
-## 🧪 Testing Strategy
-
-- **Unit Tests:** 70%+ coverage for new code
-- **Integration Tests:** All API endpoints
-- **E2E Tests:** Critical flows (browse → deploy → chat)
-
-### Test Files
-- `tests/api/marketplace.test.ts`
-- `tests/e2e/marketplace.test.ts`
+**Checkpoint:** Can demo onboarding flow with OAuth integrations
 
 ---
 
-## 📊 Observability
+### Week 2: Workflow Templates & Creation Flow
+**Goal:** Complete workflow template library and creation flow.
 
-### Key Metrics
-- `marketplace.deployments.total`
-- `agent.chat.response_time`
-- `agent.chat.errors`
-- `marketplace.agents.active`
+**Key Deliverables:**
+- Workflow template database schema
+- Template API endpoints
+- Workflow creation API
+- Workflow execution engine
+- Template library UI
+- Workflow creation wizard
 
-### Key Events
-- `marketplace.agent.viewed`
-- `marketplace.agent.deployed`
-- `agent.chat.message.sent`
-- `agent.chat.response.received`
-
----
-
-## 🚨 Risk Mitigation
-
-1. **OpenAI API Issues:** Retry logic + fallback provider
-2. **Database Performance:** Indexes + connection pooling
-3. **Complex Agent Logic:** Start simple, iterate
-4. **User Confusion:** Clear forms + tooltips
-5. **Timeline:** Buffer in Week 4, prioritize must-haves
+**Checkpoint:** Can demo complete flow: onboarding → workflow creation → execution
 
 ---
 
-## 📞 Quick Commands
+### Week 3: Activation Funnel Instrumentation & Metrics Dashboard
+**Goal:** Instrument activation funnel and build metrics dashboard MVP.
 
-```bash
-# Development
-pnpm dev
-pnpm typecheck
-pnpm lint
-pnpm test
+**Key Deliverables:**
+- Activation funnel instrumentation (all events tracked)
+- Metrics calculation functions
+- Metrics API endpoints
+- Metrics dashboard UI
+- Error tracking integration (Sentry)
+- Performance monitoring setup
 
-# Database
-pnpm db:push
-pnpm db:migrate
-
-# Testing
-pnpm test:e2e
-pnpm test:coverage
-```
+**Checkpoint:** Can answer "Are we improving?" with data
 
 ---
 
-**For full details, see:** `docs/30_DAY_SPRINT_PLAN.md`
+### Week 4: Polish, Performance & User Testing
+**Goal:** Final UX polish, performance optimization, and user validation.
+
+**Key Deliverables:**
+- Mobile responsiveness
+- Accessibility improvements
+- Performance optimizations
+- User satisfaction survey
+- Documentation
+- Sprint retrospective
+
+**Checkpoint:** Sprint goal achieved, ready for next sprint
+
+---
+
+## 🔑 Key Documents
+
+- **[Sprint Review & Planning](./SPRINT_REVIEW_AND_PLANNING.md)** - Complete sprint review and planning document
+- **[Sprint Goal](./SPRINT_N+1_GOAL.md)** - Detailed sprint goal and success criteria
+- **[Sprint Backlog](./SPRINT_BACKLOG.md)** - Detailed task backlog (update for this sprint)
+- **[Product Decisions](./decisions/)** - Architecture Decision Records
+- **[Sprint Learnings](./sprint-learnings/)** - Feedback and validation results
+
+---
+
+## ⚠️ Critical Actions (Next 7 Days)
+
+### Safety (Errors, Data, Reliability)
+1. **Fix environment variable sync** ⏱️ Quick Win (≤1 hour)
+2. **Integrate error tracking (Sentry)** ⏱️ Deep Work (≥3 hours)
+3. **Add database backup verification** ⏱️ Quick Win (≤1 hour)
+4. **Add input validation to all API routes** ⏱️ Deep Work (≥3 hours)
+
+### Clarity (Docs, Decision Records)
+5. **Create sprint goal alignment document** ⏱️ Quick Win (≤1 hour) ✅ Done
+6. **Document sprint retrospective** ⏱️ Quick Win (≤1 hour)
+7. **Create product decision records** ⏱️ Quick Win (≤1 hour) ✅ Done
+
+### Leverage (Instrumentation, Automation)
+8. **Instrument activation funnel events** ⏱️ Deep Work (≥3 hours)
+9. **Build metrics dashboard MVP** ⏱️ Deep Work (≥3 hours)
+10. **Add test coverage for critical paths** ⏱️ Deep Work (≥3 hours)
+
+See [Sprint Review & Planning](./SPRINT_REVIEW_AND_PLANNING.md#g-7-day-improvement-checklist) for full 7-day checklist.
+
+---
+
+## 📈 Success Metrics
+
+### Weekly Metrics Dashboard
+- **Week 1:** Onboarding completion rate, OAuth success rate
+- **Week 2:** Workflow creation rate, workflow execution success rate
+- **Week 3:** Activation rate, time-to-activation, Day 7 retention
+- **Week 4:** Final activation rate, user satisfaction, performance metrics
+
+### Sprint Goal Success Criteria
+- ✅ Activation rate >60%
+- ✅ Time-to-activation <24 hours (median)
+- ✅ Day 7 retention >40%
+- ✅ Onboarding completion rate >80%
+- ✅ Integration connection success rate >95%
+
+---
+
+## 🎯 Next Steps
+
+1. **Read:** [Sprint Review & Planning](./SPRINT_REVIEW_AND_PLANNING.md) for complete context
+2. **Review:** [Sprint Goal](./SPRINT_N+1_GOAL.md) for detailed success criteria
+3. **Execute:** [First 72 Hours Action Plan](#-first-72-hours-action-plan)
+4. **Track:** Use GitHub project board for task tracking
+5. **Review:** Weekly checkpoints (end of each week)
+
+---
+
+**Questions?** See [Sprint Review & Planning](./SPRINT_REVIEW_AND_PLANNING.md) for detailed answers.
+
+**Last Updated:** 2025-01-30
