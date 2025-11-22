@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { SystemError, NetworkError, formatError } from "@/src/lib/errors";
+import { SystemError, NetworkError, formatError } from "@/lib/errors";
 import { createPOSTHandler } from "@/lib/api/route-handler";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";

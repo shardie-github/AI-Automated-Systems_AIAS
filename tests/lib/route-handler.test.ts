@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createGETHandler, createPOSTHandler } from '@/lib/api/route-handler';
 import { NextRequest, NextResponse } from 'next/server';
-import { ValidationError } from '@/src/lib/errors';
+import { ValidationError } from '@/lib/errors';
 import { z } from 'zod';
 
 describe('Route Handler Utility', () => {

@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
-import { SystemError, formatError } from "@/src/lib/errors";
+import { SystemError, formatError } from "@/lib/errors";
 import { validateEnvOnStartup } from "@/lib/env-validation";
 
 // Load environment variables dynamically

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { SystemError, ValidationError, formatError } from "@/src/lib/errors";
+import { SystemError, ValidationError, formatError } from "@/lib/errors";
 import { createPOSTHandler } from "@/lib/api/route-handler";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";

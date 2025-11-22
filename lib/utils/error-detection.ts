@@ -3,7 +3,7 @@
  * Monitors errors and sends alerts when thresholds are exceeded
  */
 
-import { SystemError, formatError } from '@/src/lib/errors'; // Using src/lib/errors.ts as source of truth
+import { SystemError, formatError } from '@/lib/errors';
 
 export interface ErrorAlert {
   id: string;
@@ -83,19 +83,21 @@ class ErrorDetector {
 
     // Check if threshold exceeded
     if (errorCount >= this.config.errorThreshold) {
-      this.createAlert(error, context, severity, errorCount);
+      this.createAlert(error, context, severity, errorCount).catch(e => {
+        console.warn('Failed to create alert:', e);
+      });
     }
   }
 
   /**
    * Create an alert
    */
-  private createAlert(
+  private async createAlert(
     error: Error,
     context: Record<string, unknown>,
     severity: 'low' | 'medium' | 'high' | 'critical',
     count: number
-  ): void {
+  ): Promise<void> {
     const alert: ErrorAlert = {
       id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date(),
@@ -112,13 +114,13 @@ class ErrorDetector {
     this.alerts = this.alerts.filter(a => a.timestamp > oneDayAgo);
 
     // Send alert (implement notification logic here)
-    this.sendAlert(alert);
+    await this.sendAlert(alert);
   }
 
   /**
    * Send alert notification
    */
-  private sendAlert(alert: ErrorAlert): void {
+  private async sendAlert(alert: ErrorAlert): Promise<void> {
     // Only send if alert threshold not exceeded
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const recentAlerts = this.alerts.filter(a => a.timestamp > oneHourAgo);
@@ -138,7 +140,7 @@ class ErrorDetector {
     });
 
     // Integrate with monitoring service (e.g., Sentry, Datadog)
-    this.sendToMonitoringService(alert);
+    await this.sendToMonitoringService(alert);
   }
 
   /**
@@ -160,7 +162,7 @@ class ErrorDetector {
   /**
    * Send alert to monitoring service
    */
-  private sendToMonitoringService(alert: ErrorAlert): void {
+  private async sendToMonitoringService(alert: ErrorAlert): Promise<void> {
     // Integration with monitoring services
     // Supports Sentry, Datadog, or custom webhook
     
@@ -222,7 +224,8 @@ class ErrorDetector {
 
     // Also send to enhanced telemetry if available
     try {
-      const { telemetry } = require('@/lib/monitoring/enhanced-telemetry');
+      // Dynamic import to avoid circular dependencies
+      const { telemetry } = await import('@/lib/monitoring/enhanced-telemetry');
       if (telemetry && telemetry.trackError) {
         telemetry.trackError(alert.error, {
           ...alert.context,

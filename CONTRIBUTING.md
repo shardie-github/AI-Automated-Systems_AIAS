@@ -1,292 +1,179 @@
 # Contributing to AIAS Platform
 
-Thank you for your interest in contributing to the AIAS Platform! This document provides guidelines and information for contributors.
-
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Contributing Process](#contributing-process)
-- [Coding Standards](#coding-standards)
-- [Testing](#testing)
-- [Pull Request Process](#pull-request-process)
-- [Issue Reporting](#issue-reporting)
-
-## Code of Conduct
-
-This project adheres to our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 18.17.0 or higher
-- pnpm 8.0.0 or higher
-- Git
-
-### Development Setup
-
-1. **Fork and clone the repository**
+1. **Fork the repository**
+2. **Clone your fork**
    ```bash
    git clone https://github.com/your-username/aias-platform.git
    cd aias-platform
    ```
-
-2. **Install dependencies**
+3. **Create a branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. **Install dependencies**
    ```bash
    pnpm install
    ```
-
-3. **Set up environment variables**
+5. **Make your changes**
+6. **Test your changes**
    ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your configuration
+   pnpm test
+   pnpm typecheck
+   pnpm lint
    ```
-
-4. **Set up the database**
+7. **Commit your changes**
    ```bash
-   pnpm run db:push
-   pnpm run db:seed
+   git commit -m "Add: your feature description"
    ```
-
-5. **Start the development server**
+8. **Push to your fork**
    ```bash
-   pnpm run dev
+   git push origin feature/your-feature-name
    ```
+9. **Open a Pull Request**
 
-## Contributing Process
+## Development Workflow
 
-### 1. Create a Feature Branch
+### Before You Start
 
-```bash
-git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/your-bug-fix
-```
+- Check existing [issues](https://github.com/your-org/aias-platform/issues) to see if your idea is already being worked on
+- For major changes, open an issue first to discuss the approach
+- Make sure you can run the project locally
 
-### 2. Make Your Changes
+### Making Changes
 
-- Write clean, readable code
-- Follow the coding standards
-- Add tests for new functionality
-- Update documentation as needed
+1. **Follow the code style**
+   - Run `pnpm format` before committing
+   - Follow existing patterns in the codebase
+   - Use TypeScript for all new code
 
-### 3. Test Your Changes
+2. **Write tests**
+   - Add tests for new features
+   - Ensure all tests pass
+   - Aim for good test coverage
 
-```bash
-# Run linting
-pnpm run lint
+3. **Update documentation**
+   - Update relevant docs if you change functionality
+   - Add JSDoc comments for new functions
+   - Update README if needed
 
-# Run type checking
-pnpm run typecheck
+4. **Keep commits focused**
+   - One feature or fix per commit
+   - Write clear commit messages
+   - Use conventional commit format when possible
 
-# Run tests
-pnpm run test
+## Code Standards
 
-# Run E2E tests
-pnpm run test:e2e
-```
-
-### 4. Commit Your Changes
-
-We use [Conventional Commits](https://www.conventionalcommits.org/):
-
-```bash
-git commit -m "feat: add new feature"
-git commit -m "fix: resolve bug in component"
-git commit -m "docs: update README"
-```
-
-### 5. Push and Create Pull Request
-
-```bash
-git push origin feature/your-feature-name
-```
-
-Then create a pull request on GitHub.
-
-## Coding Standards
-
-### TypeScript/JavaScript
+### TypeScript
 
 - Use TypeScript for all new code
-- Follow the existing ESLint configuration
+- Avoid `any` types
+- Use proper type definitions
+- Run `pnpm typecheck` before committing
+
+### Code Style
+
+- Use Prettier for formatting (run `pnpm format`)
+- Follow ESLint rules (run `pnpm lint`)
 - Use meaningful variable and function names
-- Add JSDoc comments for public APIs
-- Prefer functional components over class components
-- Use hooks for state management
+- Add comments for complex logic
 
-### React
+### Testing
 
-- Use functional components with hooks
-- Implement proper error boundaries
-- Follow accessibility guidelines
-- Use TypeScript for prop types
-- Implement proper loading and error states
-
-### CSS/Styling
-
-- Use Tailwind CSS for styling
-- Follow mobile-first responsive design
-- Use CSS variables for theming
-- Implement dark mode support
-- Follow accessibility guidelines
-
-### File Organization
-
-```
-src/
-├── components/          # Reusable UI components
-├── pages/              # Page components
-├── hooks/              # Custom React hooks
-├── lib/                # Utility functions
-├── types/              # TypeScript type definitions
-└── integrations/       # Third-party integrations
-```
-
-## Testing
-
-### Unit Tests
-
-- Write tests for all new functionality
-- Use Vitest for unit testing
-- Aim for high test coverage
-- Test both happy path and edge cases
-
-### Integration Tests
-
-- Test component interactions
-- Test API integrations
-- Test user workflows
-
-### E2E Tests
-
-- Use Playwright for E2E testing
-- Test critical user journeys
-- Test across different browsers
-- Test responsive design
-
-### Running Tests
-
-```bash
-# Unit tests
-pnpm run test
-
-# E2E tests
-pnpm run test:e2e
-
-# Test coverage
-pnpm run test:coverage
-```
+- Write tests for new features
+- Use Vitest for unit tests
+- Use Playwright for E2E tests
+- Aim for 80%+ test coverage
 
 ## Pull Request Process
 
-### Before Submitting
+1. **Update your branch**
+   ```bash
+   git checkout main
+   git pull upstream main
+   git checkout your-branch
+   git rebase main
+   ```
 
-- [ ] Code follows the coding standards
-- [ ] All tests pass
-- [ ] No linting errors
-- [ ] TypeScript compilation succeeds
-- [ ] Documentation is updated
-- [ ] Commit messages follow conventional format
+2. **Ensure all checks pass**
+   - Type checking: `pnpm typecheck`
+   - Linting: `pnpm lint`
+   - Tests: `pnpm test`
+   - Formatting: `pnpm format:check`
 
-### PR Template
+3. **Write a good PR description**
+   - Explain what changes you made
+   - Explain why you made them
+   - Reference related issues
+   - Include screenshots if applicable
 
-When creating a pull request, please include:
+4. **Wait for review**
+   - Address feedback promptly
+   - Be open to suggestions
+   - Ask questions if something is unclear
 
-1. **Description**: What changes were made and why
-2. **Type**: feat, fix, docs, style, refactor, test, chore
-3. **Testing**: How the changes were tested
-4. **Screenshots**: If applicable
-5. **Breaking Changes**: If any
-6. **Related Issues**: Link to related issues
+## Commit Message Format
 
-### Review Process
+We prefer conventional commits:
 
-1. Automated checks must pass
-2. At least one reviewer approval required
-3. All conversations must be resolved
-4. No merge conflicts
+```
+type(scope): subject
 
-## Issue Reporting
+body
 
-### Bug Reports
+footer
+```
 
-When reporting bugs, please include:
+Types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Test additions or changes
+- `chore`: Maintenance tasks
 
-- Clear description of the issue
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots if applicable
-- Environment details (OS, browser, etc.)
+Examples:
+```
+feat(workflows): add workflow template marketplace
+fix(api): handle edge case in route handler
+docs(readme): update installation instructions
+```
 
-### Feature Requests
+## Project Structure
 
-When requesting features, please include:
-
-- Clear description of the feature
-- Use case and motivation
-- Proposed solution (if any)
-- Alternatives considered
-
-### Issue Labels
-
-- `bug`: Something isn't working
-- `enhancement`: New feature or request
-- `documentation`: Improvements to documentation
-- `good first issue`: Good for newcomers
-- `help wanted`: Extra attention is needed
-- `priority: high`: High priority
-- `priority: medium`: Medium priority
-- `priority: low`: Low priority
-
-## Development Guidelines
-
-### Git Workflow
-
-1. Always work on feature branches
-2. Keep commits atomic and focused
-3. Use descriptive commit messages
-4. Rebase before merging
-5. Squash commits when appropriate
-
-### Code Review
-
-- Be constructive and respectful
-- Focus on the code, not the person
-- Suggest improvements, don't just criticize
-- Ask questions if something is unclear
-- Approve when you're confident in the changes
-
-### Performance
-
-- Consider performance implications
-- Use React.memo when appropriate
-- Implement proper loading states
-- Optimize images and assets
-- Monitor bundle size
-
-### Security
-
-- Never commit secrets or credentials
-- Use environment variables for configuration
-- Validate all user inputs
-- Follow security best practices
-- Report security issues privately
+```
+aias-platform/
+├── apps/web/          # Next.js application
+├── lib/               # Shared libraries
+├── components/       # Shared React components
+├── docs/              # Documentation
+├── scripts/           # Utility scripts
+├── tests/             # Test files
+└── supabase/          # Database migrations and functions
+```
 
 ## Getting Help
 
-- Check existing issues and discussions
-- Join our community discussions
-- Contact maintainers for urgent issues
-- Read the documentation thoroughly
+- **Questions?** Open a [Discussion](https://github.com/your-org/aias-platform/discussions)
+- **Found a bug?** Open an [Issue](https://github.com/your-org/aias-platform/issues)
+- **Need help?** Check the [Documentation](docs/)
+
+## Code of Conduct
+
+- Be respectful and inclusive
+- Welcome newcomers
+- Focus on constructive feedback
+- Help others learn and grow
 
 ## Recognition
 
-Contributors will be recognized in:
-- CONTRIBUTORS.md file
-- Release notes
-- Project documentation
+Contributors will be:
+- Listed in the project README
+- Credited in release notes
+- Appreciated by the community
 
-Thank you for contributing to AIAS Platform! 🚀
+Thank you for contributing! 🎉

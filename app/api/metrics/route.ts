@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { SystemError, formatError } from "@/src/lib/errors";
+import { SystemError, formatError } from "@/lib/errors";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { cacheService } from "@/lib/performance/cache";
 import { createGETHandler } from "@/lib/api/route-handler";

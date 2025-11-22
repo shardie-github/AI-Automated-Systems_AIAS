@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { SystemError, ValidationError, formatError } from "@/src/lib/errors";
+import { SystemError, ValidationError, formatError } from "@/lib/errors";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";
 import { z } from "zod";

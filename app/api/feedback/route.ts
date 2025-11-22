@@ -5,7 +5,7 @@ import { createValidatedRoute } from "@/lib/api/validation-middleware";
 import { z } from "zod";
 import { logger } from "@/lib/logging/structured-logger";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
-import { SystemError, ValidationError, formatError } from "@/src/lib/errors";
+import { SystemError, ValidationError, formatError } from "@/lib/errors";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";
 
