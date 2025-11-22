@@ -1,0 +1,82 @@
+name: Sync Environment Variables
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  sync-env-vars:
+    runs-on: ubuntu-latest
+    permissions:
+      secrets: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Sync Supabase variables to GitHub Secrets
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          echo "Syncing environment variables from Supabase to GitHub Secrets..."
+          
+          # Note: This is a placeholder script
+          # In production, you would:
+          # 1. Use Supabase CLI to fetch environment variables
+          # 2. Use GitHub API to update secrets
+          # 3. Validate that all required variables are present
+          
+          echo "Required variables to sync:"
+          echo "- NEXT_PUBLIC_SUPABASE_URL"
+          echo "- NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          echo "- SUPABASE_SERVICE_ROLE_KEY"
+          echo "- SUPABASE_JWT_SECRET"
+          echo "- DATABASE_URL"
+          
+          # Example: Use Supabase CLI to get variables
+          # supabase secrets list --project-ref $SUPABASE_PROJECT_REF
+          
+          echo "Environment variable sync completed (manual sync required)"
+
+      - name: Sync to Vercel (if Vercel token available)
+        if: env.VERCEL_TOKEN != ''
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          echo "Syncing environment variables to Vercel..."
+          # Note: This would use Vercel CLI or API to sync variables
+          echo "Vercel sync completed (manual sync required)"
+
+      - name: Validate required variables
+        run: |
+          echo "Validating required environment variables..."
+          REQUIRED_VARS=(
+            "NEXT_PUBLIC_SUPABASE_URL"
+            "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+            "SUPABASE_SERVICE_ROLE_KEY"
+            "DATABASE_URL"
+          )
+          
+          MISSING_VARS=()
+          for var in "${REQUIRED_VARS[@]}"; do
+            if ! gh secret list | grep -q "$var"; then
+              MISSING_VARS+=("$var")
+            fi
+          done
+          
+          if [ ${#MISSING_VARS[@]} -gt 0 ]; then
+            echo "⚠️ Missing required secrets: ${MISSING_VARS[*]}"
+            echo "Please add these secrets manually in GitHub Settings → Secrets"
+            exit 1
+          else
+            echo "✅ All required secrets are present"
+          fi

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
 import { handleApiError } from "@/lib/api/route-handler";
+import { track } from "@/lib/telemetry/track";
 
 const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
 
@@ -134,6 +135,51 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info("Workflow created", { workflowId: workflow.id, userId: user.id });
+
+    // Track workflow created event
+    try {
+      await track(user.id, {
+        type: "workflow_created",
+        path: "/api/v1/workflows",
+        meta: {
+          workflow_id: workflow.id,
+          workflow_name: validatedData.name,
+          timestamp: new Date().toISOString(),
+        },
+        app: "web",
+      });
+
+      // Check if user has activated (has integration + workflow)
+      // This is a simplified check - in production, you'd query the database
+      const { data: integrations } = await supabase
+        .from("integrations")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("status", "connected")
+        .limit(1);
+
+      const { data: workflows } = await supabase
+        .from("workflows")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      // User is activated if they have at least one integration and one workflow
+      if (integrations && integrations.length > 0 && workflows && workflows.length > 0) {
+        await track(user.id, {
+          type: "user_activated",
+          path: "/api/v1/workflows",
+          meta: {
+            timestamp: new Date().toISOString(),
+            activation_method: "workflow_created",
+          },
+          app: "web",
+        });
+      }
+    } catch (telemetryError) {
+      // Log but don't fail workflow creation if telemetry fails
+      logger.warn("Failed to track workflow event", { error: telemetryError });
+    }
 
     return NextResponse.json({ workflow }, { status: 201 });
   } catch (error) {

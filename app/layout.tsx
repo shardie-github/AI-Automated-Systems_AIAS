@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { PWARegistration } from "@/components/pwa-registration";
 import { PerformanceHUD } from "@/components/dev/performance-hud";
 import { PerformanceBeacon } from "@/components/performance-beacon";
+import { WebVitalsTracker } from "@/components/performance/WebVitalsTracker";
 import AgentProvider from "@/components/agent/AgentProvider";
 import { OrganizationSchema, WebSiteSchema } from "@/components/seo/structured-data";
 import { EnhancedErrorBoundary } from "@/lib/error-handling/error-boundary-enhanced";
@@ -63,27 +64,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  // [STAKE+TRUST:BEGIN:i18n_layout]
-  // TODO: Replace with dynamic locale detection when i18n is implemented
-  // Implementation: Use i18next/react-i18next (already in dependencies)
-  // Example:
-  // import { useTranslation } from 'react-i18next';
-  // const { i18n } = useTranslation();
-  // const locale = i18n.language || detectLocaleFromCookie() || detectLocaleFromHeader() || 'en';
-  // const isRTL = ['ar', 'he', 'fa', 'ur'].includes(locale);
-  // Note: i18next and react-i18next are already installed in package.json
   const locale = "en";
   const isRTL = false;
-  // [STAKE+TRUST:END:i18n_layout]
 
   return (
     <html lang={locale} dir={isRTL ? "rtl" : "ltr"} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        {/* [META:BEGIN:pwa] */}
         <link rel="manifest" href="/manifest.json" />
         <script dangerouslySetInnerHTML={{__html:`if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}`}} />
-        {/* [META:END:pwa] */}
         <OrganizationSchema />
         <WebSiteSchema />
       </head>
@@ -91,10 +80,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <EnhancedErrorBoundary>
           <TelemetryProvider>
             <ThemeProvider>
-              {/* [STAKE+TRUST:BEGIN:skip_link] */}
-              {/* Skip link already exists - verified accessibility feature */}
               <a href="#main" className="skip-link">Skip to content</a>
-              {/* [STAKE+TRUST:END:skip_link] */}
               <Header />
               <main id="main" className="container py-6">{children}</main>
               <Footer />
@@ -103,14 +89,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <PWARegistration />
               <PerformanceHUD />
               <PerformanceBeacon />
-              {/* Agent Suggestions: show drawer site-wide when enabled */}
+              <WebVitalsTracker />
               <AgentProvider />
-          {/* [META:BEGIN:mounts] */}
-          {/* Example mounts — wire auth user ID + app meta in your layout or provider */}
-          {/* <meta name="x-app-id" content={process.env.NEXT_PUBLIC_APP_ID || 'generic'} /> */}
-          {/* <ConsentPanel /> */}
-          {/* <RecoDrawer userId="{AUTH_USER_ID}" /> */}
-          {/* [META:END:mounts] */}
             </ThemeProvider>
           </TelemetryProvider>
         </EnhancedErrorBoundary>
