@@ -3,8 +3,9 @@ name: Future Runtime Compatibility Check
 on:
   push:
     branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+  # Removed PR trigger - compatibility checks moved to scheduled workflow
+  # pull_request:
+  #   branches: [main, develop]
   schedule:
     # Run daily at 6 AM UTC
     - cron: '0 6 * * *'

@@ -227,7 +227,8 @@
     "db:validate-schema": "tsx scripts/db-schema-validator.ts",
     "db:validate-migrations": "tsx scripts/db-schema-validator.ts migrations",
     "startup:validate": "tsx scripts/startup-validation.ts",
-    "test:api-contract": "vitest run tests/api/contract.test.ts"
+    "test:api-contract": "vitest run tests/api/contract.test.ts",
+    "ci": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.2",

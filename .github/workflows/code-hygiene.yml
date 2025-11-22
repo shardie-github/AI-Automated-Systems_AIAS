@@ -1,8 +1,9 @@
 name: Code Hygiene
 
 on:
-  pull_request:
-    branches: [main, develop]
+  # Removed PR trigger - this is now scheduled/maintenance only
+  # pull_request:
+  #   branches: [main, develop]
   push:
     branches: [main]
   schedule:

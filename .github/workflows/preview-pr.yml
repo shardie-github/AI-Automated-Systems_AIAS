@@ -1,8 +1,9 @@
 name: PR Preview & Quality Gates
 
 on:
-  pull_request:
-    branches: [main]
+  # Changed to manual trigger only - preview deployments are opt-in
+  # pull_request:
+  #   branches: [main]
   workflow_dispatch:
 
 jobs:
