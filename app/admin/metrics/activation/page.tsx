@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { ActivationChart } from "@/components/metrics/ActivationChart";
+import { FunnelChart } from "@/components/metrics/FunnelChart";
 
 interface ActivationMetrics {
   metrics: {
@@ -231,6 +233,20 @@ export default function ActivationMetricsDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 gap-6">
+        <ActivationChart
+          data={[
+            // Placeholder data - in production, this would come from time-series queries
+            { date: "Week 1", activationRate: m.activation_rate, timeToActivation: m.time_to_activation_hours, day7Retention: m.day_7_retention },
+            { date: "Week 2", activationRate: m.activation_rate * 1.1, timeToActivation: m.time_to_activation_hours * 0.9, day7Retention: m.day_7_retention * 1.05 },
+            { date: "Week 3", activationRate: m.activation_rate * 1.2, timeToActivation: m.time_to_activation_hours * 0.8, day7Retention: m.day_7_retention * 1.1 },
+            { date: "Week 4", activationRate: m.activation_rate, timeToActivation: m.time_to_activation_hours, day7Retention: m.day_7_retention },
+          ]}
+        />
+        <FunnelChart data={funnel} />
+      </div>
 
       {/* Detailed Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

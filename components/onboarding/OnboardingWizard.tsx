@@ -1,11 +1,11 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, ArrowLeft, Sparkles, Zap, Target } from "lucide-react";
-import { conversionTracker } from "@/lib/analytics/conversion-tracking";
 import { track } from "@/lib/telemetry/track";
 import Link from "next/link";
 
@@ -20,19 +20,6 @@ export function OnboardingWizard() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-
-  useEffect(() => {
-    // Track onboarding start
-    const userId = localStorage.getItem("user_id") || "anonymous";
-    track(userId, {
-      type: "onboarding_started",
-      path: "/onboarding",
-      meta: {
-        timestamp: new Date().toISOString(),
-      },
-      app: "web",
-    });
-  }, []);
 
   const steps: Step[] = [
     {
@@ -67,6 +54,19 @@ export function OnboardingWizard() {
     },
   ];
 
+  useEffect(() => {
+    // Track onboarding start
+    const userId = localStorage.getItem("user_id") || "anonymous";
+    track(userId, {
+      type: "onboarding_started",
+      path: "/onboarding",
+      meta: {
+        timestamp: new Date().toISOString(),
+      },
+      app: "web",
+    });
+  }, []);
+
   const goToNext = () => {
     const currentStepId = steps[currentStep].id;
     if (!completedSteps.includes(currentStepId)) {
@@ -89,7 +89,7 @@ export function OnboardingWizard() {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Track onboarding completion
+      // Track activation
       track(userId, {
         type: "onboarding_completed",
         path: "/onboarding",
@@ -97,9 +97,6 @@ export function OnboardingWizard() {
           timestamp: new Date().toISOString(),
         },
         app: "web",
-      });
-      conversionTracker.track("first_workflow_created", {
-        timeToActivation: Date.now(),
       });
     }
   };
@@ -113,20 +110,20 @@ export function OnboardingWizard() {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="main" aria-label="Onboarding wizard">
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium">Step {currentStep + 1} of {steps.length}</span>
           <span className="text-muted-foreground">{Math.round(progress)}% Complete</span>
         </div>
-        <Progress value={progress} className="h-2" />
+        <Progress value={progress} className="h-2" aria-label={`Onboarding progress: ${Math.round(progress)}%`} />
       </div>
 
       {/* Step Indicator */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" role="list" aria-label="Onboarding steps">
         {steps.map((step, index) => (
-          <div key={step.id} className="flex items-center flex-1">
+          <div key={step.id} className="flex items-center flex-1" role="listitem">
             <div className="flex flex-col items-center flex-1">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
@@ -136,11 +133,12 @@ export function OnboardingWizard() {
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-muted text-muted-foreground"
                 }`}
+                aria-label={`Step ${index + 1}: ${step.title}${index < currentStep ? " completed" : index === currentStep ? " current" : ""}`}
               >
                 {index < currentStep ? (
-                  <Check className="h-5 w-5" />
+                  <Check className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <span>{index + 1}</span>
+                  <span aria-hidden="true">{index + 1}</span>
                 )}
               </div>
               <div className="mt-2 text-xs text-center max-w-[100px] text-muted-foreground">
@@ -152,6 +150,7 @@ export function OnboardingWizard() {
                 className={`h-0.5 flex-1 mx-2 ${
                   index < currentStep ? "bg-primary" : "bg-muted"
                 }`}
+                aria-hidden="true"
               />
             )}
           </div>
@@ -171,18 +170,19 @@ export function OnboardingWizard() {
 
       {/* Navigation */}
       {currentStep < steps.length - 1 && (
-        <div className="flex justify-between">
+        <div className="flex justify-between" role="navigation" aria-label="Onboarding navigation">
           <Button
             variant="outline"
             onClick={goToPrevious}
             disabled={currentStep === 0}
+            aria-label="Go to previous step"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
             Previous
           </Button>
-          <Button onClick={goToNext}>
+          <Button onClick={goToNext} aria-label="Go to next step">
             Next
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       )}
@@ -194,7 +194,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <Sparkles className="h-16 w-16 text-primary mx-auto mb-4" />
+        <Sparkles className="h-16 w-16 text-primary mx-auto mb-4" aria-hidden="true" />
         <h3 className="text-2xl font-bold mb-2">Welcome to AIAS Platform!</h3>
         <p className="text-muted-foreground">
           We'll help you create your first automation workflow in just 30 minutes.
@@ -202,24 +202,24 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="text-center p-4 bg-muted/50 rounded-lg">
-          <Zap className="h-8 w-8 text-primary mx-auto mb-2" />
+          <Zap className="h-8 w-8 text-primary mx-auto mb-2" aria-hidden="true" />
           <div className="font-semibold mb-1">Quick Setup</div>
           <div className="text-sm text-muted-foreground">30 minutes</div>
         </div>
         <div className="text-center p-4 bg-muted/50 rounded-lg">
-          <Target className="h-8 w-8 text-primary mx-auto mb-2" />
+          <Target className="h-8 w-8 text-primary mx-auto mb-2" aria-hidden="true" />
           <div className="font-semibold mb-1">First Workflow</div>
           <div className="text-sm text-muted-foreground">Automate tasks</div>
         </div>
         <div className="text-center p-4 bg-muted/50 rounded-lg">
-          <Check className="h-8 w-8 text-primary mx-auto mb-2" />
+          <Check className="h-8 w-8 text-primary mx-auto mb-2" aria-hidden="true" />
           <div className="font-semibold mb-1">Save Time</div>
           <div className="text-sm text-muted-foreground">10+ hours/week</div>
         </div>
       </div>
       <Button onClick={onNext} className="w-full" size="lg">
         Get Started
-        <ArrowRight className="ml-2 h-4 w-4" />
+        <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
       </Button>
     </div>
   );
@@ -249,6 +249,18 @@ function ChooseIntegrationStep({ onNext }: { onNext: () => void }) {
 
       const data = await response.json();
       
+      // Track integration connection attempt
+      const userId = localStorage.getItem("user_id") || "anonymous";
+      track(userId, {
+        type: "integration_connect_started",
+        path: "/onboarding/choose-integration",
+        meta: {
+          provider,
+          timestamp: new Date().toISOString(),
+        },
+        app: "web",
+      });
+      
       // Redirect to OAuth URL
       if (data.oauth_url) {
         window.location.href = data.oauth_url;
@@ -271,20 +283,21 @@ function ChooseIntegrationStep({ onNext }: { onNext: () => void }) {
       <p className="text-muted-foreground">
         Choose a tool you use daily. We'll help you automate it.
       </p>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4" role="list" aria-label="Available integrations">
         {integrations.map((integration) => (
           <button
             key={integration.name}
             onClick={() => handleIntegrationClick(integration.provider)}
             disabled={connecting}
-            className={`p-4 border rounded-lg transition-colors text-left ${
+            className={`p-4 border rounded-lg transition-colors text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
               selectedIntegration === integration.provider
                 ? "border-primary bg-primary/10"
                 : "hover:border-primary hover:bg-primary/5"
             } ${connecting ? "opacity-50 cursor-not-allowed" : ""}`}
             aria-label={`Connect ${integration.name}`}
+            role="listitem"
           >
-            <div className="text-2xl mb-2">{integration.icon}</div>
+            <div className="text-2xl mb-2" aria-hidden="true">{integration.icon}</div>
             <div className="font-semibold mb-1">{integration.name}</div>
             <div className="text-sm text-muted-foreground">{integration.description}</div>
           </button>
@@ -315,7 +328,7 @@ function CreateWorkflowStep({ onNext }: { onNext: () => void }) {
           <div className="font-semibold mb-2">Trigger</div>
           <div className="text-sm text-muted-foreground">New order in Shopify</div>
         </div>
-        <div className="text-center text-2xl">→</div>
+        <div className="text-center text-2xl" aria-hidden="true">→</div>
         <div className="p-4 bg-muted/50 rounded-lg">
           <div className="font-semibold mb-2">Action</div>
           <div className="text-sm text-muted-foreground">Send notification to Slack</div>
@@ -323,7 +336,7 @@ function CreateWorkflowStep({ onNext }: { onNext: () => void }) {
       </div>
       <Button onClick={handleCreateWorkflow} className="w-full" size="lg">
         Choose Template
-        <ArrowRight className="ml-2 h-4 w-4" />
+        <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
       </Button>
     </div>
   );
@@ -337,7 +350,7 @@ function TestWorkflowStep({ onNext }: { onNext: () => void }) {
       </p>
       <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
         <div className="flex items-center gap-2 mb-2">
-          <Check className="h-5 w-5 text-green-600" />
+          <Check className="h-5 w-5 text-green-600" aria-hidden="true" />
           <div className="font-semibold text-green-900 dark:text-green-100">Workflow Created Successfully</div>
         </div>
         <div className="text-sm text-green-800 dark:text-green-200">
@@ -346,7 +359,7 @@ function TestWorkflowStep({ onNext }: { onNext: () => void }) {
       </div>
       <Button onClick={onNext} className="w-full" size="lg">
         Test Complete
-        <ArrowRight className="ml-2 h-4 w-4" />
+        <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
       </Button>
     </div>
   );
@@ -355,7 +368,7 @@ function TestWorkflowStep({ onNext }: { onNext: () => void }) {
 function CompleteStep() {
   return (
     <div className="space-y-6 text-center">
-      <div className="text-6xl mb-4">🎉</div>
+      <div className="text-6xl mb-4" role="img" aria-label="Celebration">🎉</div>
       <h3 className="text-2xl font-bold">Congratulations!</h3>
       <p className="text-muted-foreground">
         You've created your first workflow. You're now ready to automate and save time.
@@ -367,15 +380,15 @@ function CompleteStep() {
           </CardHeader>
           <CardContent className="space-y-2 text-left">
             <div className="flex items-start gap-2">
-              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
               <span className="text-sm">Create more workflows</span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
               <span className="text-sm">Explore templates</span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
               <span className="text-sm">Connect more integrations</span>
             </div>
           </CardContent>
