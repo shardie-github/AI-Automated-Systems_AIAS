@@ -142,6 +142,32 @@ export const env = {
     projectRef: getEnvVar('SUPABASE_PROJECT_REF', false),
   },
   
+  // Email Configuration
+  email: {
+    fromEmail: getEnvVar('EMAIL_FROM', false, 'noreply@aias-platform.com'),
+    fromName: getEnvVar('EMAIL_FROM_NAME', false, 'AIAS Platform'),
+    replyTo: getEnvVar('EMAIL_REPLY_TO', false),
+  },
+  
+  // Resend Configuration
+  resend: {
+    apiKey: getEnvVar('RESEND_API_KEY', false),
+  },
+  
+  // SendGrid Configuration
+  sendgrid: {
+    apiKey: getEnvVar('SENDGRID_API_KEY', false),
+  },
+  
+  // SMTP Configuration
+  smtp: {
+    host: getEnvVar('SMTP_HOST', false),
+    port: parseInt(getEnvVar('SMTP_PORT', false, '587')),
+    user: getEnvVar('SMTP_USER', false),
+    password: getEnvVar('SMTP_PASSWORD', false),
+    secure: getEnvVar('SMTP_SECURE', false, 'false') === 'true',
+  },
+  
   // Runtime information
   runtime: {
     env: getRuntimeEnv(),

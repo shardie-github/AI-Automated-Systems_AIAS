@@ -11,6 +11,7 @@ import { leadScoringService } from './lead-scoring';
 import { leadNurturingService } from './lead-nurturing';
 import { crmIntegrationService } from './crm-integration';
 import { conversionTrackingService } from './conversion-tracking';
+import { emailService } from '@/lib/email/email-service';
 
 export interface AutopilotWorkflow {
   id: string;
@@ -139,30 +140,65 @@ class AutopilotWorkflowService {
   ): Promise<void> {
     const templateId = config.template as string;
     const leadId = context.leadId as string;
+    const email = (context.email as string) || undefined;
 
-    if (!templateId || !leadId) {
-      throw new Error('Template ID and Lead ID required for send_email action');
+    if (!templateId || (!leadId && !email)) {
+      throw new Error('Template ID and Lead ID or email required for send_email action');
     }
 
-    // Get lead
-    const { data: lead } = await this.supabase
-      .from('leads')
-      .select('*')
-      .eq('id', leadId)
-      .single();
+    // Get lead if leadId provided
+    let lead: any = null;
+    if (leadId) {
+      const { data } = await this.supabase
+        .from('leads')
+        .select('*')
+        .eq('id', leadId)
+        .single();
 
-    if (!lead) {
-      throw new Error('Lead not found');
+      if (!data) {
+        throw new Error('Lead not found');
+      }
+      lead = data;
     }
 
-    // Queue email
-    await this.supabase.from('email_queue').insert({
-      lead_id: leadId,
-      template: templateId,
-      recipient_email: lead.email,
-      recipient_name: lead.first_name || 'there',
-      tenant_id: tenantId,
-      scheduled_at: new Date().toISOString(),
+    // Prepare variables
+    const variables: Record<string, string> = {
+      firstName: lead?.first_name || (context.firstName as string) || 'there',
+      lastName: lead?.last_name || (context.lastName as string) || '',
+      email: lead?.email || email || '',
+      company: lead?.company || (context.company as string) || 'your company',
+      planName: lead?.plan_name || (context.planName as string) || 'Starter',
+      automationName: lead?.automation_name || (context.automationName as string) || '',
+      score: String(context.score || lead?.score || 0),
+      qualified: String(context.qualified || lead?.qualified || false),
+    };
+
+    // Send email via email service
+    const recipientEmail = lead?.email || email;
+    if (!recipientEmail) {
+      throw new Error('No email address available');
+    }
+
+    const result = await emailService.sendTemplate(templateId, recipientEmail, variables, {
+      tags: ['autopilot', templateId],
+      metadata: {
+        leadId: leadId || '',
+        templateId,
+        tenantId: tenantId || '',
+        workflowTrigger: (context.trigger as string) || '',
+      },
+    });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to send email');
+    }
+
+    logger.info('Autopilot email sent', {
+      templateId,
+      leadId,
+      email: recipientEmail,
+      messageId: result.messageId,
+      tenantId,
     });
   }
 

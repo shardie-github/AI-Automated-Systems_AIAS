@@ -6,6 +6,8 @@
 import { logger } from '@/lib/logging/structured-logger';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
+import { emailService } from '@/lib/email/email-service';
+import { getTemplateById, replaceTemplateVariables } from '@/lib/email-templates';
 
 export interface NurturingSequence {
   id: string;
@@ -147,37 +149,82 @@ class LeadNurturingService {
     templateId: string,
     tenantId?: string
   ): Promise<void> {
-    // Get email template
-    const template = await this.getEmailTemplate(templateId, tenantId);
+    // Try to get template from our template library first
+    let template = getTemplateById(templateId);
+    
+    // If not found, try database (for custom templates)
     if (!template) {
-      throw new Error(`Template ${templateId} not found`);
+      const dbTemplate = await this.getEmailTemplate(templateId, tenantId);
+      if (!dbTemplate) {
+        throw new Error(`Template ${templateId} not found`);
+      }
+      
+      // Use database template
+      const personalized = this.personalizeEmail(dbTemplate, lead);
+      
+      // Send via email service
+      const result = await emailService.send({
+        to: lead.email,
+        subject: personalized.subject,
+        html: personalized.body,
+        tags: ['nurturing', templateId],
+        metadata: {
+          leadId: lead.id,
+          templateId,
+          tenantId: tenantId || '',
+        },
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      // Track event
+      await this.trackEvent('nurturing_email_sent', {
+        leadId: lead.id,
+        templateId,
+        tenantId,
+        messageId: result.messageId,
+      });
+
+      return;
     }
 
-    // Personalize email
-    const personalized = this.personalizeEmail(template, lead);
+    // Use template library template
+    const variables = {
+      firstName: lead.first_name || 'there',
+      lastName: lead.last_name || '',
+      email: lead.email || '',
+      company: lead.company || 'your company',
+      planName: lead.plan_name || 'Starter',
+      automationName: lead.automation_name || '',
+    };
 
-    // Queue email
-    await this.supabase.from('email_queue').insert({
-      lead_id: lead.id,
-      template: templateId,
-      recipient_email: lead.email,
-      recipient_name: lead.first_name || 'there',
-      subject: personalized.subject,
-      body: personalized.body,
-      tenant_id: tenantId,
-      scheduled_at: new Date().toISOString(),
+    // Send via email service
+    const result = await emailService.sendTemplate(templateId, lead.email, variables, {
+      tags: ['nurturing', templateId],
+      metadata: {
+        leadId: lead.id,
+        templateId,
+        tenantId: tenantId || '',
+      },
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to send email');
+    }
 
     // Track event
     await this.trackEvent('nurturing_email_sent', {
       leadId: lead.id,
       templateId,
       tenantId,
+      messageId: result.messageId,
     });
   }
 
   /**
-   * Personalize email
+   * Personalize email (for database templates)
    */
   private personalizeEmail(template: any, lead: any): { subject: string; body: string } {
     let subject = template.subject || '';
