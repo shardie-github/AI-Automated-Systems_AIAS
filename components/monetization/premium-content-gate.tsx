@@ -1,14 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useUser } from "@/hooks/use-user";
 
 interface PremiumContentGateProps {
   title?: string;
   description?: string;
   preview?: string;
   unlockPrice?: number;
+  children?: React.ReactNode;
 }
 
 export function PremiumContentGate({
@@ -16,13 +18,48 @@ export function PremiumContentGate({
   description = "This content is available for premium subscribers",
   preview,
   unlockPrice = 9,
+  children,
 }: PremiumContentGateProps) {
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useUser();
 
-  // TODO: Check if user is premium subscriber
+  // Check if user is premium subscriber
+  useEffect(() => {
+    async function checkSubscription() {
+      if (!user?.id) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/billing/subscription-status?userId=${user.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setIsUnlocked(data.isPremium || false);
+        }
+      } catch (error) {
+        console.error('Failed to check subscription:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    checkSubscription();
+  }, [user?.id]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">Checking subscription status...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isUnlocked) {
-    return null; // Show full content
+    return <>{children}</>; // Show full content
   }
 
   return (

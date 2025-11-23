@@ -101,17 +101,164 @@ serve(async (req) => {
       // Continue execution even if storage fails
     }
 
-    // TODO: Integrate with booking system (Calendly, Cal.com, or custom)
-    // Implementation: Use Calendly API or Cal.com webhook to create actual calendar event
-    // Example: await createCalendlyEvent(bookingData);
+    // Integrate with booking system (Calendly, Cal.com, or custom)
+    let meetingLink: string | undefined;
+    try {
+      const calendlyApiKey = Deno.env.get('CALENDLY_API_KEY');
+      const calendlyEventTypeUri = Deno.env.get('CALENDLY_EVENT_TYPE_URI');
+      const calComApiKey = Deno.env.get('CAL_COM_API_KEY');
+      const calComEventTypeId = Deno.env.get('CAL_COM_EVENT_TYPE_ID');
+
+      if (calendlyApiKey && calendlyEventTypeUri) {
+        // Create Calendly event
+        const startDateTime = new Date(`${bookingData.requested_date}T${bookingData.requested_time}`);
+        const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+        
+        const calendlyResponse = await fetch('https://api.calendly.com/scheduled_events', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${calendlyApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            event_type: calendlyEventTypeUri,
+            invitees: [{ email: bookingData.email, name: bookingData.name }],
+            start_time: startDateTime.toISOString(),
+            end_time: endDateTime.toISOString(),
+            location: bookingData.meeting_type === 'video' 
+              ? { type: 'zoom', location: 'Zoom Meeting' }
+              : bookingData.meeting_type === 'phone'
+              ? { type: 'phone', location: bookingData.phone || 'Phone Call' }
+              : { type: 'calendly', location: 'Calendly Chat' },
+            notes: bookingData.notes || '',
+          }),
+        });
+        
+        if (calendlyResponse.ok) {
+          const event = await calendlyResponse.json();
+          meetingLink = event.location?.location || event.uri;
+        }
+      } else if (calComApiKey && calComEventTypeId) {
+        // Create Cal.com booking
+        const startDateTime = new Date(`${bookingData.requested_date}T${bookingData.requested_time}`);
+        const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000);
+        
+        const calComResponse = await fetch('https://api.cal.com/v1/bookings', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${calComApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            eventTypeId: parseInt(calComEventTypeId),
+            start: startDateTime.toISOString(),
+            end: endDateTime.toISOString(),
+            responses: {
+              name: bookingData.name,
+              email: bookingData.email,
+              phone: bookingData.phone || '',
+              company: bookingData.company || '',
+              notes: bookingData.notes || '',
+            },
+          }),
+        });
+        
+        if (calComResponse.ok) {
+          const event = await calComResponse.json();
+          meetingLink = event.location;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create calendar event:', error);
+    }
     
-    // TODO: Send confirmation email
-    // Implementation: Use Resend/SendGrid/Mailgun to send confirmation
-    // Example: await sendBookingConfirmationEmail(bookingData);
+    // Send confirmation email
+    try {
+      const resendKey = Deno.env.get('RESEND_API_KEY');
+      const sendgridKey = Deno.env.get('SENDGRID_API_KEY');
+      const mailgunKey = Deno.env.get('MAILGUN_API_KEY');
+      const mailgunDomain = Deno.env.get('MAILGUN_DOMAIN');
+
+      if (resendKey) {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'AIAS Platform <noreply@aias-platform.com>',
+            to: bookingData.email,
+            subject: `Booking Confirmed: ${bookingData.meeting_type} Meeting on ${bookingData.requested_date}`,
+            html: `
+              <h1>Booking Confirmed!</h1>
+              <p>Hi ${bookingData.name},</p>
+              <p>Your meeting has been confirmed:</p>
+              <ul>
+                <li>Date: ${bookingData.requested_date}</li>
+                <li>Time: ${bookingData.requested_time}</li>
+                <li>Type: ${bookingData.meeting_type}</li>
+                ${meetingLink ? `<li>Meeting Link: <a href="${meetingLink}">${meetingLink}</a></li>` : ''}
+              </ul>
+            `,
+            text: `Booking Confirmed! Hi ${bookingData.name}, Your meeting on ${bookingData.requested_date} at ${bookingData.requested_time} has been confirmed.${meetingLink ? ` Join: ${meetingLink}` : ''}`,
+          }),
+        });
+      } else if (sendgridKey) {
+        await fetch('https://api.sendgrid.com/v3/mail/send', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${sendgridKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: { email: 'noreply@aias-platform.com', name: 'AIAS Platform' },
+            personalizations: [{
+              to: [{ email: bookingData.email }],
+              subject: `Booking Confirmed: ${bookingData.meeting_type} Meeting`,
+            }],
+            content: [{
+              type: 'text/html',
+              value: `<h1>Booking Confirmed!</h1><p>Hi ${bookingData.name}, your meeting on ${bookingData.requested_date} at ${bookingData.requested_time} has been confirmed.</p>`,
+            }],
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send confirmation email:', error);
+    }
     
-    // TODO: Store in CRM
-    // Implementation: Integrate with CRM (HubSpot, Salesforce, etc.)
-    // Example: await createCRMLead(bookingData);
+    // Store in CRM
+    try {
+      const crmProvider = Deno.env.get('CRM_PROVIDER');
+      const hubspotKey = Deno.env.get('HUBSPOT_API_KEY');
+      
+      if (crmProvider === 'hubspot' && hubspotKey) {
+        const [firstName, ...lastNameParts] = bookingData.name.split(' ');
+        const lastName = lastNameParts.join(' ') || '';
+        
+        await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${hubspotKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            properties: {
+              firstname: firstName,
+              lastname: lastName,
+              email: bookingData.email,
+              phone: bookingData.phone || '',
+              company: bookingData.company || '',
+              notes: bookingData.notes || '',
+              hs_lead_status: 'BOOKING_REQUESTED',
+            },
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to store in CRM:', error);
+    }
 
     return new Response(
       JSON.stringify({ 

@@ -18,12 +18,12 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       version: process.env.npm_package_version || "1.0.0",
       environment: process.env.NODE_ENV || "development",
-      services: {
-        database: "operational",
-        auth: "operational",
-        storage: "operational",
-        api: "operational",
-      },
+      services: [
+        { service: "API", status: "operational" },
+        { service: "Database", status: "operational" },
+        { service: "Authentication", status: "operational" },
+        { service: "Storage", status: "operational" },
+      ],
       uptime: process.uptime(),
       memory: {
         used: Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100,
@@ -36,24 +36,36 @@ export async function GET() {
     try {
       const { error } = await supabase.from("app_events").select("count").limit(1);
       if (error) {
-        status.services.database = "degraded";
-        status.status = "degraded";
+        const dbService = status.services.find(s => s.service === "Database");
+        if (dbService) {
+          dbService.status = "degraded";
+          status.status = "degraded";
+        }
       }
     } catch (error) {
-      status.services.database = "down";
-      status.status = "degraded";
+      const dbService = status.services.find(s => s.service === "Database");
+      if (dbService) {
+        dbService.status = "outage";
+        status.status = "degraded";
+      }
     }
 
     // Quick auth check
     try {
       const { error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1 });
       if (error) {
-        status.services.auth = "degraded";
-        status.status = "degraded";
+        const authService = status.services.find(s => s.service === "Authentication");
+        if (authService) {
+          authService.status = "degraded";
+          status.status = "degraded";
+        }
       }
     } catch (error) {
-      status.services.auth = "degraded";
-      status.status = "degraded";
+      const authService = status.services.find(s => s.service === "Authentication");
+      if (authService) {
+        authService.status = "degraded";
+        status.status = "degraded";
+      }
     }
 
     const statusCode = status.status === "operational" ? 200 : 503;

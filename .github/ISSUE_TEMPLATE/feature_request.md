@@ -7,54 +7,19 @@ assignees: ''
 ---
 
 ## Feature Description
-
-<!-- A clear and concise description of the feature you'd like to see -->
+<!-- A clear and concise description of the feature you'd like to see. -->
 
 ## Problem Statement
-
-<!-- What problem does this feature solve? What pain point does it address? -->
+<!-- What problem does this feature solve? What use case does it address? -->
 
 ## Proposed Solution
-
-<!-- Describe how you envision this feature working -->
+<!-- Describe how you envision this feature working. -->
 
 ## Alternatives Considered
-
-<!-- Describe any alternative solutions or features you've considered -->
-
-## Use Cases
-
-<!-- Provide specific examples of how this feature would be used -->
-
-1. 
-2. 
-3. 
-
-## Benefits
-
-<!-- What benefits would this feature provide? -->
-
-- 
-- 
-- 
-
-## Implementation Notes
-
-<!-- Any technical considerations or implementation details -->
-
-## Mockups / Examples
-
-<!-- If applicable, add mockups, wireframes, or examples -->
+<!-- Describe any alternative solutions or features you've considered. -->
 
 ## Additional Context
+<!-- Add any other context, mockups, or examples about the feature request here. -->
 
-<!-- Add any other context, references, or examples about the feature request -->
-
----
-
-**Checklist:**
-
-- [ ] I have searched existing issues to ensure this is not a duplicate
-- [ ] I have provided a clear problem statement
-- [ ] I have considered alternatives
-- [ ] I have provided use cases
+## Implementation Notes
+<!-- If you have technical ideas about how to implement this, please share them. -->

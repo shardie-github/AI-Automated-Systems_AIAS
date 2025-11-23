@@ -8,6 +8,17 @@ import type { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
 import { rateLimiter } from '@/lib/performance/rate-limiter';
+import { validateEnvOnStartup } from '@/lib/env-validation';
+
+// Validate environment variables at middleware startup
+if (typeof process !== 'undefined' && process.env) {
+  try {
+    validateEnvOnStartup();
+  } catch (error) {
+    console.error('Environment validation failed in middleware:', error);
+    // Don't throw - allow middleware to continue but log the error
+  }
+}
 
 // Security headers configuration
 const securityHeaders = {

@@ -19,11 +19,49 @@ export async function GET(request: NextRequest) {
       feeds = feeds.filter(f => f.category === category);
     }
 
-    // Fetch RSS feeds (simplified - in production, use RSS parser)
-    const items: RSSFeedItem[] = [];
+    // Fetch RSS feeds using rss-parser
+    const Parser = (await import('rss-parser')).default;
+    const parser = new Parser({
+      timeout: 10000,
+      maxRedirects: 5,
+    });
 
-    // TODO: Integrate with RSS parser library
-    // For now, return structure
+    const items: RSSFeedItem[] = [];
+    const errors: Array<{ feed: string; error: string }> = [];
+
+    // Fetch all feeds in parallel with error handling
+    const feedPromises = feeds.map(async (feed) => {
+      try {
+        const feedData = await parser.parseURL(feed.url);
+        if (feedData.items) {
+          feedData.items.forEach((item) => {
+            items.push({
+              title: item.title || '',
+              description: item.contentSnippet || item.content || '',
+              link: item.link || '',
+              source: feed.name,
+              pubDate: item.pubDate || new Date().toISOString(),
+            });
+          });
+        }
+      } catch (error) {
+        errors.push({
+          feed: feed.name,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        console.error(`Failed to fetch feed ${feed.name}:`, error);
+      }
+    });
+
+    await Promise.allSettled(feedPromises);
+
+    // Sort items by publication date (newest first)
+    items.sort((a, b) => {
+      const dateA = new Date(a.pubDate).getTime();
+      const dateB = new Date(b.pubDate).getTime();
+      return dateB - dateA;
+    });
+
     return NextResponse.json({
       success: true,
       feeds: feeds.map(f => ({
@@ -31,8 +69,9 @@ export async function GET(request: NextRequest) {
         category: f.category,
         url: f.url,
       })),
-      items: items,
-      message: "RSS feed integration ready. Connect RSS parser library to fetch real feeds.",
+      items: items.slice(0, 50), // Limit to 50 items
+      errors: errors.length > 0 ? errors : undefined,
+      count: items.length,
     });
   } catch (error) {
     return NextResponse.json(

@@ -18,8 +18,25 @@ export default function Status() {
   ]);
 
   useEffect(() => {
-    // TODO: Fetch real status from monitoring API
-    // fetch("/api/status").then(r => r.json()).then(data => setStatus(data));
+    // Fetch real status from monitoring API
+    async function fetchStatus() {
+      try {
+        const response = await fetch("/api/status");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.services) {
+            setStatus(data.services);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+      }
+    }
+    
+    fetchStatus();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchStatus, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const getStatusColor = (s: string) => {
