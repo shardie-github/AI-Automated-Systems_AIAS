@@ -89,19 +89,97 @@ serve(async (req) => {
       // Continue execution even if storage fails
     }
 
-    // TODO: Generate PDF with 10-page master system prompts
-    // Implementation: Use a PDF generation library (pdfkit, puppeteer, etc.)
-    // Example: const pdfBuffer = await generateSystemPromptsPDF();
-    // Store PDF in storage bucket: await supabaseAdmin.storage.from('pdfs').upload(`${email}-system-prompts.pdf`, pdfBuffer);
+    // Generate PDF with 10-page master system prompts
+    let pdfBuffer: Uint8Array | null = null;
+    let pdfUrl: string | undefined;
+    try {
+      const pdfModule = await import('https://esm.sh/@/lib/pdf/generator.ts');
+      const buffer = await pdfModule.generateSystemPromptsPDF(email, name);
+      pdfBuffer = new Uint8Array(buffer);
+      
+      // Store PDF in storage bucket
+      const fileName = `${email.replace(/[^a-zA-Z0-9]/g, '_')}-system-prompts-${Date.now()}.pdf`;
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('pdfs')
+        .upload(fileName, pdfBuffer, {
+          contentType: 'application/pdf',
+          upsert: false,
+        });
+      
+      if (!uploadError && uploadData) {
+        const { data: urlData } = supabaseAdmin.storage
+          .from('pdfs')
+          .getPublicUrl(fileName);
+        pdfUrl = urlData?.publicUrl;
+      }
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      // Continue execution even if PDF generation fails
+    }
     
-    // TODO: Send PDF via email (use SendGrid, Mailgun, or Resend)
-    // Implementation: Use email service API to send PDF attachment
-    // Example: await sendEmailWithAttachment(email, 'Your Free System Prompts Guide', pdfBuffer);
-    // Required env vars: RESEND_API_KEY, SENDGRID_API_KEY, or MAILGUN_API_KEY
+    // Send PDF via email
+    try {
+      const resendKey = Deno.env.get('RESEND_API_KEY');
+      const sendgridKey = Deno.env.get('SENDGRID_API_KEY');
+      const mailgunKey = Deno.env.get('MAILGUN_API_KEY');
+      const mailgunDomain = Deno.env.get('MAILGUN_DOMAIN');
+
+      if (resendKey || sendgridKey || (mailgunKey && mailgunDomain)) {
+        const emailModule = await import('https://esm.sh/@/lib/email/sender.ts');
+        const templateModule = await import('https://esm.sh/@/lib/email/templates.ts');
+        
+        const template = templateModule.getLeadGenPDFTemplate({
+          name,
+          pdfUrl,
+        });
+        
+        await emailModule.sendEmailFromTemplate(template, email, {
+          attachments: pdfBuffer ? [{
+            filename: 'system-prompts-guide.pdf',
+            content: Buffer.from(pdfBuffer),
+            contentType: 'application/pdf',
+          }] : undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      // Continue execution even if email fails
+    }
     
-    // TODO: Add to CRM/mailing list
-    // Implementation: Integrate with CRM (HubSpot, Salesforce, etc.) or mailing list service
-    // Example: await addToCRM(leadData); await addToMailingList(leadData);
+    // Add to CRM/mailing list
+    try {
+      const crmProvider = Deno.env.get('CRM_PROVIDER') as 'hubspot' | 'salesforce' | undefined;
+      if (crmProvider) {
+        const crmModule = await import('https://esm.sh/@/lib/integrations/crm.ts');
+        const crmConfig: Record<string, string> = {};
+        
+        if (crmProvider === 'hubspot') {
+          crmConfig.apiKey = Deno.env.get('HUBSPOT_API_KEY') || '';
+        } else if (crmProvider === 'salesforce') {
+          crmConfig.clientId = Deno.env.get('SALESFORCE_CLIENT_ID') || '';
+          crmConfig.clientSecret = Deno.env.get('SALESFORCE_CLIENT_SECRET') || '';
+          crmConfig.username = Deno.env.get('SALESFORCE_USERNAME') || '';
+          crmConfig.password = Deno.env.get('SALESFORCE_PASSWORD') || '';
+          crmConfig.securityToken = Deno.env.get('SALESFORCE_SECURITY_TOKEN') || '';
+          crmConfig.instanceUrl = Deno.env.get('SALESFORCE_INSTANCE_URL') || '';
+        }
+        
+        const crm = crmModule.createCRMClient(crmProvider, crmConfig);
+        const [firstName, ...lastNameParts] = name.split(' ');
+        const lastName = lastNameParts.join(' ') || '';
+        
+        await crm.createLead({
+          firstName,
+          lastName,
+          email,
+          source: 'lead-gen-form',
+          status: 'new',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to add to CRM:', error);
+      // Continue execution even if CRM integration fails
+    }
 
     return new Response(
       JSON.stringify({ 

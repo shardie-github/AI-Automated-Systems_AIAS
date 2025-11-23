@@ -96,7 +96,9 @@
     "openai": "^4.20.1",
     "@prisma/client": "^5.7.1",
     "ioredis": "^5.3.2",
-    "idb-keyval": "^6.2.1"
+    "idb-keyval": "^6.2.1",
+    "rss-parser": "^3.13.0",
+    "pdfkit": "^0.14.0"
   },
   "scripts": {
     "dev": "next dev",
