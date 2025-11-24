@@ -126,6 +126,7 @@
     "queue:worker": "tsx src/workers/index.ts",
     "doctor": "tsx scripts/reality-check.ts",
     "deploy:doctor": "tsx scripts/deploy-doctor.ts",
+    "env:doctor": "tsx scripts/env-doctor.ts",
     "smoke": "tsx scripts/smoke.ts",
     "ops": "tsx ops/cli.ts",
     "analyze": "npm run build:analyze",
