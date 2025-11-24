@@ -121,6 +121,7 @@
     "db:migrate": "cd apps/web && prisma migrate deploy",
     "db:generate": "cd apps/web && prisma generate",
     "db:seed": "cd apps/web && tsx prisma/seed.ts",
+    "db:seed:demo": "tsx scripts/seed-demo.ts",
     "db:studio": "cd apps/web && prisma studio",
     "queue:worker": "tsx src/workers/index.ts",
     "doctor": "tsx scripts/reality-check.ts",

@@ -294,17 +294,19 @@ Keep all workflows but organize into categories:
 3. ✅ `format-check` (from `ci.yml`)
 4. ✅ `test` (from `ci.yml`)
 5. ✅ `build` (from `ci.yml`)
+6. ✅ `test-e2e` (from `ci.yml`) - **Critical flows (blocking)**
 
 **Optional Checks:**
-- `test-e2e` (non-blocking)
 - `security-scan` (non-blocking)
 
 **Settings:**
 - Require status checks to pass before merging
 - Require branches to be up to date before merging
-- Require pull request reviews (recommended)
+- Require pull request reviews (recommended: 1 approval)
 - Do not allow force pushes
 - Do not allow deletions
+
+**See:** [Branch Protection Guide](./branch-protection.md) for complete setup instructions
 
 ---
 
