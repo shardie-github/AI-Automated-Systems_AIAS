@@ -6,6 +6,10 @@
 import { NextResponse } from 'next/server';
 import { createGETHandler } from '@/lib/api/route-handler';
 
+import openApiSpec from "@/../docs/openapi-complete.yaml?raw";
+
+const openApiSpecParsed = JSON.parse(openApiSpec);
+
 const openApiSpec = {
   openapi: '3.0.0',
   info: {
@@ -186,7 +190,8 @@ const openApiSpec = {
 
 export const GET = createGETHandler(
   async () => {
-    return NextResponse.json(openApiSpec, {
+    const spec = loadOpenAPISpec();
+    return NextResponse.json(spec, {
       headers: {
         'Content-Type': 'application/json',
       },

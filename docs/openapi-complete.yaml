@@ -1,0 +1,1033 @@
+openapi: 3.0.3
+info:
+  title: AIAS Platform API
+  description: |
+    Enterprise-grade AI consultancy platform API
+    
+    This API provides endpoints for:
+    - Authentication and user management
+    - Workflow automation
+    - AI agent management
+    - Lead generation and CRM
+    - Billing and subscriptions
+    - Telemetry and analytics
+    - Admin operations
+  version: 1.0.0
+  contact:
+    name: AIAS Platform Support
+    email: support@aias-platform.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://aias-platform.com/api
+    description: Production
+  - url: http://localhost:3000/api
+    description: Development
+
+tags:
+  - name: Health
+    description: Health check and system status endpoints
+  - name: Auth
+    description: Authentication and user management
+  - name: Settings
+    description: User settings and preferences
+  - name: Workflows
+    description: Workflow automation management
+  - name: Agents
+    description: AI agent management
+  - name: Telemetry
+    description: Telemetry and analytics ingestion
+  - name: Leads
+    description: Lead generation and CRM integration
+  - name: Billing
+    description: Billing, subscriptions, and Stripe integration
+  - name: Admin
+    description: Admin-only endpoints
+  - name: Integrations
+    description: Third-party integrations
+  - name: Notifications
+    description: User notifications
+
+security:
+  - bearerAuth: []
+
+paths:
+  /healthz:
+    get:
+      tags: [Health]
+      summary: Comprehensive health check
+      description: |
+        Performs comprehensive health checks on all system components:
+        - Database connectivity
+        - Supabase REST API
+        - Authentication service
+        - Row Level Security (RLS)
+        - Storage service
+      security: []
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+
+  /status:
+    get:
+      tags: [Health]
+      summary: System status
+      description: Get system status and version information
+      security: []
+      responses:
+        '200':
+          description: Status information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+
+  /health:
+    get:
+      tags: [Health]
+      summary: Simple health check
+      description: Simple health check endpoint
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      description: Authenticate user with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/signup:
+    post:
+      tags: [Auth]
+      summary: User signup
+      description: Create a new user account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+        '400':
+          description: Validation error or account already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get user settings
+      description: Retrieve current user's settings
+      responses:
+        '200':
+          description: User settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/UserSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Settings]
+      summary: Update user settings
+      description: Update user settings and preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSettingsUpdate'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/UserSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /workflows/execute:
+    post:
+      tags: [Workflows]
+      summary: Execute workflow
+      description: Execute a workflow by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowExecuteRequest'
+      responses:
+        '200':
+          description: Workflow executed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  execution:
+                    $ref: '#/components/schemas/WorkflowExecution'
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/{id}/execute:
+    post:
+      tags: [Workflows]
+      summary: Execute workflow by ID
+      description: Execute a specific workflow by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Workflow ID
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trigger:
+                  type: object
+      responses:
+        '200':
+          description: Workflow executed
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/agents:
+    get:
+      tags: [Agents]
+      summary: List agents
+      description: Get all agents for the authenticated user
+      parameters:
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by tenant ID
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Agent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Agents]
+      summary: Create agent
+      description: Create a new AI agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentCreate'
+      responses:
+        '201':
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/workflows:
+    get:
+      tags: [Workflows]
+      summary: List workflows
+      parameters:
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of workflows
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /telemetry/ingest:
+    post:
+      tags: [Telemetry]
+      summary: Ingest telemetry data
+      description: Submit telemetry events for analytics
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryEvent'
+      responses:
+        '200':
+          description: Telemetry ingested successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /telemetry:
+    get:
+      tags: [Telemetry]
+      summary: Get telemetry data
+      description: Retrieve telemetry data (admin only)
+      responses:
+        '200':
+          description: Telemetry data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden - Admin access required
+
+  /leads/capture:
+    post:
+      tags: [Leads]
+      summary: Capture lead
+      description: Capture a new lead from forms or integrations
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadCaptureRequest'
+      responses:
+        '200':
+          description: Lead captured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadCaptureResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /leads/score:
+    get:
+      tags: [Leads]
+      summary: Get lead score
+      description: Calculate and retrieve lead score
+      parameters:
+        - name: lead_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lead score
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /billing/subscription-status:
+    get:
+      tags: [Billing]
+      summary: Get subscription status
+      description: Get current user's subscription status
+      responses:
+        '200':
+          description: Subscription status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /stripe/create-checkout:
+    post:
+      tags: [Billing]
+      summary: Create Stripe checkout session
+      description: Create a Stripe checkout session for subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [priceId, userId, tier]
+              properties:
+                priceId:
+                  type: string
+                userId:
+                  type: string
+                  format: uuid
+                tier:
+                  type: string
+                  enum: [starter, pro, enterprise]
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /stripe/webhook:
+    post:
+      tags: [Billing]
+      summary: Stripe webhook handler
+      description: Handle Stripe webhook events (used internally)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Get notifications
+      description: Get user notifications
+      parameters:
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+          description: Filter unread notifications only
+      responses:
+        '200':
+          description: List of notifications
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Notifications]
+      summary: Create notification
+      description: Create a new notification (admin only)
+      responses:
+        '201':
+          description: Notification created
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+
+  /notifications/{id}:
+    get:
+      tags: [Notifications]
+      summary: Get notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification details
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notifications/mark-read:
+    post:
+      tags: [Notifications]
+      summary: Mark notifications as read
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Notifications marked as read
+
+  /admin/metrics:
+    get:
+      tags: [Admin]
+      summary: Get admin metrics
+      description: Get system metrics (admin only)
+      responses:
+        '200':
+          description: Metrics data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden - Admin access required
+
+  /admin/compliance:
+    get:
+      tags: [Admin]
+      summary: Get compliance data
+      description: Get compliance audit data (admin only)
+      responses:
+        '200':
+          description: Compliance data
+        '403':
+          description: Forbidden
+
+  /integrations/{provider}/oauth:
+    get:
+      tags: [Integrations]
+      summary: OAuth authorization
+      description: Initiate OAuth flow for integration
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [github, google, shopify]
+      responses:
+        '302':
+          description: Redirect to OAuth provider
+
+  /integrations/{provider}/callback:
+    get:
+      tags: [Integrations]
+      summary: OAuth callback
+      description: Handle OAuth callback
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OAuth completed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from Supabase Auth
+
+  schemas:
+    HealthCheck:
+      type: object
+      required: [ok, timestamp]
+      properties:
+        ok:
+          type: boolean
+          description: Overall health status
+        timestamp:
+          type: string
+          format: date-time
+        db:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+              nullable: true
+            error:
+              type: string
+              nullable: true
+        rest:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+              nullable: true
+            error:
+              type: string
+              nullable: true
+        auth:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+              nullable: true
+            error:
+              type: string
+              nullable: true
+        rls:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            note:
+              type: string
+            error:
+              type: string
+        storage:
+          type: object
+          properties:
+            ok:
+              type: boolean
+            latency_ms:
+              type: number
+              nullable: true
+            buckets_count:
+              type: number
+            error:
+              type: string
+              nullable: true
+        total_latency_ms:
+          type: number
+        error:
+          type: string
+          nullable: true
+
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [operational, degraded, down]
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        environment:
+          type: string
+        services:
+          type: object
+          properties:
+            database:
+              type: string
+            auth:
+              type: string
+            storage:
+              type: string
+            api:
+              type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+        session:
+          type: object
+          description: Supabase session object
+        message:
+          type: string
+
+    SignupRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        name:
+          type: string
+
+    SignupResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+        message:
+          type: string
+
+    UserSettings:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email_notifications_enabled:
+          type: boolean
+        push_notifications_enabled:
+          type: boolean
+        sms_notifications_enabled:
+          type: boolean
+        theme:
+          type: string
+          enum: [light, dark, system]
+        language:
+          type: string
+        timezone:
+          type: string
+        date_format:
+          type: string
+        time_format:
+          type: string
+          enum: [12h, 24h]
+        profile_visibility:
+          type: string
+          enum: [public, private, friends]
+        analytics_opt_in:
+          type: boolean
+        beta_features_enabled:
+          type: boolean
+
+    UserSettingsUpdate:
+      type: object
+      properties:
+        email_notifications_enabled:
+          type: boolean
+        push_notifications_enabled:
+          type: boolean
+        sms_notifications_enabled:
+          type: boolean
+        theme:
+          type: string
+          enum: [light, dark, system]
+        language:
+          type: string
+        timezone:
+          type: string
+        date_format:
+          type: string
+        time_format:
+          type: string
+          enum: [12h, 24h]
+        profile_visibility:
+          type: string
+          enum: [public, private, friends]
+        analytics_opt_in:
+          type: boolean
+        beta_features_enabled:
+          type: boolean
+        custom_settings:
+          type: object
+
+    WorkflowExecuteRequest:
+      type: object
+      required: [workflowId]
+      properties:
+        workflowId:
+          type: string
+          format: uuid
+        trigger:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [webhook, schedule, manual]
+            config:
+              type: object
+
+    WorkflowExecution:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        result:
+          type: object
+          nullable: true
+
+    Agent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [chatbot, automation, analytics, custom]
+        config:
+          type: object
+        enabled:
+          type: boolean
+        user_id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AgentCreate:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        type:
+          type: string
+          enum: [chatbot, automation, analytics, custom]
+        config:
+          type: object
+        enabled:
+          type: boolean
+          default: true
+        tenant_id:
+          type: string
+          format: uuid
+
+    TelemetryEvent:
+      type: object
+      required: [type]
+      properties:
+        app:
+          type: string
+        type:
+          type: string
+          minLength: 1
+        path:
+          type: string
+        meta:
+          type: object
+        ts:
+          type: string
+          format: date-time
+
+    LeadCaptureRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        company:
+          type: string
+        phone:
+          type: string
+        source:
+          type: string
+        campaign:
+          type: string
+        metadata:
+          type: object
+
+    LeadCaptureResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        leadId:
+          type: string
+          format: uuid
+        score:
+          type: number
+        qualified:
+          type: boolean
+        nextAction:
+          type: string
+
+    SubscriptionStatus:
+      type: object
+      properties:
+        active:
+          type: boolean
+        tier:
+          type: string
+          enum: [free, starter, pro, enterprise]
+        current_period_start:
+          type: string
+          format: date-time
+        current_period_end:
+          type: string
+          format: date-time
+        cancel_at_period_end:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Bad request - validation error or invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

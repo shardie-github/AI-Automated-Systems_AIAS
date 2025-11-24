@@ -46,24 +46,21 @@ export async function handleStripeWebhook(
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
-  const prisma = await import('@prisma/client').then((m) => new m.PrismaClient());
+  const { upsert } = await import('@/lib/supabase/db-helpers');
   
-  await prisma.subscription.upsert({
-    where: { stripeSubscriptionId: subscription.id },
-    update: {
-      status: mapStripeStatus(subscription.status),
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-    create: {
-      id: subscription.id,
-      status: mapStripeStatus(subscription.status),
-      plan: 'BASIC',
-      stripeCustomerId: subscription.customer as string,
-      stripeSubscriptionId: subscription.id,
-      orgId: '',
-    },
-  });
+  // Get org_id from customer metadata if available
+  const customerId = subscription.customer as string;
+  const orgId = subscription.metadata?.org_id || '';
+  
+  await upsert('subscriptions', {
+    stripe_subscription_id: subscription.id,
+    status: mapStripeStatus(subscription.status),
+    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    stripe_customer_id: customerId,
+    plan: 'BASIC',
+    org_id: orgId,
+  }, 'stripe_subscription_id');
 }
 
 function mapStripeStatus(status: string): any {

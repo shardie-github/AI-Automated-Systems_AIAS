@@ -126,6 +126,7 @@
     "queue:worker": "tsx src/workers/index.ts",
     "doctor": "tsx scripts/reality-check.ts",
     "deploy:doctor": "tsx scripts/deploy-doctor.ts",
+    "env:doctor": "tsx scripts/env-doctor.ts",
     "smoke": "tsx scripts/smoke.ts",
     "ops": "tsx ops/cli.ts",
     "analyze": "npm run build:analyze",
@@ -150,6 +151,7 @@
     "audit:licenses": "license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'",
     "audit:security": "npm audit --audit-level high",
     "security:check": "tsx scripts/security-self-check.ts",
+    "security:audit": "tsx scripts/security-audit.ts",
     "perf:budgets": "lighthouse-ci autorun",
     "perf:analyze": "npm run build:analyze && open dist/stats.html",
     "clean": "rm -rf node_modules dist .next",
@@ -232,8 +234,12 @@
     "omega:full-diagnostic": "npm run omega:validate-env && npm run omega:validate-schema && npm run omega:brand-audit",
     "db:validate-schema": "tsx scripts/db-schema-validator.ts",
     "db:validate-migrations": "tsx scripts/db-schema-validator.ts migrations",
+    "db:backup": "tsx scripts/db-backup.ts",
+    "create:rollback": "tsx scripts/create-rollback.ts",
     "startup:validate": "tsx scripts/startup-validation.ts",
     "test:api-contract": "vitest run tests/api/contract.test.ts",
+    "test:api": "vitest run tests/api/",
+    "test:api:watch": "vitest watch tests/api/",
     "ci": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   },
   "devDependencies": {

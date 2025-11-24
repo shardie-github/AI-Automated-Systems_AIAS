@@ -11,45 +11,115 @@ export function MobileNav() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label="Open menu">
-          <Menu className="h-5 w-5" />
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          aria-label="Open navigation menu"
+          aria-expanded={open}
+          aria-controls="mobile-navigation"
+          className="min-h-[44px] min-w-[44px]"
+        >
+          <Menu className="h-5 w-5" aria-hidden="true" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-64">
-        <nav className="flex flex-col gap-4 mt-8">
-          <Link href="/services" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+      <SheetContent 
+        side="right" 
+        className="w-64"
+        aria-label="Mobile navigation"
+        id="mobile-navigation"
+      >
+        <nav 
+          className="flex flex-col gap-4 mt-8"
+          role="navigation"
+          aria-label="Mobile navigation menu"
+        >
+          <Link 
+            href="/services" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Services"
+          >
             Services
           </Link>
-          <Link href="/portfolio" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/portfolio" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Portfolio"
+          >
             Portfolio
           </Link>
-          <Link href="/tasks" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/tasks" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Our Builds"
+          >
             Our Builds
           </Link>
-          <Link href="/case-studies" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/case-studies" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Case Studies"
+          >
             Case Studies
           </Link>
-          <Link href="/pricing" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/pricing" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Platform Pricing"
+          >
             Platform Pricing
           </Link>
-          <Link href="/features" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/features" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Features"
+          >
             Features
           </Link>
-          <Link href="/systems-thinking" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline text-primary">
+          <Link 
+            href="/systems-thinking" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline text-primary min-h-[44px] flex items-center"
+            aria-label="Navigate to Systems Thinking"
+          >
             Systems Thinking
           </Link>
-          <Link href="/blog" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/blog" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Blog"
+          >
             Blog
           </Link>
-          <Link href="/about" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/about" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to About"
+          >
             About
           </Link>
-          <Link href="/demo" onClick={() => setOpen(false)} className="text-lg font-medium hover:underline">
+          <Link 
+            href="/demo" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Demo"
+          >
             Demo
           </Link>
           <div className="pt-4 border-t">
-            <Button className="w-full" asChild>
-              <Link href="/pricing" onClick={() => setOpen(false)}>
+            <Button className="w-full min-h-[44px]" asChild>
+              <Link 
+                href="/pricing" 
+                onClick={() => setOpen(false)}
+                aria-label="Start your free trial"
+              >
                 Start Free
               </Link>
             </Button>

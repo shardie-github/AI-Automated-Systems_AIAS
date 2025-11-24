@@ -4,21 +4,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 min-h-[44px] min-w-[44px]",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-fg hover:opacity-90",
-        secondary: "bg-secondary text-secondary-fg hover:opacity-90",
-        outline: "border border-border hover:bg-muted",
-        ghost: "hover:bg-muted",
-        destructive: "bg-destructive text-destructive-fg hover:opacity-90",
+        default: "bg-gradient-to-r from-primary to-primary/90 text-primary-fg hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg",
+        secondary: "bg-secondary text-secondary-fg hover:bg-secondary/80 shadow-sm hover:shadow-md",
+        outline: "border-2 border-border bg-background hover:bg-muted hover:border-primary/50 shadow-sm hover:shadow-md",
+        ghost: "hover:bg-muted hover:text-foreground",
+        destructive: "bg-destructive text-destructive-fg hover:bg-destructive/90 shadow-md hover:shadow-lg",
       },
       size: {
-        sm: "h-9 px-3",
-        md: "h-10 px-4",
-        lg: "h-11 px-5",
-        pill: "h-11 px-6 rounded-full",
+        sm: "h-9 px-4 text-xs",
+        md: "h-10 px-5 text-sm",
+        lg: "h-12 px-8 text-base",
+        pill: "h-11 px-8 rounded-full text-sm",
       },
     },
     defaultVariants: { variant: "default", size: "md" },

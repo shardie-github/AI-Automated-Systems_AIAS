@@ -1,9 +1,26 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET } from '@/app/api/healthz/route';
-import { NextRequest } from 'next/server';
+/**
+ * Health Check API Tests
+ */
 
-// Mock Supabase client
-vi.mock('@supabase/supabase-js', () => ({
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { GET } from "@/app/api/healthz/route";
+import { NextRequest } from "next/server";
+
+// Mock dependencies
+vi.mock("@/lib/env", () => ({
+  env: {
+    supabase: {
+      url: "https://test.supabase.co",
+      anonKey: "test-anon-key",
+      serviceRoleKey: "test-service-key",
+    },
+    database: {
+      url: "postgresql://test",
+    },
+  },
+}));
+
+vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(() => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({
@@ -21,56 +38,49 @@ vi.mock('@supabase/supabase-js', () => ({
   })),
 }));
 
-// Mock environment variables
-vi.mock('@/lib/env', () => ({
-  env: {
-    supabase: {
-      url: 'https://test.supabase.co',
-      anonKey: 'test-anon-key',
-      serviceRoleKey: 'test-service-key',
-    },
-    database: {
-      url: 'postgresql://test',
-    },
-  },
+vi.mock("@/lib/env-validation", () => ({
+  validateEnvOnStartup: vi.fn(),
 }));
 
-describe('Health Check Endpoint', () => {
+describe("GET /api/healthz", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should return 200 when healthy', async () => {
-    const request = new NextRequest('http://localhost:3000/api/healthz');
+  it("should return 200 when all checks pass", async () => {
     const response = await GET();
+    const data = await response.json();
 
     expect(response.status).toBe(200);
-    const data = await response.json();
-    expect(data).toHaveProperty('ok');
-    expect(data).toHaveProperty('timestamp');
+    expect(data.ok).toBe(true);
+    expect(data.timestamp).toBeDefined();
+    expect(data.db).toBeDefined();
+    expect(data.rest).toBeDefined();
+    expect(data.auth).toBeDefined();
   });
 
-  it('should include database check', async () => {
+  it("should return 503 when environment validation fails", async () => {
+    const { validateEnvOnStartup } = await import("@/lib/env-validation");
+    vi.mocked(validateEnvOnStartup).mockImplementation(() => {
+      throw new Error("Environment validation failed");
+    });
+
     const response = await GET();
     const data = await response.json();
 
-    expect(data).toHaveProperty('db');
-    expect(data.db).toHaveProperty('ok');
+    expect(response.status).toBe(503);
+    expect(data.ok).toBe(false);
+    expect(data.error).toContain("Environment validation failed");
   });
 
-  it('should include auth check', async () => {
+  it("should include latency measurements", async () => {
     const response = await GET();
     const data = await response.json();
 
-    expect(data).toHaveProperty('auth');
-    expect(data.auth).toHaveProperty('ok');
-  });
-
-  it('should include performance metrics', async () => {
-    const response = await GET();
-    const data = await response.json();
-
-    expect(data).toHaveProperty('total_latency_ms');
-    expect(typeof data.total_latency_ms).toBe('number');
+    expect(data.total_latency_ms).toBeDefined();
+    expect(typeof data.total_latency_ms).toBe("number");
+    if (data.db) {
+      expect(data.db.latency_ms).toBeDefined();
+    }
   });
 });
