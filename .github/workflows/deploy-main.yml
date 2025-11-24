@@ -26,17 +26,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: '20'
+          cache: 'pnpm'
 
-      - name: Install
-        run: npm ci
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build Next.js
-        run: npm run build
+        run: pnpm run build
 
       - name: Agent Smoke Check
         run: |
@@ -59,20 +64,20 @@ jobs:
 
       - name: Supabase Login & Link
         run: |
-          npm run supa:login
-          npm run supa:link
+          pnpm run supa:login
+          pnpm run supa:link
 
       - name: Apply Supabase Migrations (Prod)
         run: |
-          npm run supa:migrate:apply
+          pnpm run supa:migrate:apply
 
       - name: Vercel Pull & Build
         run: |
-          npm run vercel:pull
-          npm run vercel:build
+          pnpm run vercel:pull
+          pnpm run vercel:build
 
       - name: Deploy to Vercel (Production)
-        run: npm run vercel:deploy:prod
+        run: pnpm run vercel:deploy:prod
 
       - name: Post-Deploy Smoke (optional)
         run: |

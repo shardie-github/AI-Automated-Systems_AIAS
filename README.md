@@ -113,7 +113,7 @@ See [USE_CASES.md](./USE_CASES.md) for detailed examples.
 
 ### Prerequisites
 
-- Node.js 18.17.0 or higher
+- Node.js 20 or higher
 - pnpm 8.0.0 or higher
 - Docker and Docker Compose (optional, for local development)
 - PostgreSQL 14+ (or use Supabase)
@@ -155,6 +155,51 @@ docker-compose up -d
 docker build -t aias-platform .
 docker run -p 3000:3000 aias-platform
 ```
+
+---
+
+## CI/CD Overview
+
+The AIAS Platform uses fully automated CI/CD pipelines that run entirely in GitHub Actions—**no local CLI tools required**.
+
+### Frontend Deployment
+
+- **Preview Deployments:** Automatically created for every Pull Request
+- **Production Deployments:** Automatically deployed when code is merged to `main`
+- **Platform:** Vercel
+- **Workflow:** `.github/workflows/frontend-deploy.yml`
+
+The workflow runs lint, typecheck, tests, and build checks before deploying. Preview URLs are automatically commented on PRs.
+
+### Database Migrations
+
+- **Platform:** Supabase
+- **Workflow:** `.github/workflows/supabase-migrate.yml`
+- **Trigger:** Manual or push to `main`
+- **Decoupled:** Runs independently of frontend deployments
+
+### Package Management
+
+- **Package Manager:** pnpm 8.15.0 (canonical)
+- **Node Version:** 20 LTS (consistent across all workflows)
+- **Lockfile:** `pnpm-lock.yaml` (only lockfile in version control)
+
+### Required GitHub Secrets
+
+For frontend deployments:
+- `VERCEL_TOKEN` - Vercel API token
+- `VERCEL_ORG_ID` - Vercel organization ID
+- `VERCEL_PROJECT_ID` - Vercel project ID
+
+For database migrations:
+- `SUPABASE_ACCESS_TOKEN` - Supabase access token
+- `SUPABASE_PROJECT_REF` - Supabase project reference ID
+
+**No local Vercel or Supabase CLI is required**—everything runs in GitHub Actions.
+
+See:
+- [Frontend Deployment Guide](docs/frontend-deploy-vercel-ci.md) - Complete guide to Vercel deployments
+- [CI/CD Overview](docs/ci-overview.md) - Detailed CI/CD documentation
 
 ---
 

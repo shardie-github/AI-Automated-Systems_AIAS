@@ -288,7 +288,7 @@
     "js-yaml": "^4.1.0"
   },
   "engines": {
-    "node": ">=18.17.0",
+    "node": ">=20 <21",
     "pnpm": ">=8.0.0"
   },
   "packageManager": "pnpm@8.15.0",

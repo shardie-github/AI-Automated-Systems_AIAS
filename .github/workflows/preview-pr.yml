@@ -26,34 +26,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: '20'
+          cache: 'pnpm'
 
-      - name: Install
-        run: npm ci
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck & Lint
         run: |
-          npm run -s typecheck || true
-          npm run -s lint || true
+          pnpm run typecheck || true
+          pnpm run lint || true
 
       - name: Build Next.js
-        run: npm run build
+        run: pnpm run build
 
       - name: Start server
-        run: npm run start-ci &
+        run: pnpm run start-ci &
       
       - name: Wait for server
         run: npx wait-on http://localhost:3000
 
       - name: Lighthouse (mobile)
-        run: npm run lhci
+        run: pnpm run lhci
 
       - name: Accessibility (Pa11y axe)
-        run: npm run a11y
+        run: pnpm run a11y
 
       - name: Upload QA Artifacts
         if: always()
@@ -69,15 +74,15 @@ jobs:
         uses: supabase/setup-cli@v1
       - name: Supabase login/link (dry-run)
         run: |
-          npm run supa:login
-          npm run supa:link
-          npm run supa:status
+          pnpm run supa:login
+          pnpm run supa:link
+          pnpm run supa:status
 
       - name: Vercel Pull & Build (Preview)
         run: |
-          npm run vercel:pull
-          npm run vercel:build
-          npm run vercel:deploy:preview > .vercel-url.txt
+          pnpm run vercel:pull
+          pnpm run vercel:build
+          pnpm run vercel:deploy:preview > .vercel-url.txt
 
       - name: Comment Preview URL
         uses: marocchino/sticky-pull-request-comment@v2
