@@ -10,14 +10,14 @@
   },
   "git": {
     "deploymentEnabled": {
-      "main": true,
-      "preview": true
+      "main": false,
+      "preview": false
     }
   },
   "github": {
     "deploymentEnabled": {
-      "main": true,
-      "preview": true
+      "main": false,
+      "preview": false
     },
     "autoAlias": true,
     "autoJobCancelation": true,

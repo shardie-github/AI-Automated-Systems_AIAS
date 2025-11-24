@@ -1,3 +1,16 @@
+# ⚠️ DEPRECATED: This workflow is deprecated in favor of frontend-deploy.yml + apply-supabase-migrations.yml
+# This workflow will be removed after confirming frontend-deploy.yml handles all cases.
+# 
+# Issues with this workflow:
+# - Duplicates frontend-deploy.yml functionality
+# - Hardcoded vercel:pull to preview environment (should be production)
+# - Migrations should run independently via apply-supabase-migrations.yml
+#
+# Migration plan:
+# 1. Ensure frontend-deploy.yml handles production deploys correctly
+# 2. Ensure apply-supabase-migrations.yml handles migrations correctly
+# 3. Remove this workflow
+
 name: Main Deploy (DB migrate + Vercel Prod)
 
 on:

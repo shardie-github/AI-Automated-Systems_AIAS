@@ -137,21 +137,27 @@ These variables are only available server-side. **Never** expose these to the cl
 
 **Location:** Repository → Settings → Secrets and variables → Actions
 
-**Required Secrets:**
-- `SUPABASE_ACCESS_TOKEN`
-- `SUPABASE_PROJECT_REF`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`)
-- `SUPABASE_ANON_KEY` (or `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
+**Required Secrets (for deployments):**
+- `VERCEL_TOKEN` - **REQUIRED** - Vercel API token (get from Vercel Dashboard → Settings → Tokens)
+- `VERCEL_ORG_ID` - **REQUIRED** - Vercel organization ID (get from Vercel Dashboard → Settings → General)
+- `VERCEL_PROJECT_ID` - **REQUIRED** - Vercel project ID (get from Vercel Dashboard → Project → Settings → General)
+
+**Required Secrets (for migrations):**
+- `SUPABASE_ACCESS_TOKEN` - Supabase CLI access token
+- `SUPABASE_PROJECT_REF` - Supabase project reference ID
+
+**Required Secrets (for builds - optional but recommended):**
+- `DATABASE_URL` - Database connection string (for Prisma generation)
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL (for build)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key (for build)
 
 **Optional Secrets:**
 - `STRIPE_SECRET_KEY`
 - `OPENAI_API_KEY`
 - `SLACK_WEBHOOK_URL`
 - And others as needed
+
+**Validation:** The `frontend-deploy.yml` workflow validates required Vercel secrets before deployment. Missing secrets will cause deployment to fail with a clear error message.
 
 ### Vercel (Production)
 
@@ -313,12 +319,17 @@ if (!validation.valid) {
 
 ### CI Workflow Fails
 
-**Error:** `Secret not found: VERCEL_TOKEN`
+**Error:** `Secret not found: VERCEL_TOKEN` or `❌ Missing required secrets: VERCEL_TOKEN`
 
 **Solution:**
 1. Go to GitHub → Settings → Secrets → Actions
-2. Add missing secret
+2. Add missing secret:
+   - `VERCEL_TOKEN` - Get from Vercel Dashboard → Settings → Tokens
+   - `VERCEL_ORG_ID` - Get from Vercel Dashboard → Settings → General
+   - `VERCEL_PROJECT_ID` - Get from Vercel Dashboard → Project → Settings → General
 3. Re-run workflow
+
+**Note:** The `frontend-deploy.yml` workflow now validates secrets before deployment, providing clear error messages if secrets are missing.
 
 ### Vercel Deployment Fails
 

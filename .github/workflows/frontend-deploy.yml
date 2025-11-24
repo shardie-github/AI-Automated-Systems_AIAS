@@ -56,6 +56,14 @@ jobs:
           pnpm run test -- --run
         continue-on-error: false
 
+      - name: Generate Prisma Client
+        run: |
+          set -euo pipefail
+          pnpm run db:generate || echo "⚠️ Prisma generation skipped (DATABASE_URL not available)"
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+
       - name: Build application
         run: |
           set -euo pipefail
@@ -80,8 +88,34 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'pull_request') || 
-      (github.ref == 'refs/heads/main')
+      (github.ref == 'refs/heads/main' && github.event_name == 'push')
     steps:
+      - name: Validate Required Secrets
+        run: |
+          set -euo pipefail
+          echo "🔍 Validating required secrets..."
+          MISSING_SECRETS=()
+          
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            MISSING_SECRETS+=("VERCEL_TOKEN")
+          fi
+          
+          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
+            MISSING_SECRETS+=("VERCEL_ORG_ID")
+          fi
+          
+          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            MISSING_SECRETS+=("VERCEL_PROJECT_ID")
+          fi
+          
+          if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
+            echo "❌ Missing required secrets: ${MISSING_SECRETS[*]}"
+            echo "Please add these secrets in GitHub → Settings → Secrets → Actions"
+            exit 1
+          fi
+          
+          echo "✅ All required secrets are present"
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -135,21 +169,45 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
-          DEPLOYMENT_URL=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=false 2>&1 | grep -oP 'https://[^\s]+\.vercel\.app' | head -1 || echo "")
+          echo "🚀 Deploying to Vercel Preview..."
+          DEPLOYMENT_OUTPUT=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=false 2>&1)
+          echo "$DEPLOYMENT_OUTPUT"
+          
+          DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | grep -oP 'https://[^\s]+\.vercel\.app' | head -1 || echo "")
+          
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "❌ Failed to extract deployment URL from Vercel output"
+            echo "Deployment output:"
+            echo "$DEPLOYMENT_OUTPUT"
+            exit 1
+          fi
+          
           echo "PREVIEW_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
-          echo "🚀 Preview deployment: $DEPLOYMENT_URL"
+          echo "✅ Preview deployment successful: $DEPLOYMENT_URL"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy to Vercel (Production)
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           set -euo pipefail
-          DEPLOYMENT_URL=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=true 2>&1 | grep -oP 'https://[^\s]+\.vercel\.app' | head -1 || echo "")
+          echo "🚀 Deploying to Vercel Production..."
+          DEPLOYMENT_OUTPUT=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=true 2>&1)
+          echo "$DEPLOYMENT_OUTPUT"
+          
+          DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | grep -oP 'https://[^\s]+\.vercel\.app' | head -1 || echo "")
+          
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "❌ Failed to extract deployment URL from Vercel output"
+            echo "Deployment output:"
+            echo "$DEPLOYMENT_OUTPUT"
+            exit 1
+          fi
+          
           echo "PRODUCTION_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
-          echo "🚀 Production deployment: $DEPLOYMENT_URL"
+          echo "✅ Production deployment successful: $DEPLOYMENT_URL"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

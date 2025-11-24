@@ -40,18 +40,30 @@ The AIAS Platform uses **GitHub Actions** for all CI/CD operations. The reposito
 
 **Purpose:** Deploy frontend to Vercel (preview + production)
 
+**Status:** ✅ **CANONICAL** - This is the source of truth for deployments
+
 **Triggers:**
 - Pull requests (preview deployments)
 - Push to `main` (production deployment)
 - Manual (`workflow_dispatch`)
 
 **Jobs:**
-1. **Build and Test** - Lint, typecheck, test, build
+1. **Build and Test** - Lint, typecheck, test, build, Prisma generation
 2. **Deploy** - Deploy to Vercel (preview or production)
+   - Secret validation
+   - Environment-specific Vercel pull
+   - Enhanced error handling
 
-**Status:** ✅ Active and Required
+**Recent Fixes (2025-01-XX):**
+- ✅ Added secret validation before deploy
+- ✅ Added Prisma client generation step
+- ✅ Fixed production deploy condition (added event_name check)
+- ✅ Enhanced error handling and logging
+- ✅ Improved deployment URL extraction
 
 **Branch Protection:** Not required (deployment workflow)
+
+**See:** `docs/deploy-strategy.md` for canonical deployment strategy
 
 ---
 
@@ -80,15 +92,16 @@ The AIAS Platform uses **GitHub Actions** for all CI/CD operations. The reposito
 
 **Purpose:** Deploy to production + run migrations
 
-**Status:** ⚠️ **Redundant**
+**Status:** ⚠️ **DEPRECATED** (Marked for removal)
 
 **Reason:** Duplicates `frontend-deploy.yml` functionality
 
-**Recommendation:** 
-- **Option 1:** Remove (use `frontend-deploy.yml` + `apply-supabase-migrations.yml`)
-- **Option 2:** Keep but rename to `deploy-production.yml` and make it the canonical production deploy
+**Action Taken:** 
+- ✅ Marked as deprecated with migration plan
+- ✅ Will be removed after confirming `frontend-deploy.yml` handles all cases
+- ✅ Migrations moved to `apply-supabase-migrations.yml`
 
-**Action:** Consolidate into `frontend-deploy.yml` or remove
+**Current Status:** Workflow still exists but marked deprecated. Use `frontend-deploy.yml` + `apply-supabase-migrations.yml` instead.
 
 ---
 
@@ -403,15 +416,51 @@ concurrency:
 
 ---
 
+## Recent Improvements (2025-01-XX)
+
+### ✅ Fixed Critical Issues
+
+1. **Node Version Consistency**
+   - All workflows now use Node 20 (was 18 in some workflows)
+   - Aligned with `package.json` engines requirement
+
+2. **Package Manager Consistency**
+   - All workflows now use pnpm (was npm in some workflows)
+   - Aligned with `package.json` packageManager
+
+3. **Vercel Git Integration**
+   - Disabled in `vercel.json` to prevent double deployments
+   - GitHub Actions is now single source of truth
+
+4. **Deployment Reliability**
+   - Added secret validation
+   - Enhanced error handling
+   - Improved logging
+
+5. **Diagnostic Tooling**
+   - Created `deploy-doctor` script (`scripts/deploy-doctor.ts`)
+   - Added `deploy-doctor.yml` workflow for automatic checks
+
+**See:** `docs/deploy-failure-postmortem-final.md` for complete details
+
+---
+
 ## Conclusion
 
-**Current State:** 37 workflows (many redundant)  
+**Current State:** 37 workflows (many redundant, some deprecated)  
 **Target State:** 3-5 essential workflows  
-**Action Required:** Audit and consolidate workflows  
+**Status:** ✅ Critical issues fixed, consolidation in progress
+
+**Canonical Workflows:**
+- ✅ `frontend-deploy.yml` - Preview + Production deploys
+- ✅ `apply-supabase-migrations.yml` - Database migrations
+- ✅ `ci.yml` - Quality checks
 
 **Next Steps:**
-1. Audit all workflows
-2. Remove redundant workflows
-3. Consolidate similar workflows
-4. Update branch protection rules
-5. Document final workflow structure
+1. ✅ Fixed Node/pnpm version mismatches
+2. ✅ Fixed Vercel Git integration conflict
+3. ✅ Added secret validation and error handling
+4. ✅ Created diagnostic tooling
+5. ⏳ Remove deprecated workflows after verification
+6. ⏳ Continue workflow consolidation
+7. ⏳ Update branch protection rules
