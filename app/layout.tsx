@@ -82,7 +82,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <ThemeProvider>
               <a href="#main" className="skip-link">Skip to content</a>
               <Header />
-              <main id="main" className="container py-6">{children}</main>
+              <main id="main" className="min-h-[calc(100vh-8rem)]">{children}</main>
               <Footer />
               <StickyCTA />
               <Toaster />

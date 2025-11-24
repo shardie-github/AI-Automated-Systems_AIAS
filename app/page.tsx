@@ -6,6 +6,7 @@ import { ROICalculator } from "@/components/home/roi-calculator";
 import { CaseStudyPreview } from "@/components/home/case-study-preview";
 import { TrustSignals } from "@/components/home/trust-signals";
 import { FAQ } from "@/components/home/faq";
+import { StatsSection } from "@/components/home/stats-section";
 import { SoftwareApplicationSchema } from "@/components/seo/structured-data";
 import { FAQSchema } from "@/components/seo/structured-data";
 
@@ -30,6 +31,7 @@ export default function HomePage() {
       <SoftwareApplicationSchema />
       <FAQSchema faqs={homepageFAQs} />
       <Hero />
+      <StatsSection />
       <TrustSignals />
       <CaseStudyPreview />
       <ROICalculator />

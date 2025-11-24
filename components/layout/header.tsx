@@ -3,44 +3,73 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 backdrop-blur bg-bg/70 border-b border-border">
-      <div className="container flex items-center justify-between h-14">
-        <Link href="/" className="font-bold text-lg">
-          AIAS Platform
-        </Link>
-        <nav aria-label="Primary" className="hidden md:flex items-center gap-4">
-          <Link href="/services" className="px-3 py-2 hover:underline text-sm">
-            Services
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-bg/80 border-b border-border/50 shadow-sm">
+      <div className="container flex items-center justify-between h-16">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Link 
+            href="/" 
+            className="font-bold text-xl flex items-center gap-2 hover:opacity-80 transition-opacity group"
+          >
+            <Sparkles className="h-5 w-5 text-primary group-hover:rotate-12 transition-transform" />
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              AIAS Platform
+            </span>
           </Link>
-          <Link href="/portfolio" className="px-3 py-2 hover:underline text-sm">
-            Portfolio
-          </Link>
-          <Link href="/tasks" className="px-3 py-2 hover:underline text-sm">
-            Our Builds
-          </Link>
-          <Link href="/case-studies" className="px-3 py-2 hover:underline text-sm">
-            Case Studies
-          </Link>
-          <Link href="/pricing" className="px-3 py-2 hover:underline text-sm">
-            Platform Pricing
-          </Link>
-          <Link href="/features" className="px-3 py-2 hover:underline text-sm">
-            Features
-          </Link>
-          <Link href="/why-canadian" className="px-3 py-2 hover:underline text-sm">
-            🇨🇦 Why Canadian
-          </Link>
-          <Link href="/blog" className="px-3 py-2 hover:underline text-sm">
-            Blog
-          </Link>
-          <Button size="sm" asChild>
-            <Link href="/signup">Start Free Trial</Link>
-          </Button>
+        </motion.div>
+        
+        <nav aria-label="Primary" className="hidden md:flex items-center gap-1">
+          {[
+            { href: "/services", label: "Services" },
+            { href: "/portfolio", label: "Portfolio" },
+            { href: "/tasks", label: "Our Builds" },
+            { href: "/case-studies", label: "Case Studies" },
+            { href: "/pricing", label: "Pricing" },
+            { href: "/features", label: "Features" },
+            { href: "/why-canadian", label: "🇨🇦 Why Canadian" },
+            { href: "/blog", label: "Blog" },
+          ].map((item, index) => (
+            <motion.div
+              key={item.href}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+            >
+              <Link
+                href={item.href}
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-all relative group"
+              >
+                {item.label}
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+              </Link>
+            </motion.div>
+          ))}
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+          >
+            <Button 
+              size="sm" 
+              className="ml-2 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105" 
+              asChild
+            >
+              <Link href="/signup">Start Free Trial</Link>
+            </Button>
+          </motion.div>
+          
           <ThemeToggle />
         </nav>
+        
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <MobileNav />
