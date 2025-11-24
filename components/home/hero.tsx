@@ -63,7 +63,10 @@ export function Hero() {
             className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.1]"
           >
             <span className="block">Custom AI Platforms</span>
-            <span className="block mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+            <span 
+              className="block mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient"
+              aria-label="That Transform Your Business"
+            >
               That Transform Your Business
             </span>
           </motion.h1>
@@ -98,8 +101,9 @@ export function Hero() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-sm hover:shadow-md transition-shadow"
+                role="listitem"
               >
-                <item.icon className="h-4 w-4 text-primary" />
+                <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
                 <span className="text-foreground font-medium">{item.text}</span>
               </motion.div>
             ))}
@@ -114,31 +118,31 @@ export function Hero() {
           >
             <Button 
               size="lg" 
-              className="text-base px-8 h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group" 
+              className="text-base px-8 h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group min-h-[44px]" 
               asChild
             >
-              <Link href="/demo">
+              <Link href="/demo" aria-label="Schedule a strategy call">
                 Schedule Strategy Call
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              className="text-base px-8 h-14 text-lg font-semibold border-2 hover:bg-primary/5 hover:border-primary/50 transition-all hover:scale-105" 
+              className="text-base px-8 h-14 text-lg font-semibold border-2 hover:bg-primary/5 hover:border-primary/50 transition-all hover:scale-105 min-h-[44px]" 
               asChild
             >
-              <Link href="/tasks">
+              <Link href="/tasks" aria-label="View our builds and portfolio">
                 See Our Builds
               </Link>
             </Button>
             <Button 
               size="lg" 
               variant="ghost" 
-              className="text-base px-8 h-14 text-lg font-semibold hover:bg-primary/10 transition-all hover:scale-105" 
+              className="text-base px-8 h-14 text-lg font-semibold hover:bg-primary/10 transition-all hover:scale-105 min-h-[44px]" 
               asChild
             >
-              <Link href="/pricing">
+              <Link href="/pricing" aria-label="Try AIAS Platform free trial">
                 Try AIAS Platform
               </Link>
             </Button>

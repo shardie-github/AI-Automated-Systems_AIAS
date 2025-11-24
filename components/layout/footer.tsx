@@ -5,7 +5,11 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-gradient-to-b from-background to-muted/20 py-12 md:py-16 text-sm text-muted-foreground mt-auto">
+    <footer 
+      className="border-t border-border bg-gradient-to-b from-background to-muted/20 py-12 md:py-16 text-sm text-muted-foreground mt-auto"
+      role="contentinfo"
+      aria-label="Site footer"
+    >
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <motion.div
@@ -15,7 +19,7 @@ export function Footer() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
               <h3 className="font-bold text-lg text-foreground">AIAS Platform</h3>
             </div>
             <p className="text-sm mb-4 leading-relaxed">
@@ -71,12 +75,13 @@ export function Footer() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <h4 className="font-bold text-foreground mb-4">{section.title}</h4>
-              <ul className="space-y-3">
+              <ul className="space-y-3" role="list">
                 {section.links.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href} role="listitem">
                     <Link
                       href={link.href}
-                      className="hover:text-foreground hover:underline transition-colors inline-block"
+                      className="hover:text-foreground hover:underline transition-colors inline-block min-h-[44px] flex items-center"
+                      aria-label={`Navigate to ${link.label}`}
                     >
                       {link.label}
                     </Link>
@@ -104,7 +109,8 @@ export function Footer() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="hover:text-foreground hover:underline transition-colors"
+                className="hover:text-foreground hover:underline transition-colors min-h-[44px] flex items-center"
+                aria-label={`Navigate to ${link.label}`}
               >
                 {link.label}
               </Link>

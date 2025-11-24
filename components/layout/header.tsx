@@ -8,7 +8,10 @@ import { motion } from "framer-motion";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-bg/80 border-b border-border/50 shadow-sm">
+    <header 
+      className="sticky top-0 z-50 backdrop-blur-md bg-bg/80 border-b border-border/50 shadow-sm"
+      role="banner"
+    >
       <div className="container flex items-center justify-between h-16">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -18,8 +21,12 @@ export function Header() {
           <Link 
             href="/" 
             className="font-bold text-xl flex items-center gap-2 hover:opacity-80 transition-opacity group"
+            aria-label="AIAS Platform - Home"
           >
-            <Sparkles className="h-5 w-5 text-primary group-hover:rotate-12 transition-transform" />
+            <Sparkles 
+              className="h-5 w-5 text-primary group-hover:rotate-12 transition-transform" 
+              aria-hidden="true"
+            />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               AIAS Platform
             </span>
@@ -45,10 +52,14 @@ export function Header() {
             >
               <Link
                 href={item.href}
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-all relative group"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-all relative group min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label={`Navigate to ${item.label}`}
               >
                 {item.label}
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+                <span 
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left" 
+                  aria-hidden="true"
+                />
               </Link>
             </motion.div>
           ))}
@@ -60,10 +71,10 @@ export function Header() {
           >
             <Button 
               size="sm" 
-              className="ml-2 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105" 
+              className="ml-2 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105 min-h-[44px]" 
               asChild
             >
-              <Link href="/signup">Start Free Trial</Link>
+              <Link href="/signup" aria-label="Start your free trial">Start Free Trial</Link>
             </Button>
           </motion.div>
           

@@ -142,7 +142,7 @@ a, button {
   }
 }
 
-/* Reduced motion preference */
+/* Reduced motion preference - Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -150,10 +150,50 @@ a, button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Skip link */
+/* Mobile-first responsive improvements */
+@media (max-width: 640px) {
+  html {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+  
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Skip link - Accessibility */
 .skip-link {
   position: absolute;
   left: -999px;
@@ -161,6 +201,7 @@ a, button {
   width: 1px;
   height: 1px;
   overflow: hidden;
+  z-index: 9999;
 }
 
 .skip-link:focus {
@@ -173,10 +214,39 @@ a, button {
   color: hsl(var(--fg));
   border: 2px solid hsl(var(--ring));
   border-radius: var(--radius);
-  z-index: 9999;
   text-decoration: none;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Touch target sizes - Mobile accessibility */
+a, button, [role="button"], [role="link"] {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Focus visible improvements */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 20%;
+  }
+  
+  .dark {
+    --border: 0 0% 80%;
+  }
 }
 
 /* Selection styling */

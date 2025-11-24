@@ -3,8 +3,18 @@
 # Preview: Disallow all (set via middleware or environment)
 
 User-agent: *
+Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /_next/
+Disallow: /account/
+Disallow: /settings/
+
+# Sitemap location
+Sitemap: https://aias-platform.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
 
 # Allow preview environments to be blocked via environment variable
 # Set PREVIEW_DISALLOW_ROBOTS=true in Vercel preview environment

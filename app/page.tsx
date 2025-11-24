@@ -1,14 +1,29 @@
+import dynamic from "next/dynamic";
 import { Hero } from "@/components/home/hero";
 import { Features } from "@/components/home/features";
-import { Testimonials } from "@/components/home/testimonials";
-import { CTASection } from "@/components/home/cta-section";
-import { ROICalculator } from "@/components/home/roi-calculator";
-import { CaseStudyPreview } from "@/components/home/case-study-preview";
-import { TrustSignals } from "@/components/home/trust-signals";
-import { FAQ } from "@/components/home/faq";
 import { StatsSection } from "@/components/home/stats-section";
 import { SoftwareApplicationSchema } from "@/components/seo/structured-data";
 import { FAQSchema } from "@/components/seo/structured-data";
+
+// Lazy load below-the-fold components for performance
+const Testimonials = dynamic(() => import("@/components/home/testimonials").then(mod => ({ default: mod.Testimonials })), {
+  loading: () => <div className="py-16" aria-label="Loading testimonials" />,
+});
+const CTASection = dynamic(() => import("@/components/home/cta-section").then(mod => ({ default: mod.CTASection })), {
+  loading: () => <div className="py-16" aria-label="Loading call to action" />,
+});
+const ROICalculator = dynamic(() => import("@/components/home/roi-calculator").then(mod => ({ default: mod.ROICalculator })), {
+  loading: () => <div className="py-16" aria-label="Loading ROI calculator" />,
+});
+const CaseStudyPreview = dynamic(() => import("@/components/home/case-study-preview").then(mod => ({ default: mod.CaseStudyPreview })), {
+  loading: () => <div className="py-16" aria-label="Loading case studies" />,
+});
+const TrustSignals = dynamic(() => import("@/components/home/trust-signals").then(mod => ({ default: mod.TrustSignals })), {
+  loading: () => <div className="py-16" aria-label="Loading trust signals" />,
+});
+const FAQ = dynamic(() => import("@/components/home/faq").then(mod => ({ default: mod.FAQ })), {
+  loading: () => <div className="py-16" aria-label="Loading FAQ" />,
+});
 
 const homepageFAQs = [
   {
