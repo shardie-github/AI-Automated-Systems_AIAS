@@ -241,6 +241,7 @@ All tests are configured to run in CI. See [.github/workflows/ci.yml](.github/wo
 - **[Getting Started Guide](docs/getting-started.md)** - Complete setup and configuration
 - **[API Documentation](docs/api.md)** - Comprehensive API reference
 - **[Deployment Guide](DEPLOYMENT_GUIDE.md)** - Production deployment instructions
+- **[Supabase Migrations (CI)](docs/supabase-migrations-ci.md)** - GitHub Actions workflow for applying Supabase migrations
 - **[Value Proposition](VALUE_PROPOSITION.md)** - Why this project exists
 - **[Use Cases](USE_CASES.md)** - Real-world examples and scenarios
 - **[Contributing Guide](CONTRIBUTING.md)** - Development guidelines and standards
