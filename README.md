@@ -283,6 +283,19 @@ All tests are configured to run in CI. See [.github/workflows/ci.yml](.github/wo
 
 ## Documentation
 
+### YC Readiness Documentation
+
+**For YC Application & Interview Prep:**
+- **[YC Readiness Overview](yc/REPO_ORIENTATION.md)** - Product overview and architecture
+- **[YC Product Overview](yc/YC_PRODUCT_OVERVIEW.md)** - Product narrative and positioning
+- **[YC Problem & Users](yc/YC_PROBLEM_USERS.md)** - Problem statement and user segments
+- **[YC Market Vision](yc/YC_MARKET_VISION.md)** - Market opportunity and sizing
+- **[YC Metrics Checklist](yc/YC_METRICS_CHECKLIST.md)** - Metrics definitions and instrumentation
+- **[YC Distribution Plan](yc/YC_DISTRIBUTION_PLAN.md)** - User acquisition strategy
+- **[YC Interview Cheat Sheet](yc/YC_INTERVIEW_CHEATSHEET.md)** - Interview preparation guide
+- **[YC Gap Analysis](yc/YC_GAP_ANALYSIS.md)** - Gaps vs YC expectations
+- **[YC Readiness Log](yc/YCREADINESS_LOG.md)** - Ongoing readiness tracking
+
 ### Core Documentation
 
 - **[Stack Discovery](docs/stack-discovery.md)** - Complete technical audit and stack analysis
