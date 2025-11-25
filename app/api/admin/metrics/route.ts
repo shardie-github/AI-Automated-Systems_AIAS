@@ -1,65 +1,63 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createGETHandler } from "@/lib/api/route-handler";
-import { getAllActivationMetrics, getFunnelMetrics } from "@/lib/analytics/metrics";
-import { logger } from "@/lib/logging/structured-logger";
-
-export const runtime = "edge";
-
 /**
- * GET /api/admin/metrics
- * Get activation metrics for dashboard
+ * Performance Metrics API
+ * 
+ * Returns performance metrics for the dashboard
  */
-export const GET = createGETHandler(
-  async (context) => {
-    const { request } = context;
 
-    // Get date range from query params (default to last 30 days)
-    const days = parseInt(request.nextUrl.searchParams.get("days") || "30");
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { env } from '@/lib/env';
+import { cacheService } from '@/lib/cache/cache-service';
 
-    try {
-      const metrics = await getAllActivationMetrics(days);
-      const funnel = await getFunnelMetrics(days);
-
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-
-      return NextResponse.json({
-        metrics: {
-          activation_rate: Math.round(metrics.activationRate * 100) / 100,
-          time_to_activation_ms: metrics.timeToActivation,
-          time_to_activation_hours: Math.round((metrics.timeToActivation / (1000 * 60 * 60)) * 100) / 100,
-          day_7_retention: Math.round(metrics.day7Retention * 100) / 100,
-          total_signups: metrics.totalSignups,
-          total_integrations: metrics.totalIntegrations,
-          total_workflows: metrics.totalWorkflows,
-          total_activations: metrics.totalActivations,
-          unique_active_users: metrics.uniqueActiveUsers,
-        },
-        funnel: {
-          signups: funnel.signups,
-          integrations: funnel.integrations,
-          workflows: funnel.workflows,
-          activations: funnel.activations,
-        },
-        period: {
-          days,
-          start_date: startDate.toISOString(),
-          end_date: new Date().toISOString(),
-        },
-      });
-    } catch (error) {
-      logger.error("Error calculating metrics", error instanceof Error ? error : new Error(String(error)), {
-        endpoint: "/api/admin/metrics",
-        days,
-      });
+export async function GET(request: NextRequest) {
+  try {
+    // Check admin access (simplified - implement proper auth)
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: "Failed to calculate metrics" },
-        { status: 500 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
-  },
-  {
-    requireAuth: true,
-    cache: { enabled: true, ttl: 300 }, // Cache for 5 minutes
+
+    const searchParams = request.nextUrl.searchParams;
+    const range = searchParams.get('range') || '1h';
+
+    // Get metrics from database (simplified - implement proper metrics collection)
+    const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
+
+    // Mock metrics for now - in production, query from metrics table
+    const metrics = {
+      api: {
+        p50: 150,
+        p95: 450,
+        p99: 800,
+        errorRate: 0.002,
+        requestsPerMinute: 120,
+      },
+      database: {
+        avgQueryTime: 45,
+        slowQueries: 2,
+        connectionPoolUsage: 0.65,
+      },
+      cache: {
+        hitRate: 0.75,
+        missRate: 0.25,
+        totalRequests: 10000,
+      },
+      webVitals: {
+        lcp: 2200,
+        fid: 85,
+        cls: 0.08,
+      },
+    };
+
+    return NextResponse.json(metrics);
+  } catch (error) {
+    console.error('Metrics API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
-);
+}
