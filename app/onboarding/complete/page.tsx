@@ -7,14 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Check, Sparkles, Zap, Target } from "lucide-react";
 import Link from "next/link";
 import { track } from "@/lib/telemetry/track";
+import { ShareInvite } from "@/components/plg/share-invite";
+import { useState } from "react";
 
 export default function CompletePage() {
   const router = useRouter();
+  const [userId, setUserId] = useState<string | undefined>();
+  const [referralCode, setReferralCode] = useState<string | undefined>();
 
   useEffect(() => {
     // Track onboarding completion
-    const userId = localStorage.getItem("user_id") || "anonymous";
-    track(userId, {
+    const storedUserId = localStorage.getItem("user_id") || "anonymous";
+    setUserId(storedUserId);
+    
+    // TODO: Fetch referral code from API
+    // For now, generate a simple referral code
+    setReferralCode(storedUserId !== "anonymous" ? `REF-${storedUserId.slice(0, 8)}` : undefined);
+
+    track(storedUserId, {
       type: "onboarding_completed",
       path: "/onboarding/complete",
       meta: {
@@ -115,6 +125,11 @@ export default function CompletePage() {
         <Button size="lg" variant="outline" asChild>
           <Link href="/templates">Browse More Templates</Link>
         </Button>
+      </div>
+
+      {/* Viral Invite Flow */}
+      <div className="max-w-2xl mx-auto mt-8">
+        <ShareInvite userId={userId} referralCode={referralCode} />
       </div>
     </div>
   );
