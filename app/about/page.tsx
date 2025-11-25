@@ -145,6 +145,34 @@ export default function AboutPage() {
         </section>
 
         <section>
+          <h2 className="text-2xl font-bold mb-4">Our Team</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Founder & CEO</CardTitle>
+                <CardDescription>TODO: Add founder name and photo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  TODO: Add founder bio, background, and why building AIAS Platform.
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p><strong>Background:</strong> TODO: Previous experience, education</p>
+                  <p><strong>LinkedIn:</strong> <a href="#" className="text-primary hover:underline">TODO: Add LinkedIn profile</a></p>
+                  <p><strong>Why AIAS:</strong> TODO: Personal story about why building this</p>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Add more team members as needed */}
+          </div>
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              <strong>Note:</strong> Team information is being updated. Check back soon for complete team bios.
+            </p>
+          </div>
+        </section>
+
+        <section>
           <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
           <Card>
             <CardHeader>

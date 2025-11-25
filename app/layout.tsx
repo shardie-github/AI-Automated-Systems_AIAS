@@ -14,6 +14,7 @@ import AgentProvider from "@/components/agent/AgentProvider";
 import { OrganizationSchema, WebSiteSchema } from "@/components/seo/structured-data";
 import { EnhancedErrorBoundary } from "@/lib/error-handling/error-boundary-enhanced";
 import { TelemetryProvider } from "@/lib/monitoring/telemetry-provider";
+import { UTMTracker } from "@/components/analytics/utm-tracker";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aias-platform.com";
 
@@ -157,6 +158,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <PerformanceBeacon />
               <WebVitalsTracker />
               <AgentProvider />
+              <UTMTracker />
             </ThemeProvider>
           </TelemetryProvider>
         </EnhancedErrorBoundary>
