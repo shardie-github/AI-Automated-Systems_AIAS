@@ -171,26 +171,23 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card>
               <CardHeader>
-                <CardTitle>Founder & CEO</CardTitle>
-                <CardDescription>Building AIAS Platform to make automation accessible to Canadian SMBs</CardDescription>
+                <CardTitle>Scott Hardie</CardTitle>
+                <CardDescription>Founder & CEO</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  [TODO: Add founder bio, background, and why building AIAS Platform. See yc/EF_FOUNDER_STORY.md for template.]
+                  Scott is building AIAS Platform to make automation accessible to Canadian SMBs. Based in Toronto, he combines technical execution with deep understanding of the Canadian market and e-commerce operations.
                 </p>
                 <div className="space-y-2 text-sm">
-                  <p><strong>Background:</strong> [TODO: Previous experience, education]</p>
-                  <p><strong>LinkedIn:</strong> <a href="#" className="text-primary hover:underline">[TODO: Add LinkedIn profile]</a></p>
-                  <p><strong>Why AIAS:</strong> [TODO: Personal story about why building this]</p>
+                  <p><strong>Location:</strong> Toronto, Canada</p>
+                  <p><strong>Background:</strong> Full-stack developer, e-commerce operator (Hardonia.store), founder of Hardonian Industries. Active open-source contributor with 40+ public repositories.</p>
+                  <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/scottrmhardie" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">scottrmhardie</a></p>
+                  <p><strong>GitHub:</strong> <a href="https://github.com/shardie-github" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">shardie-github</a></p>
+                  <p><strong>Why AIAS:</strong> Experienced firsthand the pain of manual workflows running e-commerce operations. Built AIAS Platform to solve this problem for Canadian SMBs who can't afford expensive enterprise tools.</p>
                 </div>
               </CardContent>
             </Card>
             {/* Add more team members as needed */}
-          </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              <strong>Note:</strong> Team information is being updated. See <code className="text-xs bg-muted px-1 py-0.5 rounded">yc/EF_FOUNDER_STORY.md</code> for founder story template.
-            </p>
           </div>
         </section>
 

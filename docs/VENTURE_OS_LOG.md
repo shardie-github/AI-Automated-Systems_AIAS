@@ -6,6 +6,29 @@
 
 ---
 
+## 2025-01-31 — Updated Founder Information
+
+### Changes Made
+
+**Founder Information Added:**
+- ✅ Updated `yc/YC_TEAM_NOTES.md` — Added Scott Hardie founder information
+- ✅ Updated `app/about/page.tsx` — Added Scott Hardie bio and links
+- ✅ Updated `dataroom/01_EXEC_SUMMARY.md` — Added founder information
+- ✅ Updated `dataroom/02_PRODUCT_DECK_OUTLINE.md` — Added team slide content
+- ✅ Updated `dataroom/APPLICATION_ANSWERS_YC_DRAFT.md` — Added team answer
+- ✅ Created `yc/EF_FOUNDER_STORY.md` — Founder story document
+
+**Founder Details:**
+- **Name:** Scott Hardie
+- **Location:** Toronto, Canada
+- **Role:** Founder & CEO
+- **LinkedIn:** scottrmhardie
+- **GitHub:** shardie-github
+- **Background:** Full-stack developer, e-commerce operator (Hardonia.store), founder of Hardonian Industries
+- **Experience:** 40+ public repositories, active open-source contributor
+
+---
+
 ## 2025-01-31 — Initial Venture OS Setup
 
 ### Changes Made

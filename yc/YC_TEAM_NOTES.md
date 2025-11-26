@@ -7,26 +7,38 @@
 
 ## Team Information from Repo
 
-### Founders/Team (Inferred from Repo)
+### Founders/Team
 
-**Limited Information Available:**
+**Founder Information:**
 
-From `package.json`:
+**Scott Hardie** — Founder & CEO
+- **Location:** Toronto, Canada
+- **GitHub:** [shardie-github](https://github.com/shardie-github)
+- **LinkedIn:** [scottrmhardie](https://www.linkedin.com/in/scottrmhardie)
+- **Company:** Hardonian Industries
+- **Website:** Hardonia.store
+- **GitHub Activity:** 40+ public repositories, active since 2022
+- **Role:** Technical founder, full-stack developer, product builder
+
+**Background (from GitHub/repo):**
+- Based in Toronto, Canada (strong Canadian market understanding)
+- Active developer with 40+ public repositories
+- Built Hardonian Industries (previous/current venture)
+- Experience with e-commerce (Hardonia.store)
+- Strong technical execution (comprehensive platform built)
+
+**From `package.json`:**
 - **Author:** "AIAS Platform Team"
 - **Email:** team@aias-platform.com
 - **URL:** https://aias-platform.com
 
-From `README.md`:
-- Mentions "solo founders" and "small teams" as target users
-- No explicit founder information
-
-From `VALUE_PROPOSITION.md`:
+**From `VALUE_PROPOSITION.md`:**
 - Contains "Founder Vision" section:
   > "I built this because I was tired of watching great ideas fail not because they were bad ideas, but because the founders didn't have access to the right tools."
   > "I built this because I believe that the best businesses aren't built by the biggest teams or the deepest pockets—they're built by people who refuse to accept limitations."
 
 **Inference:**  
-Likely a solo founder or small team (2-3 people) building this platform. The "Founder Vision" suggests personal experience with the problem (watching founders struggle with tools).
+Solo founder (Scott Hardie) building this platform. Strong technical execution, Canadian market focus, e-commerce experience (Hardonia.store), and personal experience with the problem (watching founders struggle with tools).
 
 ---
 

@@ -143,17 +143,18 @@
 
 ## Slide 9: Team
 
-**Headline:** [PLACEHOLDER — Add team slide]
+**Headline:** Built by a Canadian founder who experienced the problem firsthand
 
-**Founders:**
-- **[Founder 1]:** [Background, previous experience]
-- **[Founder 2]:** [Background, previous experience]
+**Founder:**
+- **Scott Hardie** — Founder & CEO
+  - **Location:** Toronto, Canada
+  - **Background:** Full-stack developer, e-commerce operator (Hardonia.store), founder of Hardonian Industries
+  - **Experience:** 40+ public repositories, active open-source contributor
+  - **Why Us:** Experienced firsthand the pain of manual workflows running e-commerce operations. Built AIAS Platform to solve this problem for Canadian SMBs.
 
-**Why Us:** [Why founders are uniquely positioned to solve this problem]
+**Visual:** Founder photo and LinkedIn profile
 
-**Visual:** Founder photos and LinkedIn profiles
-
-**TODO:** Add actual team information. See `yc/YC_TEAM_NOTES.md`.
+**Cross-Reference:** See `yc/YC_TEAM_NOTES.md` for detailed team information.
 
 ---
 

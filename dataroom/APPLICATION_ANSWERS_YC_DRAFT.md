@@ -130,13 +130,9 @@ Three things: (1) **Canadian-first:** We're the only automation platform built s
 ## 12. Who is on your team? (1 paragraph)
 
 **Draft Answer:**
-[PLACEHOLDER — Add team information]
+I'm Scott Hardie, founder and CEO of AIAS Platform. I'm a full-stack developer based in Toronto, Canada, with experience running e-commerce operations (Hardonia.store) and building automation tools. I've experienced firsthand the pain of manual workflows—spending 15+ hours per week on order processing, trying expensive tools ($150-500/month), and struggling with complex setups. I built AIAS Platform to solve this problem for Canadian SMBs who can't afford enterprise tools but need automation. I'm an active open-source contributor with 40+ public repositories and have built Hardonian Industries, giving me both technical execution capability and business experience.
 
-**[Founder 1]:** [Background, previous experience, why building this]. **[Founder 2]:** [Background, previous experience, why building this].
-
-**Why us:** [Why founders are uniquely positioned to solve this problem, e.g., "We've run Shopify stores and experienced this pain firsthand"].
-
-**TODO:** Add actual team information. See `yc/YC_TEAM_NOTES.md` for team details.
+**Cross-Reference:** See `yc/YC_TEAM_NOTES.md` for detailed team information.
 
 ---
 

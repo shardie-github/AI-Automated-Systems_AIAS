@@ -18,7 +18,7 @@
 | MUST | Launch MVP and get first 10 paying customers | Founder | ⏳ Pending | Gap 1, Gap 6 |
 | MUST | Start tracking real metrics (MRR, DAU, activation, retention) | Tech Founder | ⏳ Pending | Gap 4, `YC_METRICS_CHECKLIST.md` |
 | MUST | Document actual revenue data (MRR, paying customers) | Founder | ⏳ Pending | Gap 6, `YC_INTERVIEW_CHEATSHEET.md` |
-| MUST | Create team page with founder bios, LinkedIn profiles | Founder | ⏳ Pending | Gap 9, `app/about/page.tsx` |
+| MUST | Create team page with founder bios, LinkedIn profiles | Founder | ✅ Complete | Gap 9, `app/about/page.tsx` |
 | MUST | Get Supabase credentials and set up local environment | Tech Founder | ⏳ Pending | `docs/SETUP_LOCAL.md` |
 
 ### NEXT (Should Do Before YC Interview)
@@ -32,7 +32,7 @@
 | NEXT | Create financial model (revenue, costs, runway) | Founder | ⏳ Pending | Gap 11, `yc/FINANCIAL_PROJECTIONS.md` |
 | NEXT | Calculate LTV:CAC ratio and validate unit economics | Founder | ⏳ Pending | Gap 12, `YC_METRICS_CHECKLIST.md` |
 | NEXT | Create mentor onboarding document for Techstars | Founder | ⏳ Pending | Techstars Lens, `yc/TECHSTARS_MENTOR_GUIDE.md` |
-| NEXT | Document founder story and problem connection | Founder | ⏳ Pending | EF Lens, Antler Lens, `yc/EF_FOUNDER_STORY.md` |
+| NEXT | Document founder story and problem connection | Founder | ✅ Complete | EF Lens, Antler Lens, `yc/EF_FOUNDER_STORY.md` |
 | NEXT | Run 3 growth experiments and document results | Founder | ⏳ Pending | 500 Global Lens, Gap 8, `yc/500_GLOBAL_EXPERIMENTS.md` |
 | NEXT | Create metrics dashboard with real data | Tech Founder | ⏳ Pending | Gap 4, Techstars Lens, `app/admin/metrics/page.tsx` |
 

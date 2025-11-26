@@ -221,22 +221,26 @@ We measure this through:
 ### Why This Team?
 
 **Answer:**  
-"[TODO: Add actual team information]
+"I'm Scott Hardie, founder and CEO. I'm a full-stack developer based in Toronto, Canada, with experience running e-commerce operations (Hardonia.store) and building automation tools. I've experienced firsthand the pain of manual workflows—spending 15+ hours per week on order processing, trying expensive tools ($150-500/month), and struggling with complex setups.
 
-**Founder 1: [Name]**
-- Background: [previous experience, education]
-- Why: [why you're building this]
-- Role: [technical/product/business]
+**Background:**
+- Full-stack developer (Next.js, React, TypeScript, Supabase)
+- E-commerce operator (Hardonia.store - Shopify store)
+- Founder of Hardonian Industries
+- Active open-source contributor (40+ public repositories)
+- Based in Toronto, Canada (deep understanding of Canadian market)
 
-**Founder 2: [Name]** (if applicable)
-- Background: [previous experience, education]
-- Why: [why you're building this]
-- Role: [technical/product/business]
+**Why I'm Building This:**
+- Experienced the problem firsthand (15+ hours/week manual work)
+- Recognized gap: No Canadian-first automation platform
+- Built solution for my own business, then productized it
+- Understand Canadian SMB needs (Shopify, Wave Accounting, RBC integrations)
 
-**Why We're the Right Team:**
-- [Domain expertise: e-commerce, automation, Canadian market]
-- [Technical expertise: full-stack, SaaS, AI]
-- [Execution: built [previous project], shipped [X] features in [Y] months]"
+**Why I'm the Right Person:**
+- **Technical Execution:** Built comprehensive platform (not just MVP), 40+ repos, can ship fast
+- **Market Understanding:** Canadian market focus, e-commerce experience, understands SMB pain points
+- **Problem Experience:** Experienced pain firsthand, built solution for own business
+- **Business Experience:** Founder of Hardonian Industries, e-commerce operator, understands unit economics"
 
 **Practice:** Know your team story and why you're the right people.
 

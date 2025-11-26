@@ -70,12 +70,16 @@
 
 ## Team
 
-**Founders:** [PLACEHOLDER — Add founder names and backgrounds]
+**Founders:**
 
-- **[Founder 1]:** [Background, previous experience, why building this]
-- **[Founder 2]:** [Background, previous experience, why building this]
+- **Scott Hardie** — Founder & CEO
+  - **Location:** Toronto, Canada
+  - **Background:** Full-stack developer, e-commerce operator (Hardonia.store), founder of Hardonian Industries. Active open-source contributor with 40+ public repositories.
+  - **LinkedIn:** [scottrmhardie](https://www.linkedin.com/in/scottrmhardie)
+  - **GitHub:** [shardie-github](https://github.com/shardie-github)
+  - **Why Building This:** Experienced firsthand the pain of manual workflows running e-commerce operations. Built AIAS Platform to solve this problem for Canadian SMBs who can't afford expensive enterprise tools.
 
-**TODO:** Add actual founder information. See `yc/YC_TEAM_NOTES.md` for team details.
+**Cross-Reference:** See `yc/YC_TEAM_NOTES.md` for detailed team information.
 
 ---
 
