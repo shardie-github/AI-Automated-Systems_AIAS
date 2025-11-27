@@ -5,10 +5,15 @@ This document describes the automated database migration system that ensures Sup
 ## Overview
 
 The migration system automatically runs database migrations:
-- **On server startup** - via Next.js instrumentation hook
-- **In CI/CD pipelines** - via GitHub Actions workflows
-- **On preview deployments** - before deploying to Vercel preview
-- **On production deployments** - before deploying to production
+- **On server startup** - via Next.js instrumentation hook (in deployed environments only)
+- **Manual execution** - via `npm run migrate:run` or workflow_dispatch
+
+**Important**: Migrations do NOT run automatically on:
+- ❌ PR commits
+- ❌ Merges to main branch
+- ❌ CI/CD pipelines (except server startup in deployed environments)
+
+Migrations only run automatically when the server starts in deployed environments (preview/production).
 
 ## Architecture
 
@@ -25,9 +30,13 @@ The migration system automatically runs database migrations:
 ┌─────────────────────────────────────────────────────────────┐
 │                    Migration Sources                        │
 ├─────────────────────────────────────────────────────────────┤
-│ 1. Server Startup (instrumentation.ts)                     │
-│ 2. CI/CD Pipelines (GitHub Actions)                         │
-│ 3. Manual Execution (npm run migrate:run)                   │
+│ 1. Server Startup (instrumentation.ts) - Deployed envs only│
+│ 2. Manual Execution (npm run migrate:run)                  │
+│ 3. Workflow Dispatch (explicit trigger)                     │
+│                                                              │
+│ ❌ NOT on PR commits                                        │
+│ ❌ NOT on main branch merges                                │
+│ ❌ NOT in CI/CD pipelines                                   │
 └─────────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -49,12 +58,17 @@ The migration system automatically runs database migrations:
 
 ### Automatic Migrations
 
-Migrations run automatically in the following scenarios:
+Migrations run automatically ONLY in the following scenario:
 
-1. **Server Startup**: When the Next.js server starts, migrations are checked and applied automatically
-2. **CI/CD**: Migrations run in GitHub Actions workflows before deployment
-3. **Preview Deployments**: Migrations run before deploying preview environments
-4. **Production Deployments**: Migrations run before deploying to production
+1. **Server Startup**: When the Next.js server starts in deployed environments (preview/production), migrations are checked and applied automatically
+
+**Migrations do NOT run automatically on:**
+- PR commits
+- Merges to main branch  
+- CI/CD pipeline execution
+- Build processes
+
+This ensures migrations only run when the actual server starts serving traffic, not during development or CI/CD processes.
 
 ### Manual Execution
 

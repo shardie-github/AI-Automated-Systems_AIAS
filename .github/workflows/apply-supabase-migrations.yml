@@ -77,11 +77,10 @@ jobs:
     name: Apply Pending Migrations
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+    # Only run on explicit triggers, NOT on PR commits or main merges
     if: |
-      github.event_name == 'push' || 
       github.event_name == 'workflow_dispatch' || 
-      github.event_name == 'schedule' ||
-      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-migrations'))
+      github.event_name == 'schedule'
     
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

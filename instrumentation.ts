@@ -4,10 +4,39 @@
  * This file runs migrations automatically on server startup.
  * It ensures the database schema is always up-to-date before serving requests.
  * 
- * This runs in all environments: development, preview, and production.
+ * NOTE: Migrations do NOT run automatically on PR commits or merges to main.
+ * They only run on server startup in deployed environments.
  */
 
 import { runMigrationsOnStartup } from '@/lib/database/migrations';
+
+/**
+ * Check if we're in a CI/CD environment that should skip migrations
+ */
+function shouldSkipMigrations(): boolean {
+  // Skip migrations in CI/CD environments (GitHub Actions, etc.)
+  if (process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true') {
+    // Skip on PR events
+    if (process.env.GITHUB_EVENT_NAME === 'pull_request') {
+      console.log('⏭️  [Instrumentation] Skipping migrations - PR event detected');
+      return true;
+    }
+    
+    // Skip on push to main (merge events)
+    if (process.env.GITHUB_EVENT_NAME === 'push' && process.env.GITHUB_REF === 'refs/heads/main') {
+      console.log('⏭️  [Instrumentation] Skipping migrations - Main branch merge detected');
+      return true;
+    }
+  }
+  
+  // Skip if explicitly disabled
+  if (process.env.SKIP_MIGRATIONS === 'true') {
+    console.log('⏭️  [Instrumentation] Skipping migrations - SKIP_MIGRATIONS=true');
+    return true;
+  }
+  
+  return false;
+}
 
 /**
  * Next.js instrumentation hook
@@ -15,6 +44,11 @@ import { runMigrationsOnStartup } from '@/lib/database/migrations';
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Skip migrations in CI/CD for PRs and main merges
+    if (shouldSkipMigrations()) {
+      return;
+    }
+    
     // Only run migrations in Node.js runtime (not Edge runtime)
     try {
       console.log('🔄 [Instrumentation] Checking for pending database migrations...');
