@@ -43,6 +43,10 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-dropdown-menu",
       "framer-motion",
     ],
+    // Ensure proper file tracing for Vercel deployments
+    outputFileTracingIncludes: {
+      '/api/**': ['./**'],
+    },
   },
   // Performance optimizations
   compiler: {

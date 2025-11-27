@@ -1,9 +1,10 @@
 {
-  "buildCommand": "pnpm run db:generate && pnpm run build",
+  "buildCommand": "pnpm run db:generate && pnpm run build && pnpm run validate:build",
   "devCommand": "pnpm run dev",
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "regions": ["iad1"],
+  "outputDirectory": ".next",
   "env": {
     "NODE_ENV": "production",
     "PRISMA_CLIENT_ENGINE_TYPE": "wasm"
