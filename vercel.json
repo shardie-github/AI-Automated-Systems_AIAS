@@ -1,13 +1,14 @@
 {
-  "buildCommand": "pnpm run db:generate && pnpm run build && pnpm run validate:build",
+  "buildCommand": "bash vercel-build.sh",
   "devCommand": "pnpm run dev",
-  "installCommand": "pnpm install",
+  "installCommand": "export ENABLE_EXPERIMENTAL_COREPACK=1 && corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "regions": ["iad1"],
   "outputDirectory": ".next",
   "env": {
     "NODE_ENV": "production",
-    "PRISMA_CLIENT_ENGINE_TYPE": "wasm"
+    "PRISMA_CLIENT_ENGINE_TYPE": "wasm",
+    "ENABLE_EXPERIMENTAL_COREPACK": "1"
   },
   "git": {
     "deploymentEnabled": {

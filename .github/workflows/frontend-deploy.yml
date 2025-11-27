@@ -149,6 +149,14 @@ jobs:
           name: build-artifacts
           path: .next/
 
+      - name: Ensure pnpm is available
+        run: |
+          set -euo pipefail
+          echo "🔧 Ensuring pnpm is available for Vercel..."
+          corepack enable || echo "Corepack already enabled"
+          corepack prepare pnpm@8.15.0 --activate || echo "pnpm already prepared"
+          pnpm --version
+
       - name: Pull Vercel environment
         run: |
           set -euo pipefail
@@ -161,6 +169,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          ENABLE_EXPERIMENTAL_COREPACK: "1"
 
       - name: Build for Vercel
         run: |
