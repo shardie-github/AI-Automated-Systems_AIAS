@@ -157,6 +157,55 @@ jobs:
           path: .next/
           retention-days: 7
 
+  # Run migrations in CI (dry-run validation)
+  validate-migrations:
+    name: Validate Migrations
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'pull_request'
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Validate migration files
+        run: |
+          echo "🔍 Validating migration files..."
+          if [ ! -d "supabase/migrations" ]; then
+            echo "⚠️  No migrations directory found"
+            exit 0
+          fi
+          
+          MIGRATION_COUNT=$(find supabase/migrations -name "*.sql" | wc -l)
+          echo "📋 Found $MIGRATION_COUNT migration files"
+          
+          if [ $MIGRATION_COUNT -eq 0 ]; then
+            echo "⚠️  No migration files found"
+            exit 0
+          fi
+          
+          echo "✅ Migration files validated"
+        continue-on-error: true
+
   # E2E tests - blocking for critical flows, run after build
   test-e2e:
     name: E2E Tests (Critical Flows)

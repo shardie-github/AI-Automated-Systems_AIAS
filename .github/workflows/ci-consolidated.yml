@@ -179,24 +179,58 @@ jobs:
           retention-days: 7
 
   # ============================================================================
-  # Database Migrations (Run on main branch push)
+  # Database Migrations (Run on main branch push and PRs)
   # ============================================================================
   migrate-database:
     name: Database Migrations
     runs-on: ubuntu-latest
     needs: [build]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.event_name == 'pull_request')
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
     steps:
       - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - run: pnpm install --frozen-lockfile
+      
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      - run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-      - run: supabase db push --linked
+      
+      - name: Authenticate Supabase
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: |
+          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | supabase login --token -
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      
+      - name: Link Supabase project
+        if: env.SUPABASE_PROJECT_REF != ''
+        run: |
+          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      
+      - name: Run migrations
+        run: |
+          pnpm run migrate:run
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
   # ============================================================================
   # Frontend Deployment (Run on PR and main branch)
@@ -204,7 +238,7 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend
     runs-on: ubuntu-latest
-    needs: [build, test-e2e]
+    needs: [build, test-e2e, migrate-database]
     if: |
       (github.event_name == 'pull_request') || 
       (github.ref == 'refs/heads/main' && github.event_name == 'push')

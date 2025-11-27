@@ -76,8 +76,12 @@ jobs:
   apply-migrations:
     name: Apply Pending Migrations
     runs-on: ubuntu-latest
-    environment: production
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'workflow_dispatch' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-migrations'))
     
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -131,19 +135,23 @@ jobs:
       - name: Apply migrations
         run: |
           echo "Applying all pending migrations..."
-          supabase db push --include-all || {
-            echo "Supabase CLI push failed, trying alternative method..."
-            # Fallback: apply migrations directly via psql if DB URL is available
-            if [ -n "$SUPABASE_DB_URL" ]; then
-              echo "Applying migrations via psql..."
-              for file in supabase/migrations/*.sql; do
-                echo "Applying: $file"
-                psql "$SUPABASE_DB_URL" -f "$file" || echo "Migration $file may have already been applied"
-              done
-            else
-              echo "ERROR: Cannot apply migrations - no database connection available"
-              exit 1
-            fi
+          # Use npm script which handles both Supabase CLI and direct SQL fallback
+          pnpm run migrate:run || {
+            echo "Migration script failed, trying Supabase CLI directly..."
+            supabase db push --include-all || {
+              echo "Supabase CLI push failed, trying alternative method..."
+              # Fallback: apply migrations directly via psql if DB URL is available
+              if [ -n "$SUPABASE_DB_URL" ]; then
+                echo "Applying migrations via psql..."
+                for file in supabase/migrations/*.sql; do
+                  echo "Applying: $file"
+                  psql "$SUPABASE_DB_URL" -f "$file" || echo "Migration $file may have already been applied"
+                done
+              else
+                echo "ERROR: Cannot apply migrations - no database connection available"
+                exit 1
+              fi
+            }
           }
 
       - name: Validate schema after migration
