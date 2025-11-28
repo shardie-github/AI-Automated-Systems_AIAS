@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
-import { cacheService } from '@/lib/cache/cache-service';
+// import { cacheService } from '@/lib/cache/cache-service';
 
 export async function GET(request: NextRequest) {
   try {

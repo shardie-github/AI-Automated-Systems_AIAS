@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { hapticTap } from "./Haptics";
+import { hapticTap } from "../gamification/Haptics";
 
 export default function FollowButton({ userId }: { userId: string }) {
   const [following, setFollowing] = useState(false);

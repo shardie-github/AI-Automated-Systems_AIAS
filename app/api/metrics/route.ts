@@ -6,7 +6,7 @@ import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { cacheService } from "@/lib/performance/cache";
 import { createGETHandler } from "@/lib/api/route-handler";
 
-export const runtime = "edge";
+export const runtime = "nodejs"; // Use Node.js runtime for ioredis compatibility
 export const dynamic = "force-dynamic";
 export const revalidate = 60; // Cache for 60 seconds
 

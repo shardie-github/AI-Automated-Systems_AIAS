@@ -44,21 +44,10 @@ function getEnvVar(key: string, required: boolean = true, defaultValue?: string)
     }
   }
   
-  // Check import.meta.env (Vite/Edge runtime) - using eval to avoid TypeScript parsing issues
-  // Note: This is safe because we're only checking for existence, not executing user code
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-eval
-    const hasImportMeta = typeof eval !== 'undefined' && typeof eval('typeof import') !== 'undefined';
-    if (hasImportMeta) {
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-eval
-      const importMeta = eval('import.meta');
-      if (importMeta && importMeta.env) {
-        value = value || importMeta.env[key] || importMeta.env[`VITE_${key}`];
-      }
-    }
-  } catch (e) {
-    // import.meta may not be available in all contexts
-  }
+  // Check import.meta.env (Vite/Edge runtime)
+  // Note: import.meta is only available in Vite builds, not in Next.js/Node.js
+  // Skip this check to avoid Edge runtime issues
+  // Vite environment variables should be prefixed with VITE_ and will be available via process.env in Next.js
   
   // Use default if provided
   if (!value && defaultValue !== undefined) {

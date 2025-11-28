@@ -6,7 +6,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateInput, sanitizeObject, checkRequestSize, maskSensitiveData } from '../security/api-security';
 import { tenantIsolation } from '../security/tenant-isolation';
-import { cacheService } from '../performance/cache';
+// Lazy import cacheService to support Edge runtime
+// Cache is only available in Node.js runtime, not Edge
+// In Edge runtime, caching is disabled
+function getCacheService() {
+  // Cache service uses ioredis which requires Node.js runtime
+  // Return null to disable caching in Edge runtime
+  return null;
+}
 import { z } from 'zod';
 import { SystemError, ValidationError, AuthenticationError, AuthorizationError, formatError } from '@/lib/errors';
 
@@ -164,17 +171,20 @@ export function createRouteHandler(
       if (options.cache?.enabled) {
         const bodyText = await getBodyText();
         const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
-        const cached = await cacheService.get(cacheKey, {
-          ttl: options.cache.ttl,
-          tenantId: tenantId || undefined,
-          tags: options.cache.tags,
-        });
-        
-        if (cached) {
-          const response = NextResponse.json(cached);
-          response.headers.set('X-Cache', 'HIT');
-          response.headers.set('X-Response-Time', `${Date.now() - startTime}ms`);
-          return response;
+        const cache = getCacheService();
+        if (cache) {
+          const cached = await cache.get(cacheKey, {
+            ttl: options.cache.ttl,
+            tenantId: tenantId || undefined,
+            tags: options.cache.tags,
+          });
+          
+          if (cached) {
+            const response = NextResponse.json(cached);
+            response.headers.set('X-Cache', 'HIT');
+            response.headers.set('X-Response-Time', `${Date.now() - startTime}ms`);
+            return response;
+          }
         }
       }
       
@@ -200,11 +210,14 @@ export function createRouteHandler(
           const body = await response.clone().json();
           const bodyText = await getBodyText();
           const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
-          await cacheService.set(cacheKey, body, {
-            ttl: options.cache.ttl,
-            tenantId: tenantId || undefined,
-            tags: options.cache.tags,
-          });
+          const cache = getCacheService();
+          if (cache) {
+            await cache.set(cacheKey, body, {
+              ttl: options.cache.ttl,
+              tenantId: tenantId || undefined,
+              tags: options.cache.tags,
+            });
+          }
           response.headers.set('X-Cache', 'MISS');
         } catch {
           // Not JSON response, skip caching

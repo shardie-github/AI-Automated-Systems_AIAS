@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
@@ -56,6 +55,18 @@ const nextConfig: NextConfig = {
   },
   // Bundle optimization
   webpack: (config, { isServer }) => {
+    // Ignore pg module and migrations in webpack (server-only)
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push('pg', 'pg-native');
+    }
+    
+    // Ignore migrations module during build analysis
+    config.resolve.alias = config.resolve.alias || {};
+    if (!isServer) {
+      config.resolve.alias['@/lib/database/migrations'] = false;
+    }
+    
     if (!isServer) {
       // Optimize client bundle
       config.optimization = {
@@ -74,7 +85,7 @@ const nextConfig: NextConfig = {
             },
             lib: {
               test: /[\\/]node_modules[\\/]/,
-              name(module: any) {
+              name(module) {
                 const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)?.[1];
                 return `lib-${packageName?.replace("@", "")}`;
               },
