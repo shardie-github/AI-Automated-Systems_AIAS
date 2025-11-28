@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { SystemError, formatError } from "@/lib/errors";
+import { SystemError } from "@/lib/errors";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { cacheService } from "@/lib/performance/cache";
 import { createGETHandler } from "@/lib/api/route-handler";
@@ -41,8 +41,8 @@ export const revalidate = 60; // Cache for 60 seconds
  * Migrated to use route handler utility for consistent error handling and caching
  */
 export const GET = createGETHandler(
-  async (context) => {
-    // const { request } = context; // Will be used for query params
+  async (_context) => {
+    // const { request } = _context; // Will be used for query params
     const startTime = Date.now();
     
     const supabase = createClient(
@@ -93,7 +93,7 @@ export const GET = createGETHandler(
         error instanceof Error ? error : new Error(String(error)),
         { details: error.message }
       );
-      const _formatted = formatError(systemError);
+      // const formatted = formatError(systemError); // Route handler will format
       throw systemError; // Let route handler catch and format
     }
     
@@ -185,13 +185,13 @@ export const GET = createGETHandler(
           };
           break;
         case "supabase":
-          aggregated.performance.supabase = latest;
+          aggregated.performance.supabase = latest?.metric || {};
           break;
         case "expo":
-          aggregated.performance.expo = latest;
+          aggregated.performance.expo = latest?.metric || {};
           break;
         case "ci":
-          aggregated.performance.ci = latest;
+          aggregated.performance.ci = latest?.metric || {};
           break;
       }
     }

@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
     const { notification_ids, all } = markReadSchema.parse(body);
 
     // Get tenant_id from header or query
-    const _tenantId = request.headers.get("x-tenant-id") || 
-                     new URL(request.url).searchParams.get("tenant_id");
+    // const tenantId = request.headers.get("x-tenant-id") ||
+    //                  new URL(request.url).searchParams.get("tenant_id");
 
     // Use RPC function to mark as read
     const { data: count, error } = await supabase.rpc("mark_notifications_read", {
