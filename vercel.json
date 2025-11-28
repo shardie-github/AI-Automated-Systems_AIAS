@@ -2,6 +2,8 @@
   "buildCommand": "bash vercel-build.sh",
   "devCommand": "cd apps/web && pnpm run dev",
   "installCommand": "export ENABLE_EXPERIMENTAL_COREPACK=1 && corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install --frozen-lockfile",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "framework": "nextjs",
   "regions": ["iad1"],
   "outputDirectory": "apps/web/.next",
@@ -25,7 +27,7 @@
     "autoJobCancelation": true,
     "silent": false
   },
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web/",
   "preview": {
     "automaticDeployment": true
   },

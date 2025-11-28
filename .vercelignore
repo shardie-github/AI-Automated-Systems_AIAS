@@ -8,10 +8,12 @@
 .env.production.local
 
 # Build artifacts (handled by Vercel)
+# Note: We only ignore root .next, NOT apps/web/.next (which is the actual build output)
 .next
 out
 dist
 build
+# DO NOT ignore apps/web/.next - that's the build output Vercel needs!
 
 # Dependencies
 node_modules

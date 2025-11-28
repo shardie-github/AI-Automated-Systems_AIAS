@@ -15,11 +15,26 @@ interface ValidationResult {
   warnings: string[];
 }
 
-const BUILD_DIR = join(process.cwd(), '.next');
+// Support both root .next and apps/web/.next (monorepo structure)
+function findBuildDir(): string {
+  const rootNext = join(process.cwd(), '.next');
+  const webNext = join(process.cwd(), 'apps', 'web', '.next');
+  
+  if (existsSync(webNext)) {
+    return webNext;
+  }
+  if (existsSync(rootNext)) {
+    return rootNext;
+  }
+  // Default to root for backward compatibility
+  return rootNext;
+}
+
+const BUILD_DIR = findBuildDir();
 const REQUIRED_DIRS = ['static', 'server'];
 const REQUIRED_FILES = [
-  '.next/BUILD_ID',
-  '.next/package.json',
+  'BUILD_ID',
+  'package.json',
 ];
 
 /**
@@ -74,7 +89,7 @@ function validateRequiredFiles(): ValidationResult {
   const result: ValidationResult = { success: true, errors: [], warnings: [] };
 
   for (const file of REQUIRED_FILES) {
-    const filePath = join(process.cwd(), file);
+    const filePath = join(BUILD_DIR, file);
     if (!existsSync(filePath)) {
       result.success = false;
       result.errors.push(`Required file missing: ${filePath}`);
