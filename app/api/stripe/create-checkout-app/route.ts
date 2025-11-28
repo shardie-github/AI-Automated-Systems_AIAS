@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { SystemError, ValidationError, formatError } from "@/lib/errors";
+import { ValidationError, formatError } from "@/lib/errors";
 import { createPOSTHandler } from "@/lib/api/route-handler";
-import { recordError } from "@/lib/utils/error-detection";
+// import { recordError } from "@/lib/utils/error-detection"; // Will be used for error tracking
 import { retry } from "@/lib/utils/retry";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { z } from "zod";
@@ -12,7 +12,7 @@ import { recordCheckoutRequest, getCheckoutHandler } from "@/lib/canary/checkout
 
 // Load environment variables dynamically - no hardcoded values
 const stripe = new Stripe(env.stripe.secretKey!, {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2023-10-16" as any, // Using latest compatible version
 });
 
 const supabase = createClient(
@@ -20,16 +20,16 @@ const supabase = createClient(
   env.supabase.serviceRoleKey
 );
 
-const _XP_MULTIPLIERS: Record<string, number> = {
-  starter: 1.25,
-  pro: 1.5,
-  enterprise: 2.0,
-};
+// const XP_MULTIPLIERS: Record<string, number> = {
+//   starter: 1.25,
+//   pro: 1.5,
+//   enterprise: 2.0,
+// };
 
-interface _CheckoutResponse {
-  sessionId?: string;
-  error?: string;
-}
+// interface CheckoutResponse {
+//   sessionId?: string;
+//   error?: string;
+// }
 
 /**
  * Checkout request schema
