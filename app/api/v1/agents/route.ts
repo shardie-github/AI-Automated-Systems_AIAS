@@ -17,7 +17,7 @@ const agentSchema = z.object({
   tenant_id: z.string().uuid().optional(),
 });
 
-const _agentUpdateSchema = agentSchema.partial();
+// const agentUpdateSchema = agentSchema.partial(); // Will be used for PATCH updates
 
 export const dynamic = "force-dynamic";
 

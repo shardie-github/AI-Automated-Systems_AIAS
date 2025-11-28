@@ -7,7 +7,7 @@ import { logger } from '@/lib/logging/structured-logger';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
 import { emailService } from '@/lib/email/email-service';
-import { getTemplateById, replaceTemplateVariables } from '@/lib/email-templates';
+import { getTemplateById } from '@/lib/email-templates';
 
 export interface NurturingSequence {
   id: string;
@@ -303,13 +303,13 @@ class LeadNurturingService {
    * Get email template
    */
   private async getEmailTemplate(templateId: string, tenantId?: string): Promise<any> {
-    let query = this.supabase.from('email_templates').select('*').eq('id', templateId).single();
+    let query = this.supabase.from('email_templates').select('*').eq('id', templateId);
 
     if (tenantId) {
       query = query.eq('tenant_id', tenantId);
     }
 
-    const { data } = await query;
+    const { data } = await query.single();
     return data;
   }
 

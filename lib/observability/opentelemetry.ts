@@ -12,7 +12,6 @@ import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions"
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
-import { env } from "@/lib/env";
 
 const SERVICE_NAME = process.env.OTEL_SERVICE_NAME || "aias-platform";
 const OTEL_ENDPOINT = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
@@ -43,7 +42,7 @@ export function initializeOpenTelemetry(): NodeSDK | null {
           url: `${OTEL_ENDPOINT}/v1/metrics`,
         }),
         exportIntervalMillis: 60000, // Export every minute
-      }),
+      }) as any,
       instrumentations: [
         getNodeAutoInstrumentations({
           // Disable fs instrumentation in serverless environments
@@ -97,7 +96,7 @@ export function createSpan(name: string, callback: (span: any) => Promise<any>) 
   }
 
   const tracer = otel.trace.getTracer(SERVICE_NAME);
-  return tracer.startActiveSpan(name, async (span) => {
+  return tracer.startActiveSpan(name, async (span: any) => {
     try {
       const result = await callback(span);
       span.setStatus({ code: otel.SpanStatusCode.OK });

@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion"; // Will be used for animations
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,

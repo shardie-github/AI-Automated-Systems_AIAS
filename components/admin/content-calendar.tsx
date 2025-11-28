@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle, Clock, FileText } from "lucide-react";
-import { contentCalendar, getUpcomingPosts, getPublishedPosts } from "@/lib/blog/content-calendar";
+import { getUpcomingPosts, getPublishedPosts } from "@/lib/blog/content-calendar";
 import Link from "next/link";
 
 export function ContentCalendarView() {

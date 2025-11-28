@@ -64,7 +64,7 @@ export function generateBlogPost(template: BlogPostTemplate): string {
   });
 }
 
-export function analyzeContentWithSystemsThinking(content: string): {
+export function analyzeContentWithSystemsThinking(_content: string): {
   seo: number;
   ux: number;
   conversion: number;

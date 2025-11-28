@@ -53,7 +53,7 @@ const Alert = React.forwardRef<
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       className={cn(alertVariants({ variant }), className)}
-      {...props}
+      {...(props as any)}
     >
       <Icon className="h-4 w-4" />
       {dismissible && (

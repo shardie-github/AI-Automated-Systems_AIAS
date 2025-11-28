@@ -57,8 +57,8 @@ export class HubSpotCRM {
       logger.info('HubSpot contact created', { contactId: data.id, email: contact.email });
       return data.id;
     } catch (error) {
-      logger.error('Failed to create HubSpot contact', {
-        error: error instanceof Error ? error.message : String(error),
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error('Failed to create HubSpot contact', errorObj, {
         email: contact.email,
       });
       throw error;
@@ -103,8 +103,8 @@ export class HubSpotCRM {
 
       return contactId;
     } catch (error) {
-      logger.error('Failed to create HubSpot lead', {
-        error: error instanceof Error ? error.message : String(error),
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error('Failed to create HubSpot lead', errorObj, {
         email: lead.email,
       });
       throw error;
@@ -148,9 +148,8 @@ export class SalesforceCRM {
       const data = await response.json();
       return data.access_token;
     } catch (error) {
-      logger.error('Failed to get Salesforce access token', {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error('Failed to get Salesforce access token', errorObj);
       throw error;
     }
   }
@@ -186,8 +185,8 @@ export class SalesforceCRM {
       logger.info('Salesforce contact created', { contactId: data.id, email: contact.email });
       return data.id;
     } catch (error) {
-      logger.error('Failed to create Salesforce contact', {
-        error: error instanceof Error ? error.message : String(error),
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error('Failed to create Salesforce contact', errorObj, {
         email: contact.email,
       });
       throw error;

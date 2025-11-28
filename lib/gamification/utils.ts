@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import { awardXp } from "@/components/gamification/GamificationProvider";
 
 export async function checkAndAwardMilestone(userId: string, type: string, value: number) {
-  const milestones: Record<string, { check: (v: number) => boolean; type: string }> = {
+  const milestones: Record<string, { check: (v: number) => boolean; type: string | ((v: number) => string) }> = {
     streak: {
       check: (v) => v === 7 || v === 30 || v === 100,
       type: (v) => v === 7 ? "streak_7" : v === 30 ? "streak_30" : "streak_100"

@@ -17,7 +17,7 @@ interface Step {
 }
 
 export function OnboardingWizard() {
-  const router = useRouter();
+  // const router = useRouter(); // Will be used for navigation
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
 
@@ -299,7 +299,7 @@ function ChooseIntegrationStep({ onNext }: { onNext: () => void }) {
   );
 }
 
-function CreateWorkflowStep({ onNext }: { onNext: () => void }) {
+function CreateWorkflowStep({ onNext: _onNext }: { onNext: () => void }) {
   const router = useRouter();
 
   function handleCreateWorkflow() {

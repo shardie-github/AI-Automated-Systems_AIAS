@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Zap, Users } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface WorkflowTemplate {
   id: string;

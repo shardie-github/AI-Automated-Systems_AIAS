@@ -18,9 +18,9 @@ export function ROICalculator() {
   const monthlySavings = weeklySavings * 4.33;
   const yearlySavings = monthlySavings * 12;
   const monthlyCost = 49; // CAD $49/month Starter plan
-  const yearlyCost = monthlyCost * 12;
+  // const yearlyCost = monthlyCost * 12; // Will be used for yearly ROI calculation
   const monthlyROI = ((monthlySavings - monthlyCost) / monthlyCost) * 100;
-  const yearlyROI = ((yearlySavings - yearlyCost) / yearlyCost) * 100;
+  // const yearlyROI = ((yearlySavings - yearlyCost) / yearlyCost) * 100; // Will be used for yearly ROI display
   const paybackPeriod = monthlyCost / monthlySavings; // in months
 
   return (

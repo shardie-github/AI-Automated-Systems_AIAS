@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Calendar, CheckCircle2, Clock, Rocket, Target } from "lucide-react";
+import { Calendar, CheckCircle2, Rocket, Target } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Next 30 Days — AIAS Consultancy | Upcoming Builds & Case Studies",

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { validateInput, sanitizeObject, checkRequestSize, maskSensitiveData } from '../security/api-security';
+import { validateInput, checkRequestSize, maskSensitiveData } from '../security/api-security';
 import { tenantIsolation } from '../security/tenant-isolation';
 // Lazy import cacheService to support Edge runtime
 // Cache is only available in Node.js runtime, not Edge
@@ -156,7 +156,7 @@ export function createRouteHandler(
           if (!validation.success) {
             const error = new ValidationError(
               'Invalid request body',
-              validation.error?.map(e => ({ path: e.path, message: e.message }))
+              Array.isArray(validation.error) ? validation.error.map((e: any) => ({ path: e.path, message: e.message })) : []
             );
             const formatted = formatError(error);
             return NextResponse.json(
@@ -184,7 +184,7 @@ export function createRouteHandler(
         const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
         const cache = getCacheService();
         if (cache) {
-        const cached = await cache.get(cacheKey, {
+          const cached = await (cache as any).get(cacheKey, {
           ttl: normalizedOptions.cache.ttl,
           tenantId: tenantId || undefined,
           tags: normalizedOptions.cache.tags,
@@ -223,7 +223,7 @@ export function createRouteHandler(
           const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
           const cache = getCacheService();
           if (cache) {
-            await cache.set(cacheKey, body, {
+            await (cache as any).set(cacheKey, body, {
               ttl: normalizedOptions.cache.ttl,
               tenantId: tenantId || undefined,
               tags: normalizedOptions.cache.tags,

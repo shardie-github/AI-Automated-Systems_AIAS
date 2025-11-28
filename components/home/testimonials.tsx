@@ -1,10 +1,10 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button"; // Will be used for CTA actions
 import { StaggerList, StaggerItem } from "@/components/motion/stagger-list";
 import FadeIn from "@/components/motion/fade-in";
 import { Play, Star, Quote } from "lucide-react";
-import Link from "next/link";
+// import Link from "next/link"; // Will be used for navigation
 import { motion } from "framer-motion";
 
 const testimonials = [

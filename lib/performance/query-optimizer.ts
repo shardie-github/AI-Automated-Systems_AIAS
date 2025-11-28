@@ -118,8 +118,7 @@ export class QueryOptimizer {
     let query = this.supabase
       .from(table)
       .select(options.select?.join(',') || '*')
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     // Add tenant filter if provided
     if (options.tenantId) {
@@ -127,7 +126,7 @@ export class QueryOptimizer {
     }
     
     // Execute query
-    const { data, error } = await query;
+    const { data, error } = await query.single();
     
     if (error) {
       if (error.code === 'PGRST116') {
@@ -219,12 +218,13 @@ export class QueryOptimizer {
   /**
    * Invalidate cache for a table
    */
-  async invalidateTableCache(table: string, tenantId?: string): Promise<void> {
-    await cacheService.invalidateTags([`table:${table}`]);
+  async invalidateTableCache(table: string, _tenantId?: string): Promise<void> {
+    await cacheService.invalidateByTag(`table:${table}`);
     
-    if (tenantId) {
-      await cacheService.clearTenantCache(tenantId);
-    }
+    // TODO: Implement tenant-specific cache invalidation
+    // if (tenantId) {
+    //   await cacheService.clearTenantCache(tenantId);
+    // }
   }
 }
 

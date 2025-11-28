@@ -24,7 +24,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
           gradient && "bg-gradient-to-br from-card to-card/50",
           className
         )}
-        {...props}
+        {...(props as any)}
       />
     );
   }

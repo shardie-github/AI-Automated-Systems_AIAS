@@ -5,7 +5,7 @@
 
 import { logger } from '@/lib/logging/structured-logger';
 import { env } from '@/lib/env';
-import { getTemplateById, replaceTemplateVariables, EmailTemplate } from '@/lib/email-templates';
+import { getTemplateById, replaceTemplateVariables } from '@/lib/email-templates';
 
 export interface EmailOptions {
   to: string;

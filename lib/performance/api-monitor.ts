@@ -95,7 +95,8 @@ export const apiMonitor = typeof window !== "undefined" ? new APIMonitor() : {
   getAverageLatency: () => 0,
   getP95Latency: () => 0,
   clear: () => {},
-} as APIMonitor;
+  metrics: [],
+} as unknown as APIMonitor;
 
 /**
  * Intercept fetch requests to track API performance
@@ -104,7 +105,7 @@ if (typeof window !== "undefined") {
   const originalFetch = window.fetch;
   window.fetch = async function (...args) {
     const startTime = Date.now();
-    const url = typeof args[0] === "string" ? args[0] : args[0].url;
+    const url = typeof args[0] === "string" ? args[0] : args[0] instanceof URL ? args[0].toString() : (args[0] as Request).url;
     const method = (args[1]?.method || "GET").toUpperCase();
 
     try {

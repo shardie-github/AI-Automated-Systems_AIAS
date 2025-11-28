@@ -55,7 +55,7 @@ export const POST = createPOSTHandler(
       const execution = await executeWorkflow(
         validatedData.workflowId,
         user.id,
-        validatedData.trigger
+        validatedData.trigger ? { ...validatedData.trigger, config: validatedData.trigger.config || {} } : undefined
       );
 
       return NextResponse.json({
@@ -63,10 +63,10 @@ export const POST = createPOSTHandler(
         message: "Workflow executed successfully",
       });
     } catch (error) {
-      logger.error("Workflow execution failed", {
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error("Workflow execution failed", errorObj, {
         workflowId: validatedData.workflowId,
         userId: user.id,
-        error,
       });
 
       return NextResponse.json(

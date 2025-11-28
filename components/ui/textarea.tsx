@@ -26,7 +26,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        {...props}
+        {...(props as any)}
       />
     );
   }

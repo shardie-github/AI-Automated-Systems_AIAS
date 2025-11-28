@@ -286,7 +286,7 @@ class LeadCaptureService {
    */
   private async triggerScoringWorkflow(
     leadId: string,
-    data: LeadData,
+    _data: LeadData,
     tenantId?: string
   ): Promise<void> {
     // This would trigger a workflow automation
@@ -298,7 +298,7 @@ class LeadCaptureService {
    */
   private async triggerCRMSync(
     leadId: string,
-    data: LeadData,
+    _data: LeadData,
     tenantId?: string
   ): Promise<void> {
     // This would sync to CRM system

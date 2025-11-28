@@ -46,8 +46,8 @@ export class DatabasePMFTracker {
 
   async trackConversionEvent(
     eventType: string,
-    userId?: string,
     sessionId: string,
+    userId?: string,
     properties?: Record<string, any>
   ) {
     try {

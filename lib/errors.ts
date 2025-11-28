@@ -5,4 +5,4 @@
  * All imports should use: import { ... } from '@/lib/errors'
  */
 
-export * from '../src/lib/errors';
+export * from '@/src/lib/errors';

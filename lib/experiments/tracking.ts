@@ -93,7 +93,7 @@ export class ExperimentTracker {
   async trackCheckoutCompleted(
     planName: string,
     price: number,
-    userId: string,
+    _userId: string,
     variant: string,
     transactionId?: string
   ) {

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ExecutionResults } from "@/components/workflows/ExecutionResults";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { track } from "@/lib/telemetry/track";
 import { logger } from "@/lib/logging/structured-logger";
 

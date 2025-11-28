@@ -14,7 +14,7 @@ interface PremiumContentGateProps {
 }
 
 export function PremiumContentGate({
-  title = "Premium Content",
+  title: _title = "Premium Content",
   description = "This content is available for premium subscribers",
   preview,
   unlockPrice = 9,

@@ -115,7 +115,7 @@ export function moderateComment(comment: Comment): ModerationResult {
 }
 
 // Generate systems thinking insight for comment
-export function generateSystemsThinkingInsight(comment: Comment, article: BlogArticle | Partial<BlogArticle>): string {
+export function generateSystemsThinkingInsight(comment: Comment, _article: BlogArticle | Partial<BlogArticle>): string {
   const content = comment.content.toLowerCase();
   
   // Check for systems thinking concepts

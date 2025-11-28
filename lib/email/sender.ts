@@ -60,8 +60,8 @@ export async function sendEmailViaResend(
     logger.info('Email sent via Resend', { emailId: data.id, to: options.to });
     return { id: data.id, message: 'Email sent successfully' };
   } catch (error) {
-    logger.error('Failed to send email via Resend', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to send email via Resend', errorObj, {
       to: options.to,
     });
     throw error;
@@ -89,7 +89,7 @@ export async function sendEmailViaSendGrid(
       for (const att of options.attachments) {
         const blob = typeof att.content === 'string'
           ? new Blob([att.content], { type: att.contentType || 'application/octet-stream' })
-          : new Blob([att.content], { type: att.contentType || 'application/octet-stream' });
+          : new Blob([Buffer.isBuffer(att.content) ? new Uint8Array(att.content) : att.content], { type: att.contentType || 'application/octet-stream' });
         formData.append('attachments', blob, att.filename);
       }
     }
@@ -111,8 +111,8 @@ export async function sendEmailViaSendGrid(
     logger.info('Email sent via SendGrid', { messageId, to: options.to });
     return { id: messageId, message: 'Email sent successfully' };
   } catch (error) {
-    logger.error('Failed to send email via SendGrid', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to send email via SendGrid', errorObj, {
       to: options.to,
     });
     throw error;
@@ -141,7 +141,7 @@ export async function sendEmailViaMailgun(
       for (const att of options.attachments) {
         const blob = typeof att.content === 'string'
           ? new Blob([att.content], { type: att.contentType || 'application/octet-stream' })
-          : new Blob([att.content], { type: att.contentType || 'application/octet-stream' });
+          : new Blob([Buffer.isBuffer(att.content) ? new Uint8Array(att.content) : att.content], { type: att.contentType || 'application/octet-stream' });
         formData.append('attachment', blob, att.filename);
       }
     }
@@ -163,8 +163,8 @@ export async function sendEmailViaMailgun(
     logger.info('Email sent via Mailgun', { messageId: data.id, to: options.to });
     return { id: data.id, message: 'Email sent successfully' };
   } catch (error) {
-    logger.error('Failed to send email via Mailgun', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to send email via Mailgun', errorObj, {
       to: options.to,
     });
     throw error;

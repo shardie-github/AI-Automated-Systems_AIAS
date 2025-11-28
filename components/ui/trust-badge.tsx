@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Lock, CheckCircle2, Award, Star } from "lucide-react";
+import { Shield, CheckCircle2, Award, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TrustBadgeProps {

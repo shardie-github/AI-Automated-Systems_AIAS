@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { awardXp } from "@/components/gamification/GamificationProvider";
+// import { awardXp } from "@/components/gamification/GamificationProvider"; // Will be used for XP rewards
 import { hapticTap } from "@/components/gamification/Haptics";
 
 export default function ReferralWidget() {

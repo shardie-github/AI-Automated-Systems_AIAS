@@ -93,7 +93,7 @@ class CRMIntegrationService {
     lead: CRMLead,
     config: CRMConfig
   ): Promise<{ success: boolean; crmId?: string; error?: string }> {
-    return withCircuitBreaker(
+    return withCircuitBreaker<{ success: boolean; crmId?: string; error?: string }>(
       'salesforce',
       async () => {
         const response = await fetch(`${config.apiUrl || 'https://api.salesforce.com'}/services/data/v57.0/sobjects/Lead`, {
@@ -137,7 +137,7 @@ class CRMIntegrationService {
     lead: CRMLead,
     config: CRMConfig
   ): Promise<{ success: boolean; crmId?: string; error?: string }> {
-    return withCircuitBreaker(
+    return withCircuitBreaker<{ success: boolean; crmId?: string; error?: string }>(
       'hubspot',
       async () => {
         const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts`, {
@@ -183,7 +183,7 @@ class CRMIntegrationService {
     lead: CRMLead,
     config: CRMConfig
   ): Promise<{ success: boolean; crmId?: string; error?: string }> {
-    return withCircuitBreaker(
+    return withCircuitBreaker<{ success: boolean; crmId?: string; error?: string }>(
       'pipedrive',
       async () => {
         const response = await fetch(`https://api.pipedrive.com/v1/persons?api_token=${config.apiKey}`, {
@@ -231,7 +231,7 @@ class CRMIntegrationService {
       };
     }
 
-    return withCircuitBreaker(
+    return withCircuitBreaker<{ success: boolean; crmId?: string; error?: string }>(
       'custom-crm',
       async () => {
         const response = await fetch(config.apiUrl!, {
@@ -281,13 +281,13 @@ class CRMIntegrationService {
    * Get lead
    */
   private async getLead(leadId: string, tenantId?: string): Promise<any> {
-    let query = this.supabase.from('leads').select('*').eq('id', leadId).single();
+    let query = this.supabase.from('leads').select('*').eq('id', leadId);
 
     if (tenantId) {
       query = query.eq('tenant_id', tenantId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.single();
     if (error) throw error;
     return data;
   }
@@ -299,7 +299,7 @@ class CRMIntegrationService {
     leadId: string,
     crmId: string,
     provider: string,
-    tenantId?: string
+    _tenantId?: string
   ): Promise<void> {
     await this.supabase
       .from('leads')

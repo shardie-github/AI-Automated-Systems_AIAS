@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Check, X, Archive, Trash2 } from "lucide-react";
+import { Bell, Check, Archive, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
@@ -302,7 +302,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                       </div>
                       {notification.action_url && (
                         <Button
-                          variant="link"
+                          variant="ghost"
                           size="sm"
                           className="h-auto p-0 mt-2"
                           onClick={() => {

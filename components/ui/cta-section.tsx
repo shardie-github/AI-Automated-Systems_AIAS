@@ -4,7 +4,7 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle2, Shield, Zap, TrendingUp } from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CTASectionProps {

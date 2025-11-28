@@ -515,4 +515,4 @@ export const cacheService = typeof window === 'undefined'
       clear: async () => {},
       getStats: () => ({ size: 0, maxSize: 1000, provider: 'client-side' }),
       close: async () => {},
-    } as CacheService);
+    } as unknown as CacheService);

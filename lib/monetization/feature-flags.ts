@@ -21,17 +21,17 @@ export function shouldEnableFeature(
   if (!stream.enabled) return false;
 
   // Check traffic threshold
-  if (stream.minTraffic && metrics.monthlyVisitors) {
+  if ('minTraffic' in stream && stream.minTraffic && metrics.monthlyVisitors) {
     if (metrics.monthlyVisitors < stream.minTraffic) return false;
   }
 
   // Check user threshold
-  if (stream.minUsers && metrics.monthlyActiveUsers) {
+  if ('minUsers' in stream && stream.minUsers && metrics.monthlyActiveUsers) {
     if (metrics.monthlyActiveUsers < stream.minUsers) return false;
   }
 
   // Check subscriber threshold
-  if (stream.minSubscribers && metrics.emailSubscribers) {
+  if ('minSubscribers' in stream && stream.minSubscribers && metrics.emailSubscribers) {
     if (metrics.emailSubscribers < stream.minSubscribers) return false;
   }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGETHandler } from "@/lib/api/route-handler";
-import { workflowTemplates, getTemplatesByCategory, getTemplatesByIntegration } from "@/lib/workflows/templates";
+import { workflowTemplates, getTemplatesByCategory } from "@/lib/workflows/templates";
 
 export const runtime = "edge";
 

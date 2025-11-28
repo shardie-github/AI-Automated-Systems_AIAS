@@ -21,7 +21,7 @@ const workflowSchema = z.object({
   tenant_id: z.string().uuid().optional(),
 });
 
-const _workflowUpdateSchema = workflowSchema.partial();
+// const workflowUpdateSchema = workflowSchema.partial(); // Will be used for PATCH updates
 
 export const dynamic = "force-dynamic";
 

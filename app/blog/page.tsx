@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { getLatestArticles, getArticlesByCategory, getFeaturedArticles } from "@/lib/blog/articles";
+import { getLatestArticles, getFeaturedArticles } from "@/lib/blog/articles";
 import { Button } from "@/components/ui/button";
 import { AffiliateLink } from "@/components/monetization/affiliate-link";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   const articles = getLatestArticles(14); // All existing articles
   const featuredArticles = getFeaturedArticles();
-  const categories = ["Systems Thinking", "GenAI", "E-Commerce", "Automation", "Compliance", "AI", "Productivity", "Career", "Business", "Education"];
+  // const categories = ["Systems Thinking", "GenAI", "E-Commerce", "Automation", "Compliance", "AI", "Productivity", "Career", "Business", "Education"]; // Will be used for filtering
 
   return (
     <div className="container py-16">

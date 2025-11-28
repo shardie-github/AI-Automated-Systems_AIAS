@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import FadeIn from "@/components/motion/fade-in";
-import { Check, Sparkles, Zap, Shield } from "lucide-react";
+import { Sparkles, Zap, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function CTASection() {

@@ -90,7 +90,7 @@ class ConversionTrackingService {
   /**
    * Get attribution data for lead
    */
-  private async getAttribution(leadId: string, tenantId?: string): Promise<AttributionData> {
+  private async getAttribution(leadId: string, _tenantId?: string): Promise<AttributionData> {
     // Get lead
     const { data: lead } = await this.supabase
       .from('leads')
@@ -185,7 +185,7 @@ class ConversionTrackingService {
   private async updateLeadStatus(
     leadId: string,
     status: string,
-    tenantId?: string
+    _tenantId?: string
   ): Promise<void> {
     await this.supabase
       .from('leads')

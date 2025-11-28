@@ -66,7 +66,7 @@ const TableRow = React.forwardRef<
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 0.2 }}
-    {...props}
+    {...(props as any)}
   />
 ));
 TableRow.displayName = "TableRow";

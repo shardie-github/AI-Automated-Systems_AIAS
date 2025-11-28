@@ -4,7 +4,7 @@
  */
 
 import { logger } from '@/lib/logging/structured-logger';
-import { formatError, isAppError } from '@/lib/errors';
+import { formatError } from '@/lib/errors';
 
 export interface ErrorContext {
   userId?: string;

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+// import { supabase } from "@/lib/supabase/client"; // Will be used for subscription verification
 import { useRouter } from "next/navigation";
 import Confetti from "@/components/gamification/Confetti";
 

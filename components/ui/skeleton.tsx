@@ -24,7 +24,7 @@ function Skeleton({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
       className={cn(baseClasses, variantClasses[variant], className)}
-      {...props}
+      {...(props as any)}
     />
   );
 }

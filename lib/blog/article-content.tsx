@@ -1,7 +1,7 @@
 // Blog Article Content with Affiliate Links
 // Renders article content with automatic affiliate link insertion
 
-import { AffiliateLink } from "@/components/monetization/affiliate-link";
+// import { AffiliateLink } from "@/components/monetization/affiliate-link"; // Will be used for affiliate link insertion
 
 export function renderArticleContent(article: {
   slug: string;

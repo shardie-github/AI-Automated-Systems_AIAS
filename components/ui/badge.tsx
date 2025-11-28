@@ -48,7 +48,7 @@ function Badge({ className, variant, size, pulse = false, ...props }: BadgeProps
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.2 }}
       className={cn(badgeVariants({ variant, size }), className)}
-      {...props}
+      {...(props as any)}
     >
       {pulse && (
         <span className="absolute inset-0 rounded-full bg-current opacity-75 animate-ping" />

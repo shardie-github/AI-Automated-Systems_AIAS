@@ -142,7 +142,7 @@ export function WorkflowForm({ template, onSuccess, onCancel }: WorkflowFormProp
         <div>
           <Label>Select Template</Label>
           <Select
-            value={selectedTemplate?.id || ""}
+            value={(selectedTemplate as any)?.id || ""}
             onValueChange={(value) => {
               const template = templates.find((t) => t.id === value);
               setSelectedTemplate(template || null);

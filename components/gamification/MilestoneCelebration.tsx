@@ -1,14 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase/client";
+// import { supabase } from "@/lib/supabase/client"; // Will be used for milestone tracking
 import { motion } from "framer-motion";
 import Confetti from "./Confetti";
 
-interface Milestone {
-  id: number;
-  milestone_type: string;
-  achieved_at: string;
-}
+// interface Milestone {
+//   id: number;
+//   milestone_type: string;
+//   achieved_at: string;
+// }
 
 const MILESTONE_TYPES: Record<string, { title: string; icon: string; xp: number }> = {
   streak_7: { title: "Week Warrior", icon: "🔥", xp: 50 },

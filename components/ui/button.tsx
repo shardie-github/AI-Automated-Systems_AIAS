@@ -80,7 +80,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileHover={{ scale: isDisabled ? 1 : 1.05 }}
         whileTap={{ scale: isDisabled ? 1 : 0.95 }}
         transition={{ duration: 0.2 }}
-        {...props}
+        {...(props as any)}
       >
         {buttonContent}
       </Comp>

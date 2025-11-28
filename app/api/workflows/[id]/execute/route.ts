@@ -63,10 +63,10 @@ export const POST = createPOSTHandler(
         message: "Workflow executed successfully",
       });
     } catch (error) {
-      logger.error("Workflow execution failed", {
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error("Workflow execution failed", errorObj, {
         workflowId,
         userId: user.id,
-        error,
       });
 
       return NextResponse.json(

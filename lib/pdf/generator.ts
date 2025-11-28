@@ -62,9 +62,8 @@ export async function generatePDFWithPDFKit(content: PDFContent): Promise<Buffer
       doc.on('error', reject);
     });
   } catch (error) {
-    logger.error('Failed to generate PDF with PDFKit', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to generate PDF with PDFKit', errorObj);
     throw error;
   }
 }
@@ -107,9 +106,8 @@ export async function generatePDFWithPuppeteer(
     logger.info('PDF generated with Puppeteer', { size: pdf.length });
     return Buffer.from(pdf);
   } catch (error) {
-    logger.error('Failed to generate PDF with Puppeteer', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to generate PDF with Puppeteer', errorObj);
     throw error;
   }
 }
@@ -117,7 +115,7 @@ export async function generatePDFWithPuppeteer(
 /**
  * Generate System Prompts PDF (10-page master guide)
  */
-export async function generateSystemPromptsPDF(email: string, name: string): Promise<Buffer> {
+export async function generateSystemPromptsPDF(_email: string, name: string): Promise<Buffer> {
   const content: PDFContent = {
     title: 'Master System Prompts Guide',
     metadata: {
@@ -214,7 +212,7 @@ For more help, visit our documentation or contact support at support@aias-platfo
 /**
  * Generate HTML content for PDF (alternative method)
  */
-export function generateSystemPromptsHTML(email: string, name: string): string {
+export function generateSystemPromptsHTML(_email: string, name: string): string {
   return `
 <!DOCTYPE html>
 <html>
