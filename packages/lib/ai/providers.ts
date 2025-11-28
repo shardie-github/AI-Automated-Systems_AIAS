@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { AIProvider, ChatRequest, AuditRequest, EstimateRequest, ContentGenerationRequest, WorkflowGenerationRequest, AIResponse } from './types';
+import { AIProvider, ChatRequest, AuditRequest, EstimateRequest, ContentGenerationRequest, WorkflowGenerationRequest } from './types';
 import { config } from '@ai-consultancy/config';
 
 class OpenAIProvider implements AIProvider {
@@ -59,6 +59,7 @@ class OpenAIProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gpt-4',
+      stream: false,
     });
 
     return {
@@ -80,6 +81,7 @@ class OpenAIProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gpt-4',
+      stream: false,
     });
 
     return {
@@ -101,6 +103,7 @@ class OpenAIProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gpt-4',
+      stream: false,
     });
 
     return {
@@ -122,6 +125,7 @@ class OpenAIProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gpt-4',
+      stream: false,
     });
 
     return {
@@ -149,7 +153,7 @@ class AnthropicProvider implements AIProvider {
   }
 
   async chat(request: ChatRequest): Promise<any> {
-    const response = await this.client.messages.create({
+    const response = await (this.client as any).messages.create({
       model: request.model || 'claude-3-sonnet-20240229',
       max_tokens: request.maxTokens || 1000,
       temperature: request.temperature || 0.7,
@@ -172,7 +176,7 @@ class AnthropicProvider implements AIProvider {
   }
 
   async *streamChat(request: ChatRequest): AsyncIterable<string> {
-    const stream = await this.client.messages.create({
+    const stream = await (this.client as any).messages.create({
       model: request.model || 'claude-3-sonnet-20240229',
       max_tokens: request.maxTokens || 1000,
       temperature: request.temperature || 0.7,
@@ -199,6 +203,7 @@ class AnthropicProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'claude-3-sonnet-20240229',
+      stream: false,
     });
 
     return {
@@ -220,6 +225,7 @@ class AnthropicProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'claude-3-sonnet-20240229',
+      stream: false,
     });
 
     return {
@@ -241,6 +247,7 @@ class AnthropicProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'claude-3-sonnet-20240229',
+      stream: false,
     });
 
     return {
@@ -262,6 +269,7 @@ class AnthropicProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'claude-3-sonnet-20240229',
+      stream: false,
     });
 
     return {
@@ -335,6 +343,7 @@ class GoogleProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gemini-pro',
+      stream: false,
     });
 
     return {
@@ -356,6 +365,7 @@ class GoogleProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gemini-pro',
+      stream: false,
     });
 
     return {
@@ -377,6 +387,7 @@ class GoogleProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gemini-pro',
+      stream: false,
     });
 
     return {
@@ -398,6 +409,7 @@ class GoogleProvider implements AIProvider {
         { role: 'user', content: prompt }
       ],
       model: 'gemini-pro',
+      stream: false,
     });
 
     return {

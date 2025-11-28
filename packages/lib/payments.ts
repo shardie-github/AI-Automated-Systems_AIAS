@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { config } from '@ai-consultancy/config';
 import { prisma } from './database';
 
-const stripe = new Stripe(config.stripe.secretKey, {
+const stripe = new Stripe(config.stripe.secretKey || '', {
   apiVersion: '2023-10-16',
 });
 
@@ -93,7 +93,7 @@ export class PaymentService {
       return stripe.webhooks.constructEvent(
         payload,
         signature,
-        config.stripe.webhookSecret
+        config.stripe.webhookSecret || ''
       );
     } catch (error) {
       throw new Error(`Webhook signature verification failed: ${error}`);

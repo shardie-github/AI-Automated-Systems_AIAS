@@ -325,13 +325,13 @@ class ABTestingService {
    * Get test
    */
   private async getTest(testId: string, tenantId?: string): Promise<ABTest | null> {
-    let query = this.supabase.from('ab_tests').select('*').eq('id', testId).single();
+    let query = this.supabase.from('ab_tests').select('*').eq('id', testId);
 
     if (tenantId) {
       query = query.eq('tenant_id', tenantId);
     }
 
-    const { data } = await query;
+    const { data } = await query.single();
     return data as ABTest | null;
   }
 
@@ -347,14 +347,13 @@ class ABTestingService {
       .from('ab_test_assignments')
       .select('variation_id')
       .eq('test_id', testId)
-      .eq('visitor_id', visitorId)
-      .single();
+      .eq('visitor_id', visitorId);
 
     if (tenantId) {
       query = query.eq('tenant_id', tenantId);
     }
 
-    const { data } = await query;
+    const { data } = await query.single();
     return data;
   }
 

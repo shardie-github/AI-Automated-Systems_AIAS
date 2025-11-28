@@ -86,8 +86,8 @@ export async function createCalComBooking(
       description: event.description,
     };
   } catch (error) {
-    logger.error('Failed to create Cal.com booking', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to create Cal.com booking', errorObj, {
       booking: booking.email,
     });
     throw error;
@@ -118,9 +118,8 @@ export async function getCalComEventTypes(
       length: eventType.length,
     }));
   } catch (error) {
-    logger.error('Failed to fetch Cal.com event types', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to fetch Cal.com event types', errorObj);
     throw error;
   }
 }

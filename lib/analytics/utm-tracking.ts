@@ -110,7 +110,7 @@ export function getChannelName(params: UTMParams): string {
   if (params.source) {
     return params.source;
   }
-  if (params.ref) {
+  if ((params as any).ref) {
     return "referral";
   }
   return "direct";

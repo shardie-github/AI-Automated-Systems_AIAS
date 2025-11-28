@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
 
 /**
@@ -8,8 +8,17 @@ import { env } from "@/lib/env";
  * No hardcoded values are used.
  */
 
-export const supabase = createClient(
+export const supabase = createSupabaseClient(
   env.supabase.url,
   env.supabase.anonKey,
   { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
 );
+
+// Export createClient function for compatibility
+export function createClient(url?: string, key?: string, options?: any) {
+  return createSupabaseClient(
+    url || env.supabase.url,
+    key || env.supabase.anonKey,
+    options || { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+  );
+}

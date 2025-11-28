@@ -67,7 +67,7 @@ export const POST = createPOSTHandler(
       .single();
 
     if (dbError) {
-      logger.error("Failed to store Shopify integration", { error: dbError, userId: user.id });
+      logger.error("Failed to store Shopify integration", dbError instanceof Error ? dbError : new Error(String(dbError)), { userId: user.id });
       return NextResponse.json(
         { error: "Failed to connect Shopify integration" },
         { status: 500 }
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
       message: "Redirect user to this URL to authorize",
     });
   } catch (error) {
-    logger.error("Error initiating Shopify OAuth", { error });
+    logger.error("Error initiating Shopify OAuth", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "Failed to initiate OAuth flow" },
       { status: 500 }

@@ -1,5 +1,4 @@
-import { PrismaClient, Role, Plan, SubscriptionStatus, SourceType } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -57,7 +56,7 @@ async function main() {
     create: {
       userId: user1.id,
       orgId: org1.id,
-      role: Role.ADMIN,
+      role: 'ADMIN' as const,
     },
   });
 
@@ -67,7 +66,7 @@ async function main() {
     create: {
       userId: user2.id,
       orgId: org2.id,
-      role: Role.EDITOR,
+      role: 'EDITOR' as const,
     },
   });
 
@@ -77,8 +76,8 @@ async function main() {
     update: {},
     create: {
       orgId: org1.id,
-      status: SubscriptionStatus.ACTIVE,
-      plan: Plan.PRO,
+      status: 'ACTIVE' as const,
+      plan: 'PRO' as const,
       stripeCustomerId: 'cus_acme_corp',
       stripeSubscriptionId: 'sub_acme_corp',
       stripePriceId: 'price_pro_monthly',
@@ -92,8 +91,8 @@ async function main() {
     update: {},
     create: {
       orgId: org2.id,
-      status: SubscriptionStatus.ACTIVE,
-      plan: Plan.BASIC,
+      status: 'ACTIVE' as const,
+      plan: 'BASIC' as const,
       stripeCustomerId: 'cus_startup_inc',
       stripeSubscriptionId: 'sub_startup_inc',
       stripePriceId: 'price_basic_monthly',
@@ -135,7 +134,7 @@ async function main() {
   await prisma.source.create({
     data: {
       name: 'Shopify Products',
-      type: SourceType.SHOPIFY_JSON,
+      type: 'SHOPIFY_JSON' as const,
       orgId: org1.id,
       config: {
         url: 'https://acme-corp.myshopify.com/admin/api/2023-10/products.json',
@@ -147,7 +146,7 @@ async function main() {
   await prisma.source.create({
     data: {
       name: 'Google Trends Data',
-      type: SourceType.GOOGLE_TRENDS_CSV,
+      type: 'GOOGLE_TRENDS_CSV' as const,
       orgId: org2.id,
       config: {
         keywords: ['AI', 'automation', 'e-commerce'],

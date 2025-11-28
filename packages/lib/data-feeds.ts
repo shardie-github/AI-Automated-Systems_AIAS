@@ -83,7 +83,7 @@ export class TikTokBusinessAdapter implements SourceAdapter {
   }
 
   async fetchData(config: any): Promise<any> {
-    const { apiKey } = SourceConfigSchema.parse(config);
+    const { apiKey: _apiKey } = SourceConfigSchema.parse(config);
     
     // This would integrate with TikTok Business API
     // For now, return mock data
@@ -115,7 +115,7 @@ export class AliExpressAdapter implements SourceAdapter {
   }
 
   async fetchData(config: any): Promise<any> {
-    const { file } = SourceConfigSchema.parse(config);
+    const { file: _file } = SourceConfigSchema.parse(config);
     
     // This would process CSV file
     // For now, return mock data
@@ -142,7 +142,7 @@ export class GenericCsvAdapter implements SourceAdapter {
   }
 
   async fetchData(config: any): Promise<any> {
-    const { file, mapping } = SourceConfigSchema.parse(config);
+    const { file: _file, mapping: _mapping } = SourceConfigSchema.parse(config);
     
     // This would process CSV file with custom mapping
     // For now, return mock data
@@ -167,7 +167,7 @@ export class GenericJsonAdapter implements SourceAdapter {
   }
 
   async fetchData(config: any): Promise<any> {
-    const { file, mapping } = SourceConfigSchema.parse(config);
+    const { file: _file, mapping: _mapping } = SourceConfigSchema.parse(config);
     
     // This would process JSON file with custom mapping
     // For now, return mock data
@@ -323,8 +323,8 @@ export class DataFeedService {
 
     const stats = {
       totalSources: sources.length,
-      activeSources: sources.filter(s => s.isActive).length,
-      lastRun: sources.reduce((latest, source) => {
+      activeSources: sources.filter((s: any) => s.isActive).length,
+      lastRun: sources.reduce((latest: Date | null, source: any) => {
         if (!source.lastRun) return latest;
         if (!latest) return source.lastRun;
         return source.lastRun > latest ? source.lastRun : latest;

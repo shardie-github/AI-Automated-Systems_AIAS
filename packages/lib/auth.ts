@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 
 const supabase = createClient(
   config.supabase.url,
-  config.supabase.serviceRoleKey
+  config.supabase.serviceRoleKey || ''
 );
 
 export interface AuthUser {

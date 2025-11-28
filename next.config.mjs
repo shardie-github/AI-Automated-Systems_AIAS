@@ -67,6 +67,14 @@ const nextConfig = {
       config.resolve.alias['@/lib/database/migrations'] = false;
     }
     
+    // Add path aliases for webpack resolution (resolve from workspace root)
+    const path = require('path');
+    const rootDir = path.resolve(__dirname);
+    config.resolve.alias['@/components'] = path.resolve(rootDir, 'components');
+    config.resolve.alias['@/lib'] = path.resolve(rootDir, 'lib');
+    config.resolve.alias['@/app'] = path.resolve(rootDir, 'app');
+    config.resolve.alias['@'] = rootDir;
+    
     if (!isServer) {
       // Optimize client bundle
       config.optimization = {

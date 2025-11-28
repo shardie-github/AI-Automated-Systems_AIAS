@@ -70,8 +70,8 @@ export async function checkPremiumSubscription(userId: string): Promise<Subscrip
     logger.info('Subscription check completed', { userId, isPremium, plan: subscription.plan });
     return status;
   } catch (error) {
-    logger.error('Failed to check subscription', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to check subscription', errorObj, {
       userId,
     });
     
@@ -161,8 +161,8 @@ export async function checkPremiumSubscriptionViaStripe(
 
     return status;
   } catch (error) {
-    logger.error('Failed to check subscription via Stripe', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to check subscription via Stripe', errorObj, {
       userId,
     });
     

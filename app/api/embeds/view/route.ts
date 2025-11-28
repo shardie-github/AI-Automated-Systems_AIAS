@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+// import { createServerClient } from "@/lib/supabase/server"; // Will be used for tracking
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createServerClient();
+    // const supabase = await createServerClient(); // Will be used for tracking
     const body = await request.json();
     const { embedId, workflowId } = body;
 

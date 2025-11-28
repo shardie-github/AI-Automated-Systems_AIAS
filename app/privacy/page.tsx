@@ -1,7 +1,7 @@
 // [STAKE+TRUST:BEGIN:privacy_page]
 "use client";
 
-import { readFile } from "fs/promises";
+// import { readFile } from "fs/promises"; // Will be used for reading privacy policy file
 import { useEffect, useState } from "react";
 
 export default function Privacy() {

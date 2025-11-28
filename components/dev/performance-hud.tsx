@@ -21,7 +21,7 @@ export function PerformanceHUD() {
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.entryType === "largest-contentful-paint") {
-          const lcp = entry as PerformancePaintTiming;
+          const lcp = entry as any;
           setMetrics((m) => ({ ...m, lcp: lcp.renderTime || lcp.loadTime }));
         }
         if (entry.entryType === "layout-shift" && !(entry as any).hadRecentInput) {

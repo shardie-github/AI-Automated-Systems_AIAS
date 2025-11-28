@@ -17,6 +17,8 @@ export const dynamic = "force-dynamic";
 interface HealthCheckResult {
   ok: boolean;
   timestamp: string;
+  errorMessage?: string;
+  checks?: Record<string, boolean>;
   db?: {
     ok: boolean;
     latency_ms: number | null;
@@ -44,8 +46,6 @@ interface HealthCheckResult {
     error: string | null;
   };
   total_latency_ms?: number;
-  error?: string;
-  checks?: Record<string, boolean>;
 }
 
 export async function GET(): Promise<NextResponse<HealthCheckResult>> {
@@ -61,7 +61,7 @@ export async function GET(): Promise<NextResponse<HealthCheckResult>> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     checks.ok = false;
-    checks.error = `Environment validation failed: ${errorMessage}`;
+    checks.errorMessage = `Environment validation failed: ${errorMessage}`;
     return NextResponse.json(checks as HealthCheckResult, { status: 503 });
   }
 
@@ -81,7 +81,8 @@ export async function GET(): Promise<NextResponse<HealthCheckResult>> {
     return NextResponse.json(
       {
         ok: false,
-        error: formatted.message,
+        timestamp: new Date().toISOString(),
+        errorMessage: formatted.message,
         checks: formatted.details as Record<string, boolean>,
       },
       { status: formatted.statusCode }
@@ -118,7 +119,7 @@ export async function GET(): Promise<NextResponse<HealthCheckResult>> {
     (async () => {
       const authStart = Date.now();
       const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
-      const { data: { users }, error } = await supabaseService.auth.admin.listUsers({
+      const { data: { users: _users }, error } = await supabaseService.auth.admin.listUsers({
         page: 1,
         perPage: 1,
       });
@@ -133,7 +134,7 @@ export async function GET(): Promise<NextResponse<HealthCheckResult>> {
     (async () => {
       try {
         const supabaseAnon = createClient(supabaseUrl, supabaseAnonKey);
-        const { data, error } = await supabaseAnon
+ const { data: _data, error: _error } = await supabaseAnon
           .from("api_logs")
           .select("*")
           .limit(1);
@@ -252,7 +253,7 @@ export async function GET(): Promise<NextResponse<HealthCheckResult>> {
     logger.warn("Health check failed", { checks });
   }
 
-  return NextResponse.json(checks, {
+  return NextResponse.json(checks as HealthCheckResult, {
     status: checks.ok ? 200 : 503,
     headers: {
       "Cache-Control": "no-store, no-cache, must-revalidate",

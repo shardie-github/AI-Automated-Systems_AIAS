@@ -74,7 +74,7 @@ export async function PATCH(
       .single();
 
     if (error) {
-      logger.error("Failed to update notification", { error, notificationId, userId: user.id });
+      logger.error("Failed to update notification", error instanceof Error ? error : new Error(String(error)), { notificationId, userId: user.id });
       return handleApiError(error, "Failed to update notification");
     }
 
@@ -95,7 +95,7 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    logger.error("Error in PATCH /api/notifications/[id]", { error });
+    logger.error("Error in PATCH /api/notifications/[id]", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to update notification");
   }
 }
@@ -140,7 +140,7 @@ export async function DELETE(
       .eq("user_id", user.id); // Ensure user owns this notification
 
     if (error) {
-      logger.error("Failed to delete notification", { error, notificationId, userId: user.id });
+      logger.error("Failed to delete notification", error instanceof Error ? error : new Error(String(error)), { notificationId, userId: user.id });
       return handleApiError(error, "Failed to delete notification");
     }
 
@@ -148,7 +148,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error("Error in DELETE /api/notifications/[id]", { error });
+    logger.error("Error in DELETE /api/notifications/[id]", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to delete notification");
   }
 }

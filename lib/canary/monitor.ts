@@ -176,7 +176,7 @@ export class CanaryMonitor {
   private async notifyTeam(
     canaryId: string,
     reason: string,
-    details: Record<string, unknown>
+    _details: Record<string, unknown>
   ): Promise<void> {
     // TODO: Implement notification via:
     // - Slack webhook

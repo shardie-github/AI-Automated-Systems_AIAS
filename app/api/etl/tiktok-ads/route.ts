@@ -174,7 +174,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       tags: { status: "error" },
     });
 
-    logger.error("TikTok Ads ETL failed", { error: systemError.message, duration });
+    logger.error("TikTok Ads ETL failed", systemError, { duration });
 
     const formatted = formatError(systemError);
     return NextResponse.json(

@@ -147,7 +147,7 @@ export const GET = createGETHandler(
         },
       });
     } catch (error) {
-      logger.error("Error calculating metrics", { error });
+      logger.error("Error calculating metrics", error instanceof Error ? error : undefined);
       return NextResponse.json(
         { error: "Failed to calculate metrics" },
         { status: 500 }

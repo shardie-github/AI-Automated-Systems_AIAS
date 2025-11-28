@@ -3,6 +3,7 @@
  * Demonstrates enterprise security and performance features
  */
 
+import { NextResponse } from 'next/server';
 import { createGETHandler, createPOSTHandler } from '@/lib/api/route-handler';
 import { tenantIsolation } from '@/lib/security/tenant-isolation';
 import { queryOptimizer } from '@/lib/performance/query-optimizer';
@@ -158,7 +159,7 @@ export const POST = createPOSTHandler(async (context) => {
   }
   
   // Parse and validate body (already validated by route handler)
-  const body = await request.json();
+  // const body = await request.json(); // Will be used for workflow creation
   
   // Create workflow (example - would use actual Supabase client)
   // const workflow = await createWorkflow(tenantId, body);

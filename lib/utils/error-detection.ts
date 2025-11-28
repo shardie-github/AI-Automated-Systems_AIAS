@@ -3,7 +3,7 @@
  * Monitors errors and sends alerts when thresholds are exceeded
  */
 
-import { SystemError, formatError } from '@/lib/errors';
+import { formatError } from '@/lib/errors';
 
 export interface ErrorAlert {
   id: string;

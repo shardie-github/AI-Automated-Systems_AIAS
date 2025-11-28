@@ -166,7 +166,8 @@ export class CircuitBreaker {
     if (this.state === 'closed' && this.failures >= this.config.failureThreshold) {
       this.state = 'open';
       this.nextAttemptTime = Date.now() + this.config.timeout;
-      logger.error('Circuit breaker opened - service failing', {
+      const errorObj = new Error('Circuit breaker opened - service failing');
+      logger.error('Circuit breaker opened - service failing', errorObj, {
         service: this.config.name,
         failures: this.failures,
         nextAttemptTime: new Date(this.nextAttemptTime).toISOString(),

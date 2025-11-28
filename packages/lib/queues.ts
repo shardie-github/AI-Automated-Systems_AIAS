@@ -2,10 +2,10 @@ import { Queue, Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
 import { config } from '@ai-consultancy/config';
 import { prisma } from './database';
-import { aiClient } from './ai/client';
+// import { aiClient } from './ai/client'; // Unused for now
 import { AIGenerators } from './ai/generators';
 
-const connection = new IORedis(config.redis.url);
+const connection = new IORedis(config.redis.url || 'redis://localhost:6379');
 
 // Queue definitions
 export const feedIngestQueue = new Queue('feeds:ingest', { connection });
@@ -42,7 +42,7 @@ export interface BillingSyncJob {
 // Queue processors
 export class QueueProcessors {
   static async processFeedIngest(job: Job<FeedIngestJob>) {
-    const { sourceId, data, metadata } = job.data;
+    const { sourceId, data, metadata: _metadata } = job.data;
     
     try {
       // Update ingest event status
@@ -129,7 +129,7 @@ export class QueueProcessors {
   }
 
   static async processAIGenerate(job: Job<AIGenerateJob>) {
-    const { type, userId, data, metadata } = job.data;
+    const { type, userId, data, metadata: _metadata } = job.data;
     
     try {
       let result: any;
@@ -196,7 +196,7 @@ export class QueueProcessors {
   }
 
   static async processReportPdf(job: Job<ReportPdfJob>) {
-    const { reportId, userId, data } = job.data;
+    const { reportId, userId: _userId, data } = job.data;
     
     try {
       // Update report status
@@ -269,33 +269,33 @@ export class QueueProcessors {
     return [];
   }
 
-  private static async processGoogleTrendsData(data: any): Promise<any[]> {
+  private static async processGoogleTrendsData(_data: any): Promise<any[]> {
     // Process Google Trends CSV data
     // This would parse CSV and extract trend data
     return [];
   }
 
-  private static async processTikTokData(data: any): Promise<any[]> {
+  private static async processTikTokData(_data: any): Promise<any[]> {
     // Process TikTok Business API data
     return [];
   }
 
-  private static async processAliExpressData(data: any): Promise<any[]> {
+  private static async processAliExpressData(_data: any): Promise<any[]> {
     // Process AliExpress CSV data
     return [];
   }
 
-  private static async processGenericCsvData(data: any): Promise<any[]> {
+  private static async processGenericCsvData(_data: any): Promise<any[]> {
     // Process generic CSV data
     return [];
   }
 
-  private static async processGenericJsonData(data: any): Promise<any[]> {
+  private static async processGenericJsonData(_data: any): Promise<any[]> {
     // Process generic JSON data
     return [];
   }
 
-  private static async storeProcessedData(type: string, data: any[], orgId: string) {
+  private static async storeProcessedData(type: string, data: any[], _orgId: string) {
     // Store processed data in appropriate tables
     switch (type) {
       case 'SHOPIFY_JSON':
@@ -318,13 +318,13 @@ export class QueueProcessors {
     }
   }
 
-  private static async generatePdf(data: any): Promise<Buffer> {
+  private static async generatePdf(_data: any): Promise<Buffer> {
     // This would use a PDF generation library like Puppeteer or @react-pdf/renderer
     // For now, return a dummy buffer
     return Buffer.from('PDF content would be generated here');
   }
 
-  private static async uploadPdf(buffer: Buffer, reportId: string): Promise<string> {
+  private static async uploadPdf(_buffer: Buffer, reportId: string): Promise<string> {
     // Get Supabase URL from environment variables dynamically
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 
                        process.env.SUPABASE_URL || 

@@ -34,11 +34,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     });
 
     // Log with structured logger
-    logger.error("ErrorBoundary caught an error", {
+    const errorObj: Error = error instanceof Error ? error : new Error(String(error));
+    logger.error("ErrorBoundary caught an error", errorObj, {
       componentStack: errorInfo.componentStack,
-      errorName: error.name,
-      errorMessage: error.message,
-    }, error);
+      errorName: errorObj.name,
+      errorMessage: errorObj.message,
+    });
   }
 
   resetError = () => {

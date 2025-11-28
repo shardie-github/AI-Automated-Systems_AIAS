@@ -217,7 +217,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       tags: { status: "error" },
     });
 
-    logger.error("Compute Metrics ETL failed", { error: systemError.message, duration });
+    logger.error("Compute Metrics ETL failed", systemError, { duration });
 
     const formatted = formatError(systemError);
     return NextResponse.json(

@@ -1,4 +1,4 @@
-import { config } from '@ai-consultancy/config';
+// import { config } from '@ai-consultancy/config'; // Unused
 
 export interface CRMContact {
   id: string;
@@ -118,7 +118,7 @@ export class HubSpotConnector extends CRMConnector {
         updatedAt: new Date(contact.updatedAt),
       };
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return null;
       }
       throw error;
@@ -196,7 +196,7 @@ export class HubSpotConnector extends CRMConnector {
       });
       return true;
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return false;
       }
       throw error;
@@ -239,7 +239,7 @@ export class HubSpotConnector extends CRMConnector {
         updatedAt: new Date(deal.updatedAt),
       };
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return null;
       }
       throw error;
@@ -317,7 +317,7 @@ export class HubSpotConnector extends CRMConnector {
       });
       return true;
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return false;
       }
       throw error;
@@ -434,45 +434,49 @@ export class SalesforceConnector extends CRMConnector {
         updatedAt: new Date(response.LastModifiedDate),
       };
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return null;
       }
       throw error;
     }
   }
 
-  async createContact(contact: Partial<CRMContact>): Promise<CRMContact> {
+  async createContact(contactData: Partial<CRMContact>): Promise<CRMContact> {
     const response = await this.makeRequest('/sobjects/Contact', {
       method: 'POST',
       body: JSON.stringify({
-        Email: contact.email,
-        FirstName: contact.firstName,
-        LastName: contact.lastName,
-        Phone: contact.phone,
-        Company: contact.company,
-        Title: contact.title,
-        ...contact.customFields,
+        Email: contactData.email,
+        FirstName: contactData.firstName,
+        LastName: contactData.lastName,
+        Phone: contactData.phone,
+        Company: contactData.company,
+        Title: contactData.title,
+        ...contactData.customFields,
       }),
     });
 
-    return this.getContact(response.id)!;
+    const contact = await this.getContact(response.id);
+    if (!contact) throw new Error('Failed to create contact');
+    return contact;
   }
 
-  async updateContact(id: string, contact: Partial<CRMContact>): Promise<CRMContact> {
+  async updateContact(id: string, contactData: Partial<CRMContact>): Promise<CRMContact> {
     await this.makeRequest(`/sobjects/Contact/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        Email: contact.email,
-        FirstName: contact.firstName,
-        LastName: contact.lastName,
-        Phone: contact.phone,
-        Company: contact.company,
-        Title: contact.title,
-        ...contact.customFields,
+        Email: contactData.email,
+        FirstName: contactData.firstName,
+        LastName: contactData.lastName,
+        Phone: contactData.phone,
+        Company: contactData.company,
+        Title: contactData.title,
+        ...contactData.customFields,
       }),
     });
 
-    return this.getContact(id)!;
+    const contact = await this.getContact(id);
+    if (!contact) throw new Error('Contact not found');
+    return contact;
   }
 
   async deleteContact(id: string): Promise<boolean> {
@@ -482,7 +486,7 @@ export class SalesforceConnector extends CRMConnector {
       });
       return true;
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return false;
       }
       throw error;
@@ -525,47 +529,51 @@ export class SalesforceConnector extends CRMConnector {
         updatedAt: new Date(response.LastModifiedDate),
       };
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return null;
       }
       throw error;
     }
   }
 
-  async createOpportunity(opportunity: Partial<CRMOpportunity>): Promise<CRMOpportunity> {
+  async createOpportunity(opportunityData: Partial<CRMOpportunity>): Promise<CRMOpportunity> {
     const response = await this.makeRequest('/sobjects/Opportunity', {
       method: 'POST',
       body: JSON.stringify({
-        Name: opportunity.name,
-        Amount: opportunity.amount,
-        CurrencyIsoCode: opportunity.currency,
-        StageName: opportunity.stage,
-        Probability: opportunity.probability,
-        CloseDate: opportunity.closeDate?.toISOString().split('T')[0],
-        ContactId: opportunity.contactId,
-        ...opportunity.customFields,
+        Name: opportunityData.name,
+        Amount: opportunityData.amount,
+        CurrencyIsoCode: opportunityData.currency,
+        StageName: opportunityData.stage,
+        Probability: opportunityData.probability,
+        CloseDate: opportunityData.closeDate?.toISOString().split('T')[0],
+        ContactId: opportunityData.contactId,
+        ...opportunityData.customFields,
       }),
     });
 
-    return this.getOpportunity(response.id)!;
+    const opportunity = await this.getOpportunity(response.id);
+    if (!opportunity) throw new Error('Failed to create opportunity');
+    return opportunity;
   }
 
-  async updateOpportunity(id: string, opportunity: Partial<CRMOpportunity>): Promise<CRMOpportunity> {
+  async updateOpportunity(id: string, opportunityData: Partial<CRMOpportunity>): Promise<CRMOpportunity> {
     await this.makeRequest(`/sobjects/Opportunity/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        Name: opportunity.name,
-        Amount: opportunity.amount,
-        CurrencyIsoCode: opportunity.currency,
-        StageName: opportunity.stage,
-        Probability: opportunity.probability,
-        CloseDate: opportunity.closeDate?.toISOString().split('T')[0],
-        ContactId: opportunity.contactId,
-        ...opportunity.customFields,
+        Name: opportunityData.name,
+        Amount: opportunityData.amount,
+        CurrencyIsoCode: opportunityData.currency,
+        StageName: opportunityData.stage,
+        Probability: opportunityData.probability,
+        CloseDate: opportunityData.closeDate?.toISOString().split('T')[0],
+        ContactId: opportunityData.contactId,
+        ...opportunityData.customFields,
       }),
     });
 
-    return this.getOpportunity(id)!;
+    const opportunity = await this.getOpportunity(id);
+    if (!opportunity) throw new Error('Opportunity not found');
+    return opportunity;
   }
 
   async deleteOpportunity(id: string): Promise<boolean> {
@@ -575,7 +583,7 @@ export class SalesforceConnector extends CRMConnector {
       });
       return true;
     } catch (error) {
-      if (error.message.includes('404')) {
+      if ((error as any).message?.includes('404')) {
         return false;
       }
       throw error;

@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
     const { notification_ids, all } = markReadSchema.parse(body);
 
     // Get tenant_id from header or query
-    const tenantId = request.headers.get("x-tenant-id") || 
-                     new URL(request.url).searchParams.get("tenant_id");
+    // const tenantId = request.headers.get("x-tenant-id") ||
+    //                  new URL(request.url).searchParams.get("tenant_id");
 
     // Use RPC function to mark as read
     const { data: count, error } = await supabase.rpc("mark_notifications_read", {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      logger.error("Failed to mark notifications as read", { error, userId: user.id });
+      logger.error("Failed to mark notifications as read", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to mark notifications as read");
     }
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error("Error in POST /api/notifications/mark-read", { error });
+    logger.error("Error in POST /api/notifications/mark-read", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to mark notifications as read");
   }
 }

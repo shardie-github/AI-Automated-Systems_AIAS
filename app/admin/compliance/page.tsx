@@ -64,21 +64,6 @@ export default function ComplianceDashboardPage() {
     );
   }
 
-  const statusBadge = (status: string) => {
-    const colors = {
-      ok: "bg-green-100 text-green-800",
-      pass: "bg-green-100 text-green-800",
-      enabled: "bg-green-100 text-green-800",
-      enforced: "bg-green-100 text-green-800",
-      warning: "bg-yellow-100 text-yellow-800",
-      partial: "bg-yellow-100 text-yellow-800",
-      critical: "bg-red-100 text-red-800",
-      fail: "bg-red-100 text-red-800",
-      disabled: "bg-red-100 text-red-800",
-      missing: "bg-red-100 text-red-800"
-    };
-    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
-  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">

@@ -19,8 +19,8 @@ export function UTMTracker() {
     if (utmParams.source || referralCode) {
       storeUTMParams({
         ...utmParams,
-        ref: referralCode,
-      });
+        ...(referralCode && { ref: referralCode }),
+      } as any);
 
       // Also track page view with UTM parameters
       fetch("/api/analytics/track", {

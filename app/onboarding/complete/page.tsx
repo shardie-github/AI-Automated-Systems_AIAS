@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// import { useRouter } from "next/navigation"; // Will be used for navigation
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Sparkles, Zap, Target } from "lucide-react";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { ShareInvite } from "@/components/plg/share-invite";
 import { useState } from "react";
 
 export default function CompletePage() {
-  const router = useRouter();
+  // const router = useRouter(); // Will be used for navigation
   const [userId, setUserId] = useState<string | undefined>();
   const [referralCode, setReferralCode] = useState<string | undefined>();
 

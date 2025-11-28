@@ -53,7 +53,7 @@ export async function getCanaryFlag(
  * Check if user should receive canary version
  */
 export function shouldUseCanary(
-  canaryId: string,
+  _canaryId: string,
   userId: string,
   config: CanaryFlagConfig
 ): boolean {

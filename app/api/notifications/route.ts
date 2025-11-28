@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     const { data: notifications, error } = await queryBuilder;
 
     if (error) {
-      logger.error("Failed to get notifications", { error, userId: user.id });
+      logger.error("Failed to get notifications", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to retrieve notifications");
     }
 
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error("Error in GET /api/notifications", { error });
+    logger.error("Error in GET /api/notifications", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve notifications");
   }
 }
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      logger.error("Failed to create notification", { error });
+      logger.error("Failed to create notification", error instanceof Error ? error : new Error(String(error)));
       return handleApiError(error, "Failed to create notification");
     }
 
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error("Error in POST /api/notifications", { error });
+    logger.error("Error in POST /api/notifications", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to create notification");
   }
 }

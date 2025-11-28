@@ -40,7 +40,7 @@ class ErrorTracker {
         dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
         environment: process.env.NODE_ENV || "development",
         tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-        beforeSend(event, hint) {
+        beforeSend(event: any, _hint: any) {
           // Filter out sensitive data
           if (event.request) {
             delete event.request.cookies;
@@ -55,7 +55,8 @@ class ErrorTracker {
       this.initialized = true;
       logger.info("Sentry error tracking initialized");
     } catch (error) {
-      logger.error("Failed to initialize Sentry", { error });
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      logger.error("Failed to initialize Sentry", errorObj);
     }
   }
 
@@ -86,17 +87,14 @@ class ErrorTracker {
           Sentry.captureException(error);
         });
       } catch (sentryError) {
-        logger.error("Failed to capture exception in Sentry", { error: sentryError });
+        const errorObj: Error = (sentryError as any) instanceof Error ? (sentryError as Error) : new Error(String(sentryError));
+        logger.error("Failed to capture exception in Sentry", errorObj);
       }
     }
 
     // Always log to our structured logger as fallback
-    logger.error("Exception captured", {
-      error: {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      },
+    const errorObj: Error = error instanceof Error ? error : new Error(String(error));
+    logger.error("Exception captured", errorObj, {
       ...context,
     });
   }
@@ -122,13 +120,15 @@ class ErrorTracker {
           Sentry.captureMessage(message, level);
         });
       } catch (sentryError) {
-        logger.error("Failed to capture message in Sentry", { error: sentryError });
+        const errorObj: Error = (sentryError as any) instanceof Error ? (sentryError as Error) : new Error(String(sentryError));
+        logger.error("Failed to capture message in Sentry", errorObj);
       }
     }
 
     // Always log to our structured logger as fallback
     if (level === "error") {
-      logger.error(message, context);
+      const errorObj = new Error(message);
+      logger.error(message, errorObj, context);
     } else if (level === "warning") {
       logger.warn(message, context);
     } else {
@@ -148,7 +148,8 @@ class ErrorTracker {
           ...metadata,
         });
       } catch (error) {
-        logger.error("Failed to set user in Sentry", { error });
+        const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+        logger.error("Failed to set user in Sentry", errorObj);
       }
     }
   }
@@ -167,7 +168,8 @@ class ErrorTracker {
           timestamp: Date.now() / 1000,
         });
       } catch (error) {
-        logger.error("Failed to add breadcrumb in Sentry", { error });
+        const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+        logger.error("Failed to add breadcrumb in Sentry", errorObj);
       }
     }
   }

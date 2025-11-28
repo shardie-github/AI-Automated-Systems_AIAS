@@ -161,7 +161,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       tags: { status: "error" },
     });
 
-    logger.error("Meta Ads ETL failed", { error: systemError.message, duration });
+    logger.error("Meta Ads ETL failed", systemError, { duration });
 
     const formatted = formatError(systemError);
     return NextResponse.json(

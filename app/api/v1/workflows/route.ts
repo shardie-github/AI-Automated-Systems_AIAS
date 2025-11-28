@@ -21,7 +21,7 @@ const workflowSchema = z.object({
   tenant_id: z.string().uuid().optional(),
 });
 
-const workflowUpdateSchema = workflowSchema.partial();
+// const workflowUpdateSchema = workflowSchema.partial(); // Will be used for PATCH updates
 
 export const dynamic = "force-dynamic";
 
@@ -70,13 +70,13 @@ export async function GET(request: NextRequest) {
     const { data: workflows, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
-      logger.error("Failed to get workflows", { error, userId: user.id });
+      logger.error("Failed to get workflows", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to retrieve workflows");
     }
 
     return NextResponse.json({ workflows: workflows || [] });
   } catch (error) {
-    logger.error("Error in GET /api/v1/workflows", { error });
+    logger.error("Error in GET /api/v1/workflows", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve workflows");
   }
 }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      logger.error("Failed to create workflow", { error, userId: user.id });
+      logger.error("Failed to create workflow", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to create workflow");
     }
 
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error("Error in POST /api/v1/workflows", { error });
+    logger.error("Error in POST /api/v1/workflows", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to create workflow");
   }
 }

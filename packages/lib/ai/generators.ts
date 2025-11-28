@@ -100,13 +100,14 @@ export class AIGenerators {
     const result = await aiClient.generateAudit(request);
     
     // Parse the AI response and structure it according to our schema
+    const resultAny = result as any;
     const summary = {
-      overallScore: this.extractScore(result.analysis),
-      categories: this.extractCategories(result.analysis),
-      criticalIssues: this.extractCriticalIssues(result.analysis),
-      quickWins: this.extractQuickWins(result.analysis),
-      estimatedImpact: this.extractImpact(result.analysis),
-      nextSteps: this.extractNextSteps(result.analysis),
+      overallScore: this.extractScore(resultAny.analysis),
+      categories: this.extractCategories(resultAny.analysis),
+      criticalIssues: this.extractCriticalIssues(resultAny.analysis),
+      quickWins: this.extractQuickWins(resultAny.analysis),
+      estimatedImpact: this.extractImpact(resultAny.analysis),
+      nextSteps: this.extractNextSteps(resultAny.analysis),
     };
 
     return AuditSummarySchema.parse(summary);
@@ -137,13 +138,14 @@ export class AIGenerators {
     const result = await aiClient.generateEstimate(request);
     
     // Parse the AI response and structure it according to our schema
+    const resultAny = result as any;
     const estimate = {
-      totalCost: this.extractCostRange(result.estimate),
-      timeline: this.extractTimeline(result.estimate),
-      phases: this.extractPhases(result.estimate),
-      assumptions: this.extractAssumptions(result.estimate),
-      risks: this.extractRisks(result.estimate),
-      recommendations: this.extractRecommendations(result.estimate),
+      totalCost: this.extractCostRange(resultAny.estimate),
+      timeline: this.extractTimeline(resultAny.estimate),
+      phases: this.extractPhases(resultAny.estimate),
+      assumptions: this.extractAssumptions(resultAny.estimate),
+      risks: this.extractRisks(resultAny.estimate),
+      recommendations: this.extractRecommendations(resultAny.estimate),
     };
 
     return ProjectEstimateSchema.parse(estimate);
@@ -168,13 +170,14 @@ export class AIGenerators {
     const result = await aiClient.generateContent(request);
     
     // Parse the AI response and structure it according to our schema
+    const resultAny = result as any;
     const plan = {
-      title: this.extractTitle(result.content),
-      outline: this.extractOutline(result.content),
-      targetKeywords: keywords || this.extractKeywords(result.content),
-      estimatedReadTime: this.extractReadTime(result.content),
-      callToAction: this.extractCallToAction(result.content),
-      socialMediaVariants: this.extractSocialVariants(result.content),
+      title: this.extractTitle(resultAny.content),
+      outline: this.extractOutline(resultAny.content),
+      targetKeywords: keywords || this.extractKeywords(resultAny.content),
+      estimatedReadTime: this.extractReadTime(resultAny.content),
+      callToAction: this.extractCallToAction(resultAny.content),
+      socialMediaVariants: this.extractSocialVariants(resultAny.content),
     };
 
     return ContentPlanSchema.parse(plan);
@@ -200,26 +203,27 @@ export class AIGenerators {
     const result = await aiClient.generateWorkflow(request);
     
     // Parse the AI response and structure it according to our schema
+    const resultAny = result as any;
     const blueprint = {
-      name: this.extractWorkflowName(result.workflow),
-      description: this.extractWorkflowDescription(result.workflow),
-      steps: this.extractWorkflowSteps(result.workflow),
-      integrations: this.extractIntegrations(result.workflow),
-      metrics: this.extractMetrics(result.workflow),
-      estimatedROI: this.extractROI(result.workflow),
-      implementationTimeline: this.extractImplementationTimeline(result.workflow),
+      name: this.extractWorkflowName(resultAny.workflow),
+      description: this.extractWorkflowDescription(resultAny.workflow),
+      steps: this.extractWorkflowSteps(resultAny.workflow),
+      integrations: this.extractIntegrations(resultAny.workflow),
+      metrics: this.extractMetrics(resultAny.workflow),
+      estimatedROI: this.extractROI(resultAny.workflow),
+      implementationTimeline: this.extractImplementationTimeline(resultAny.workflow),
     };
 
     return WorkflowBlueprintSchema.parse(blueprint);
   }
 
   // Helper methods to parse AI responses
-  private static extractScore(analysis: string): number {
-    const scoreMatch = analysis.match(/(?:score|rating|grade)[:\s]*(\d+)/i);
+  private static extractScore(_analysis: string): number {
+    const scoreMatch = _analysis.match(/(?:score|rating|grade)[:\s]*(\d+)/i);
     return scoreMatch ? parseInt(scoreMatch[1]) : 75;
   }
 
-  private static extractCategories(analysis: string) {
+  private static extractCategories(_analysis: string) {
     // This would parse the analysis to extract categories
     // For now, return a default structure
     return [
@@ -238,23 +242,23 @@ export class AIGenerators {
     ];
   }
 
-  private static extractCriticalIssues(analysis: string): string[] {
+  private static extractCriticalIssues(_analysis: string): string[] {
     return ['Critical issue 1', 'Critical issue 2'];
   }
 
-  private static extractQuickWins(analysis: string): string[] {
+  private static extractQuickWins(_analysis: string): string[] {
     return ['Quick win 1', 'Quick win 2'];
   }
 
-  private static extractImpact(analysis: string): string {
+  private static extractImpact(_analysis: string): string {
     return 'High impact improvements identified';
   }
 
-  private static extractNextSteps(analysis: string): string[] {
+  private static extractNextSteps(_analysis: string): string[] {
     return ['Step 1', 'Step 2', 'Step 3'];
   }
 
-  private static extractCostRange(estimate: string) {
+  private static extractCostRange(_estimate: string) {
     return {
       min: 10000,
       max: 50000,
@@ -262,14 +266,14 @@ export class AIGenerators {
     };
   }
 
-  private static extractTimeline(estimate: string) {
+  private static extractTimeline(_estimate: string) {
     return {
       min: 4,
       max: 12,
     };
   }
 
-  private static extractPhases(estimate: string) {
+  private static extractPhases(_estimate: string) {
     return [
       {
         name: 'Planning',
@@ -286,23 +290,23 @@ export class AIGenerators {
     ];
   }
 
-  private static extractAssumptions(estimate: string): string[] {
+  private static extractAssumptions(_estimate: string): string[] {
     return ['Assumption 1', 'Assumption 2'];
   }
 
-  private static extractRisks(estimate: string): string[] {
+  private static extractRisks(_estimate: string): string[] {
     return ['Risk 1', 'Risk 2'];
   }
 
-  private static extractRecommendations(estimate: string): string[] {
+  private static extractRecommendations(_estimate: string): string[] {
     return ['Recommendation 1', 'Recommendation 2'];
   }
 
-  private static extractTitle(content: string): string {
-    return content.split('\n')[0] || 'Generated Content';
+  private static extractTitle(_content: string): string {
+    return _content.split('\n')[0] || 'Generated Content';
   }
 
-  private static extractOutline(content: string) {
+  private static extractOutline(_content: string) {
     return [
       {
         heading: 'Introduction',
@@ -312,19 +316,19 @@ export class AIGenerators {
     ];
   }
 
-  private static extractKeywords(content: string): string[] {
+  private static extractKeywords(_content: string): string[] {
     return ['keyword1', 'keyword2'];
   }
 
-  private static extractReadTime(content: string): number {
-    return Math.ceil(content.split(' ').length / 200);
+  private static extractReadTime(_content: string): number {
+    return Math.ceil(_content.split(' ').length / 200);
   }
 
-  private static extractCallToAction(content: string): string {
+  private static extractCallToAction(_content: string): string {
     return 'Learn more about our services';
   }
 
-  private static extractSocialVariants(content: string) {
+  private static extractSocialVariants(_content: string) {
     return [
       {
         platform: 'Twitter',
@@ -334,15 +338,15 @@ export class AIGenerators {
     ];
   }
 
-  private static extractWorkflowName(workflow: string): string {
+  private static extractWorkflowName(_workflow: string): string {
     return 'Automated Workflow';
   }
 
-  private static extractWorkflowDescription(workflow: string): string {
+  private static extractWorkflowDescription(_workflow: string): string {
     return 'A comprehensive workflow for business automation';
   }
 
-  private static extractWorkflowSteps(workflow: string) {
+  private static extractWorkflowSteps(_workflow: string) {
     return [
       {
         id: 'step1',
@@ -356,7 +360,7 @@ export class AIGenerators {
     ];
   }
 
-  private static extractIntegrations(workflow: string) {
+  private static extractIntegrations(_workflow: string) {
     return [
       {
         name: 'CRM Integration',
@@ -367,7 +371,7 @@ export class AIGenerators {
     ];
   }
 
-  private static extractMetrics(workflow: string) {
+  private static extractMetrics(_workflow: string) {
     return [
       {
         name: 'Processing Time',
@@ -378,11 +382,11 @@ export class AIGenerators {
     ];
   }
 
-  private static extractROI(workflow: string): string {
+  private static extractROI(_workflow: string): string {
     return '300% ROI within 6 months';
   }
 
-  private static extractImplementationTimeline(workflow: string): string {
+  private static extractImplementationTimeline(_workflow: string): string {
     return '4-6 weeks';
   }
 }

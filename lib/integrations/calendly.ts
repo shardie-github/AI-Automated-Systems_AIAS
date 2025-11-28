@@ -83,8 +83,8 @@ export async function createCalendlyEvent(
 
     return event;
   } catch (error) {
-    logger.error('Failed to create Calendly event', {
-      error: error instanceof Error ? error.message : String(error),
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to create Calendly event', errorObj, {
       booking: booking.email,
     });
     throw error;
@@ -120,9 +120,8 @@ export async function getCalendlyEventTypes(
       duration: eventType.duration,
     }));
   } catch (error) {
-    logger.error('Failed to fetch Calendly event types', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error('Failed to fetch Calendly event types', errorObj);
     throw error;
   }
 }

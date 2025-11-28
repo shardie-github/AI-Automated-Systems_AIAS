@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { SystemError, NetworkError, formatError } from "@/lib/errors";
+import { NetworkError } from "@/lib/errors";
 import { createPOSTHandler } from "@/lib/api/route-handler";
-import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { z } from "zod";
 
 export const runtime = "edge";
 
-interface IngestResponse {
-  success?: boolean;
-  error?: string;
-}
+// interface IngestResponse {
+//   success?: boolean;
+//   error?: string;
+// }
 
 /**
  * Event ingestion schema

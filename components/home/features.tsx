@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { StaggerList, StaggerItem } from "@/components/motion/stagger-list";
 import FadeIn from "@/components/motion/fade-in";
 import { motion } from "framer-motion";
-import { Sparkles, Zap, Shield, DollarSign, Lock, FileText } from "lucide-react";
+import { Sparkles, Zap, DollarSign, Lock, FileText } from "lucide-react";
 
 const features = [
   {

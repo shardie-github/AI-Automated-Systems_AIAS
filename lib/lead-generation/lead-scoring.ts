@@ -120,7 +120,7 @@ class LeadScoringService {
   /**
    * Calculate behavioral score
    */
-  private async calculateBehavioralScore(leadId: string, tenantId?: string): Promise<number> {
+  private async calculateBehavioralScore(leadId: string, _tenantId?: string): Promise<number> {
     let score = 0;
 
     // Get lead activities
@@ -162,7 +162,7 @@ class LeadScoringService {
   /**
    * Calculate engagement score
    */
-  private async calculateEngagementScore(leadId: string, tenantId?: string): Promise<number> {
+  private async calculateEngagementScore(leadId: string, _tenantId?: string): Promise<number> {
     let score = 0;
 
     // Email engagement
@@ -201,7 +201,7 @@ class LeadScoringService {
   /**
    * Calculate fit score
    */
-  private async calculateFitScore(lead: any, tenantId?: string): Promise<number> {
+  private async calculateFitScore(lead: any, _tenantId?: string): Promise<number> {
     let score = 0;
 
     // Source quality
@@ -283,13 +283,13 @@ class LeadScoringService {
    * Get lead data
    */
   private async getLead(leadId: string, tenantId?: string): Promise<any> {
-    let query = this.supabase.from('leads').select('*').eq('id', leadId).single();
+    let query = this.supabase.from('leads').select('*').eq('id', leadId);
 
     if (tenantId) {
       query = query.eq('tenant_id', tenantId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.single();
 
     if (error) throw error;
     return data;
@@ -301,7 +301,7 @@ class LeadScoringService {
   private async updateLeadScore(
     leadId: string,
     score: LeadScore,
-    tenantId?: string
+    _tenantId?: string
   ): Promise<void> {
     await this.supabase
       .from('leads')

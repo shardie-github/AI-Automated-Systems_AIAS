@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// Card components imported but used in PMFDashboard component
 import { PMFDashboard } from "@/components/admin/pmf-dashboard";
 
 export const metadata: Metadata = {

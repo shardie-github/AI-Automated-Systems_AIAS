@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { SystemError, formatError } from "@/lib/errors";
+import { SystemError } from "@/lib/errors";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 import { cacheService } from "@/lib/performance/cache";
 import { createGETHandler } from "@/lib/api/route-handler";
@@ -10,29 +10,29 @@ export const runtime = "nodejs"; // Use Node.js runtime for ioredis compatibilit
 export const dynamic = "force-dynamic";
 export const revalidate = 60; // Cache for 60 seconds
 
-interface MetricsResponse {
-  performance: {
-    webVitals: Record<string, unknown>;
-    supabase: Record<string, unknown>;
-    expo: Record<string, unknown>;
-    ci: Record<string, unknown>;
-  };
-  status: "healthy" | "degraded" | "error";
-  lastUpdated: string;
-  sources: Record<string, {
-    latest: Record<string, unknown>;
-    count: number;
-    lastUpdated: string;
-  }>;
-  trends?: Record<string, {
-    average: number;
-    min: number;
-    max: number;
-    count: number;
-  }>;
-  error?: string;
-  message?: string;
-}
+// interface MetricsResponse {
+//   performance: {
+//     webVitals: Record<string, unknown>;
+//     supabase: Record<string, unknown>;
+//     expo: Record<string, unknown>;
+//     ci: Record<string, unknown>;
+//   };
+//   status: "healthy" | "degraded" | "error";
+//   lastUpdated: string;
+//   sources: Record<string, {
+//     latest: Record<string, unknown>;
+//     count: number;
+//     lastUpdated: string;
+//   }>;
+//   trends?: Record<string, {
+//     average: number;
+//     min: number;
+//     max: number;
+//     count: number;
+//   }>;
+//   error?: string;
+//   message?: string;
+// }
 
 /**
  * Performance Metrics API Endpoint
@@ -41,8 +41,8 @@ interface MetricsResponse {
  * Migrated to use route handler utility for consistent error handling and caching
  */
 export const GET = createGETHandler(
-  async (context) => {
-    const { request } = context;
+  async (_context) => {
+    // const { request } = _context; // Will be used for query params
     const startTime = Date.now();
     
     const supabase = createClient(
@@ -93,7 +93,7 @@ export const GET = createGETHandler(
         error instanceof Error ? error : new Error(String(error)),
         { details: error.message }
       );
-      const formatted = formatError(systemError);
+      // const formatted = formatError(systemError); // Route handler will format
       throw systemError; // Let route handler catch and format
     }
     
@@ -185,13 +185,13 @@ export const GET = createGETHandler(
           };
           break;
         case "supabase":
-          aggregated.performance.supabase = latest;
+          aggregated.performance.supabase = latest?.metric || {};
           break;
         case "expo":
-          aggregated.performance.expo = latest;
+          aggregated.performance.expo = latest?.metric || {};
           break;
         case "ci":
-          aggregated.performance.ci = latest;
+          aggregated.performance.ci = latest?.metric || {};
           break;
       }
     }

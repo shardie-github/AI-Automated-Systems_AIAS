@@ -6,11 +6,9 @@
 import { logger } from '@/lib/logging/structured-logger';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
-import { leadCaptureService } from './lead-capture';
 import { leadScoringService } from './lead-scoring';
 import { leadNurturingService } from './lead-nurturing';
 import { crmIntegrationService } from './crm-integration';
-import { conversionTrackingService } from './conversion-tracking';
 import { emailService } from '@/lib/email/email-service';
 
 export interface AutopilotWorkflow {
@@ -97,7 +95,8 @@ class AutopilotWorkflowService {
     for (const action of actions) {
       // Apply delay if specified
       if (action.delay && action.delay > 0) {
-        await new Promise(resolve => setTimeout(resolve, action.delay * 1000));
+        const delayMs = action.delay * 1000;
+        await new Promise(resolve => setTimeout(resolve, delayMs));
       }
 
       try {
@@ -208,7 +207,7 @@ class AutopilotWorkflowService {
   private async executeAssignToSales(
     config: Record<string, unknown>,
     context: Record<string, unknown>,
-    tenantId?: string
+    _tenantId?: string
   ): Promise<void> {
     const leadId = context.leadId as string;
     const salesTeamId = config.teamId as string || config.userId as string;
@@ -274,7 +273,7 @@ class AutopilotWorkflowService {
    * Execute update score action
    */
   private async executeUpdateScore(
-    config: Record<string, unknown>,
+    _config: Record<string, unknown>,
     context: Record<string, unknown>,
     tenantId?: string
   ): Promise<void> {
@@ -292,7 +291,7 @@ class AutopilotWorkflowService {
    */
   private async executeNotify(
     config: Record<string, unknown>,
-    context: Record<string, unknown>,
+    _context: Record<string, unknown>,
     tenantId?: string
   ): Promise<void> {
     const message = config.message as string;

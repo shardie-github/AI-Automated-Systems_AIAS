@@ -86,7 +86,6 @@ async function validateAuth(): Promise<{ success: boolean; errors: string[] }> {
  * Validate storage service
  */
 async function validateStorage(): Promise<{ success: boolean; errors: string[]; warnings: string[] }> {
-  const errors: string[] = [];
   const warnings: string[] = [];
 
   try {
@@ -109,7 +108,6 @@ async function validateStorage(): Promise<{ success: boolean; errors: string[]; 
  * Initialize observability
  */
 function validateObservability(): { success: boolean; errors: string[]; warnings: string[] } {
-  const errors: string[] = [];
   const warnings: string[] = [];
 
   try {
@@ -193,7 +191,8 @@ export async function validateStartup(): Promise<StartupValidationResult> {
       warnings: result.warnings.length,
     });
   } else {
-    logger.error("Startup validation failed", {
+    const errorObj = new Error("Startup validation failed");
+    logger.error("Startup validation failed", errorObj, {
       checks: result.checks,
       errors: result.errors,
       warnings: result.warnings,

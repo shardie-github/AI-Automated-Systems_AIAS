@@ -74,7 +74,8 @@ export default function SubscriptionPlans() {
         throw new Error("Stripe not loaded");
       }
 
-      await stripe.redirectToCheckout({ sessionId });
+      // Redirect to checkout session URL
+      window.location.href = `/billing/checkout?session_id=${sessionId}`;
     } catch (error: any) {
       console.error("Subscription error:", error);
       alert("Failed to start checkout: " + error.message);

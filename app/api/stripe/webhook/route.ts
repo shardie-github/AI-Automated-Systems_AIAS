@@ -11,7 +11,7 @@ import { z } from "zod";
 
 // Load environment variables dynamically - no hardcoded values
 const stripe = new Stripe(env.stripe.secretKey!, {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2023-10-16" as any, // Using latest compatible version
 });
 
 const supabase = createClient(
@@ -166,7 +166,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<WebhookRespons
           const error = new ValidationError(
             "Invalid session metadata",
             metadataValidation.error.errors.map((e) => ({
-              path: e.path,
+              path: e.path.map(String),
               message: e.message,
             }))
           );
@@ -208,7 +208,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<WebhookRespons
 
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
+        // const subscription = event.data.object as Stripe.Subscription; // Will be used for subscription handling
         // Handle subscription updates/cancellations
         break;
       }

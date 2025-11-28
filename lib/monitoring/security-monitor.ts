@@ -174,14 +174,14 @@ export class SecurityMonitor {
       }
 
       return (data || []).map((row: SecurityEventRow) => ({
-        type: row.type,
-        severity: row.severity,
+        type: row.type as "error" | "unauthorized" | "rate_limit" | "suspicious" | "attack",
+        severity: row.severity as "critical" | "low" | "medium" | "high",
         tenantId: row.tenant_id,
         userId: row.user_id,
-        ipAddress: row.ip_address,
-        endpoint: row.endpoint,
-        method: row.method,
-        userAgent: row.user_agent,
+        ipAddress: row.ip_address || "",
+        endpoint: row.endpoint || "",
+        method: row.method || "",
+        userAgent: row.user_agent || "",
         details: row.details,
         timestamp: new Date(row.timestamp),
       }));

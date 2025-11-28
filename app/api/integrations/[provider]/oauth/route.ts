@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/logging/structured-logger";
 import { createGETHandler } from "@/lib/api/route-handler";
 
@@ -57,7 +57,7 @@ export const GET = createGETHandler(
         message: "Redirect user to this URL to authorize",
       });
     } catch (error) {
-      logger.error("Error initiating OAuth flow", { error, provider });
+      logger.error("Error initiating OAuth flow", error instanceof Error ? error : undefined, { provider });
       return NextResponse.json(
         { error: "Failed to initiate OAuth flow" },
         { status: 500 }

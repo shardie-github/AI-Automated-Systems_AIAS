@@ -27,7 +27,7 @@ export async function upsert<T>(
   
   const { data, error } = await client
     .from(table)
-    .upsert(values, {
+    .upsert(values as any, {
       onConflict,
     })
     .select()
@@ -125,7 +125,7 @@ export async function create<T>(
   
   const { data: result, error } = await client
     .from(table)
-    .insert(data)
+    .insert(data as any)
     .select()
     .single();
   
@@ -149,8 +149,8 @@ export async function update<T>(
   const key = Object.keys(where)[0];
   const value = where[key];
   
-  const { data: result, error } = await client
-    .from(table)
+  const { data: result, error } = await (client
+    .from(table) as any)
     .update(data)
     .eq(key, value)
     .select()

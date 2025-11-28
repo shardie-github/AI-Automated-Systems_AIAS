@@ -17,7 +17,7 @@ const agentSchema = z.object({
   tenant_id: z.string().uuid().optional(),
 });
 
-const agentUpdateSchema = agentSchema.partial();
+// const agentUpdateSchema = agentSchema.partial(); // Will be used for PATCH updates
 
 export const dynamic = "force-dynamic";
 
@@ -66,13 +66,13 @@ export async function GET(request: NextRequest) {
     const { data: agents, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
-      logger.error("Failed to get agents", { error, userId: user.id });
+      logger.error("Failed to get agents", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to retrieve agents");
     }
 
     return NextResponse.json({ agents: agents || [] });
   } catch (error) {
-    logger.error("Error in GET /api/v1/agents", { error });
+    logger.error("Error in GET /api/v1/agents", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve agents");
   }
 }
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      logger.error("Failed to create agent", { error, userId: user.id });
+      logger.error("Failed to create agent", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to create agent");
     }
 
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error("Error in POST /api/v1/agents", { error });
+    logger.error("Error in POST /api/v1/agents", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to create agent");
   }
 }

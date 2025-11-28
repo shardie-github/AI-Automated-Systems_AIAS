@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import { createPOSTHandler, createGETHandler } from '@/lib/api/route-handler';
 import { autopilotWorkflowService } from '@/lib/lead-generation/autopilot-workflows';
+import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 const createWorkflowSchema = z.object({
@@ -24,7 +25,7 @@ export const POST = createPOSTHandler(
     const body = createWorkflowSchema.parse(await context.request.json());
     const tenantId = context.tenantId || undefined;
     
-    const workflowId = await autopilotWorkflowService.createWorkflow(body, tenantId);
+    const workflowId = await autopilotWorkflowService.createWorkflow(body as any, tenantId);
     
     return NextResponse.json({ success: true, workflowId });
   },

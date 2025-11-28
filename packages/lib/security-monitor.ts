@@ -1,5 +1,4 @@
 import { prisma } from './database';
-import { config } from '@ai-consultancy/config';
 
 export interface SecurityEvent {
   id: string;
@@ -387,7 +386,7 @@ export class SecurityMonitor {
     // In a real implementation, this would set a flag in the user's record
   }
 
-  private async sendRealTimeAlert(alertId: string, event: SecurityEvent, rule: ThreatDetectionRule): Promise<void> {
+  private async sendRealTimeAlert(alertId: string, _event: SecurityEvent, _rule: ThreatDetectionRule): Promise<void> {
     // Send real-time alert via WebSocket or similar
     console.log(`Real-time alert sent: ${alertId}`);
   }
@@ -403,7 +402,7 @@ export class SecurityMonitor {
       skip: offset,
     });
 
-    return events.map(event => ({
+    return events.map((event: any) => ({
       id: event.id,
       type: event.event as SecurityEventType,
       severity: event.payload.severity || SecuritySeverity.LOW,

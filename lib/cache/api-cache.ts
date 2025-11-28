@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cacheService, withCache } from './cache-service';
+import { cacheService } from './cache-service';
 import { logger } from '@/lib/logging/structured-logger';
 
 export interface ApiCacheConfig {

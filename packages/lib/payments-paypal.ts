@@ -34,10 +34,10 @@ export class PayPalService {
 
   constructor() {
     this.config = {
-      clientId: config.paypal?.clientId || '',
-      clientSecret: config.paypal?.clientSecret || '',
-      environment: config.paypal?.environment || 'sandbox',
-      webhookId: config.paypal?.webhookId,
+      clientId: (config as any).paypal?.clientId || '',
+      clientSecret: (config as any).paypal?.clientSecret || '',
+      environment: (config as any).paypal?.environment || 'sandbox',
+      webhookId: (config as any).paypal?.webhookId,
     };
     
     this.baseUrl = this.config.environment === 'production' 

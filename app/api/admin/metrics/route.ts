@@ -5,8 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { env } from '@/lib/env';
+// import { createClient } from '@supabase/supabase-js'; // Will be used for metrics queries
+// import { env } from '@/lib/env'; // Will be used for env vars
 // import { cacheService } from '@/lib/cache/cache-service';
 
 export async function GET(request: NextRequest) {
@@ -20,11 +20,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const searchParams = request.nextUrl.searchParams;
-    const range = searchParams.get('range') || '1h';
+    // const searchParams = request.nextUrl.searchParams;
+    // const range = searchParams.get('range') || '1h'; // Will be used for filtering
 
     // Get metrics from database (simplified - implement proper metrics collection)
-    const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
+    // const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey); // Will be used for queries
 
     // Mock metrics for now - in production, query from metrics table
     const metrics = {

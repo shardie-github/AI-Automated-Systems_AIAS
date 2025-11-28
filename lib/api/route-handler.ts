@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { validateInput, sanitizeObject, checkRequestSize, maskSensitiveData } from '../security/api-security';
+import { validateInput, checkRequestSize, maskSensitiveData } from '../security/api-security';
 import { tenantIsolation } from '../security/tenant-isolation';
 // Lazy import cacheService to support Edge runtime
 // Cache is only available in Node.js runtime, not Edge
@@ -32,6 +32,8 @@ export interface RouteHandlerOptions {
     ttl?: number;
     tags?: string[];
   };
+  cacheable?: boolean; // Legacy alias for cache.enabled
+  cacheTTL?: number; // Legacy alias for cache.ttl
 }
 
 export interface RouteContext {
@@ -48,6 +50,15 @@ export function createRouteHandler(
   handler: (context: RouteContext) => Promise<NextResponse>,
   options: RouteHandlerOptions = {}
 ): (request: NextRequest) => Promise<NextResponse> {
+  // Convert legacy cacheable/cacheTTL to cache object
+  const normalizedOptions: RouteHandlerOptions = { ...options };
+  if (options.cacheable !== undefined && !options.cache) {
+    normalizedOptions.cache = {
+      enabled: options.cacheable,
+      ttl: options.cacheTTL,
+    };
+  }
+  
   return async (request: NextRequest): Promise<NextResponse> => {
     const startTime = Date.now();
     
@@ -72,10 +83,10 @@ export function createRouteHandler(
     
     try {
       // Check request size
-      if (options.maxBodySize) {
+      if (normalizedOptions.maxBodySize) {
         const body = await getBodyText();
-        if (!checkRequestSize(body, options.maxBodySize)) {
-          const error = new ValidationError('Request too large', undefined, { maxSize: options.maxBodySize });
+        if (!checkRequestSize(body, normalizedOptions.maxBodySize)) {
+          const error = new ValidationError('Request too large', undefined, { maxSize: normalizedOptions.maxBodySize });
           const formatted = formatError(error);
           return NextResponse.json(
             { error: formatted.message },
@@ -86,14 +97,14 @@ export function createRouteHandler(
       
       // Get user ID from request
       let userId: string | null = null;
-      if (options.requireAuth || options.requireTenant) {
+      if (normalizedOptions.requireAuth || normalizedOptions.requireTenant) {
         const authHeader = request.headers.get('authorization');
         if (authHeader?.startsWith('Bearer ')) {
           // Extract user ID from token (simplified - should verify JWT)
           userId = request.headers.get('x-user-id') || null;
         }
         
-        if (options.requireAuth && !userId) {
+        if (normalizedOptions.requireAuth && !userId) {
           const error = new AuthenticationError('Authentication required');
           const formatted = formatError(error);
           return NextResponse.json(
@@ -105,7 +116,7 @@ export function createRouteHandler(
       
       // Get tenant ID
       let tenantId: string | null = null;
-      if (options.requireTenant) {
+      if (normalizedOptions.requireTenant) {
         tenantId = request.headers.get('x-tenant-id') || null;
         
         if (!tenantId) {
@@ -122,7 +133,7 @@ export function createRouteHandler(
           const access = await tenantIsolation.validateAccess(
             tenantId,
             userId,
-            options.requiredPermission
+            normalizedOptions.requiredPermission
           );
           
           if (!access.allowed) {
@@ -137,15 +148,15 @@ export function createRouteHandler(
       }
       
       // Validate request body
-      if (options.validateBody) {
+      if (normalizedOptions.validateBody) {
         try {
           const body = await getBodyJson();
-          const validation = validateInput(options.validateBody, body);
+          const validation = validateInput(normalizedOptions.validateBody, body);
           
           if (!validation.success) {
             const error = new ValidationError(
               'Invalid request body',
-              validation.error?.map(e => ({ path: e.path, message: e.message }))
+              Array.isArray(validation.error) ? validation.error.map((e: any) => ({ path: e.path, message: e.message })) : []
             );
             const formatted = formatError(error);
             return NextResponse.json(
@@ -168,16 +179,16 @@ export function createRouteHandler(
       }
       
       // Check cache
-      if (options.cache?.enabled) {
+      if (normalizedOptions.cache?.enabled) {
         const bodyText = await getBodyText();
         const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
         const cache = getCacheService();
         if (cache) {
-          const cached = await cache.get(cacheKey, {
-            ttl: options.cache.ttl,
-            tenantId: tenantId || undefined,
-            tags: options.cache.tags,
-          });
+          const cached = await (cache as any).get(cacheKey, {
+          ttl: normalizedOptions.cache.ttl,
+          tenantId: tenantId || undefined,
+          tags: normalizedOptions.cache.tags,
+        });
           
           if (cached) {
             const response = NextResponse.json(cached);
@@ -205,17 +216,17 @@ export function createRouteHandler(
       response.headers.set('X-Response-Time', `${Date.now() - startTime}ms`);
       
       // Cache response if enabled
-      if (options.cache?.enabled && response.status === 200) {
+      if (normalizedOptions.cache?.enabled && response.status === 200) {
         try {
           const body = await response.clone().json();
           const bodyText = await getBodyText();
           const cacheKey = `api:${request.nextUrl.pathname}:${bodyText}`;
           const cache = getCacheService();
           if (cache) {
-            await cache.set(cacheKey, body, {
-              ttl: options.cache.ttl,
+            await (cache as any).set(cacheKey, body, {
+              ttl: normalizedOptions.cache.ttl,
               tenantId: tenantId || undefined,
-              tags: options.cache.tags,
+              tags: normalizedOptions.cache.tags,
             });
           }
           response.headers.set('X-Cache', 'MISS');
@@ -293,4 +304,20 @@ export function createPOSTHandler(
     ...options,
     cache: { enabled: false }, // Don't cache POST requests
   });
+}
+
+/**
+ * Handle API errors consistently
+ * Helper function for error handling in API routes
+ */
+export function handleApiError(error: unknown, message: string): NextResponse {
+  const systemError = new SystemError(
+    message,
+    error instanceof Error ? error : new Error(String(error))
+  );
+  const formatted = formatError(systemError);
+  return NextResponse.json(
+    { error: formatted.message },
+    { status: formatted.statusCode }
+  );
 }

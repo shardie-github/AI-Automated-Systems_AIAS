@@ -68,13 +68,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (error) {
-      logger.error("Failed to get user settings", { error, userId: user.id });
+      logger.error("Failed to get user settings", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to retrieve settings");
     }
 
     return NextResponse.json({ settings });
   } catch (error) {
-    logger.error("Error in GET /api/settings", { error });
+    logger.error("Error in GET /api/settings", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve settings");
   }
 }
@@ -135,7 +135,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      logger.error("Failed to update user settings", { error, userId: user.id });
+      logger.error("Failed to update user settings", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to update settings");
     }
 
@@ -149,7 +149,7 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error("Error in PUT /api/settings", { error });
+    logger.error("Error in PUT /api/settings", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to update settings");
   }
 }

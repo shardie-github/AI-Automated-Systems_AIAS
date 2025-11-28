@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
-import { uploadFileSecure, validateFileSize, validateFileType, sanitizeFilename } from '@/lib/security/file-upload';
+import { uploadFileSecure } from '@/lib/security/file-upload';
 import { logger } from '@/lib/logging/structured-logger';
 
 /**

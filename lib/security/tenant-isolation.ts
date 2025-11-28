@@ -60,7 +60,9 @@ export class TenantIsolationService {
         return null;
       }
       
-      const permissions = data.tenants?.subscription_plans?.permissions || [];
+      const tenant = Array.isArray(data.tenants) ? data.tenants[0] : null;
+      const subscriptionPlan = Array.isArray(tenant?.subscription_plans) ? tenant.subscription_plans[0] : tenant?.subscription_plans;
+      const permissions = subscriptionPlan?.permissions || [];
       
       return {
         tenantId: data.tenant_id,
@@ -113,7 +115,8 @@ export class TenantIsolationService {
         return null;
       }
       
-      const limits = data.subscription_plans?.limits || {};
+      const subscriptionPlan = Array.isArray(data.subscription_plans) ? data.subscription_plans[0] : data.subscription_plans;
+      const limits = subscriptionPlan?.limits || {};
       
       return {
         workflows: limits.workflows || 0,

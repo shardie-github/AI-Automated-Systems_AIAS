@@ -23,7 +23,7 @@ const feedbackSchema = z.object({
   comment: z.string().max(1000).optional(),
 });
 
-export const POST = createValidatedRoute(feedbackSchema, async (data, req: NextRequest): Promise<NextResponse<FeedbackResponse>> => {
+export const POST = createValidatedRoute(feedbackSchema, async (data, _req: NextRequest): Promise<NextResponse<FeedbackResponse>> => {
   try {
     // Load environment variables dynamically
     const { env } = await import("@/lib/env");
@@ -78,9 +78,10 @@ export const POST = createValidatedRoute(feedbackSchema, async (data, req: NextR
     );
 
     if (error) {
+      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
       const systemError = new SystemError(
         "Failed to submit feedback",
-        error instanceof Error ? error : new Error(String(error)),
+        errorObj,
         { userId, rating }
       );
       recordError(systemError, { endpoint: '/api/feedback', userId, rating });

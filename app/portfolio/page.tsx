@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ExternalLink, Code, Zap, BarChart, ShoppingCart, ArrowRight } from "lucide-react";
+import { BarChart, ShoppingCart, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Portfolio — Custom AI Platforms We've Built | AIAS Consultancy",

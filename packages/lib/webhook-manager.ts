@@ -160,7 +160,7 @@ export class WebhookManager {
         await this.handleSlackEvent(slackEvent.event);
       } else if (slackEvent.type === 'url_verification') {
         // Handle Slack URL verification
-        return { challenge: slackEvent.challenge };
+        return { challenge: slackEvent.challenge } as any;
       }
     } catch (error) {
       console.error('Slack webhook processing failed:', error);
@@ -292,7 +292,7 @@ export class WebhookManager {
       skip: offset,
     });
 
-    return events.map(event => ({
+    return events.map((event: any) => ({
       id: event.id,
       source: event.source,
       event: event.event,

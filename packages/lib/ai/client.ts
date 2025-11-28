@@ -1,6 +1,5 @@
 import { createAIProvider, createFallbackAIProvider } from './providers';
 import { ChatRequest, AuditRequest, EstimateRequest, ContentGenerationRequest, WorkflowGenerationRequest } from './types';
-import { config } from '@ai-consultancy/config';
 
 export class AIClient {
   private primaryProvider: any;

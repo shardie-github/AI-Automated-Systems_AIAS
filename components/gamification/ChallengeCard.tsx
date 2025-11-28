@@ -19,7 +19,7 @@ interface Challenge {
 export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
   const [participating, setParticipating] = useState(false);
   const [completed, setCompleted] = useState(false);
-  const [progress, setProgress] = useState<any>({});
+  const [_progress, setProgress] = useState<any>({});
   const [completedCelebration, setCompletedCelebration] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     await supabase.from("challenge_participants").insert({
       challenge_id: challenge.id,
       user_id: user.id,
-      progress: {}
+        progress: _progress
     });
     setParticipating(true);
   }

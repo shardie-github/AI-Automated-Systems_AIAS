@@ -178,7 +178,7 @@ export const telemetry = typeof window !== 'undefined' ? new EnhancedTelemetry()
   trackSecurityEvent: () => {},
   getEngagement: () => undefined,
   getPerformanceMetrics: () => [],
-} as EnhancedTelemetry;
+} as unknown as EnhancedTelemetry;
 
 export function useTelemetry() {
   return {

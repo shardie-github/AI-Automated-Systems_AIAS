@@ -41,7 +41,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    logger.error("Error in GET /api/flags/trust", { error });
+    logger.error("Error in GET /api/flags/trust", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "Failed to retrieve trust flags" },
       { status: 500 }

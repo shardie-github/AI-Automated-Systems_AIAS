@@ -72,7 +72,7 @@ export async function GET() {
 
     return NextResponse.json(status, { status: statusCode });
   } catch (error) {
-    logger.error("Error in GET /api/status", { error });
+    logger.error("Error in GET /api/status", error instanceof Error ? error : undefined);
     return NextResponse.json(
       {
         status: "error",

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { env } from "@/lib/env";
@@ -32,7 +32,7 @@ export const POST = createPOSTHandler(
     });
 
     if (authError || !authData.user) {
-      logger.error("Login failed", { error: authError, email: validatedData.email });
+      logger.error("Login failed", authError || undefined, { email: validatedData.email });
       return NextResponse.json(
         { error: authError?.message || "Invalid credentials" },
         { status: 401 }

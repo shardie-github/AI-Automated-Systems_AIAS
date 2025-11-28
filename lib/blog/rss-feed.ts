@@ -95,7 +95,7 @@ export function analyzeRSSItemWithSystemsThinking(item: RSSFeedItem): {
   ];
 
   const aiKeywords = ["AI", "artificial intelligence", "automation", "machine learning"];
-  const productivityKeywords = ["productivity", "efficiency", "optimization", "workflow"];
+  // const productivityKeywords = ["productivity", "efficiency", "optimization", "workflow"]; // Will be used for categorization
 
   const title = (item.title || "").toLowerCase();
   const description = (item.description || "").toLowerCase();

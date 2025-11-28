@@ -340,7 +340,7 @@ export async function validateSchemaAfterMigrations(): Promise<boolean> {
     ];
 
     for (const table of criticalTables) {
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from(table)
         .select('*')
         .limit(1);

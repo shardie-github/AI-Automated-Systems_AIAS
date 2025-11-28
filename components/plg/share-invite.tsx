@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Copy, Mail, Share2 } from "lucide-react";
+import { Copy, Share2 } from "lucide-react";
 import { track } from "@/lib/telemetry/track";
 
 interface ShareInviteProps {
@@ -93,7 +93,7 @@ export function ShareInvite({ userId, referralCode }: ShareInviteProps) {
           <Button onClick={handleCopy} variant="outline" size="icon">
             <Copy className="h-4 w-4" />
           </Button>
-          {navigator.share && (
+          {typeof navigator !== "undefined" && "share" in navigator && (
             <Button onClick={handleShare} variant="outline" size="icon">
               <Share2 className="h-4 w-4" />
             </Button>

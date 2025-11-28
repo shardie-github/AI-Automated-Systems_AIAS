@@ -77,4 +77,5 @@ export const performanceMonitor = typeof window !== 'undefined' ? new Performanc
   getStats: () => null,
   getAllMetrics: () => new Map(),
   clear: () => {},
-} as PerformanceMonitor;
+  metrics: new Map(),
+} as unknown as PerformanceMonitor;
