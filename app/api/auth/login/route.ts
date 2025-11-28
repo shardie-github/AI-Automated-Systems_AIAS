@@ -32,7 +32,7 @@ export const POST = createPOSTHandler(
     });
 
     if (authError || !authData.user) {
-      logger.error("Login failed", { error: authError, email: validatedData.email });
+      logger.error("Login failed", authError || undefined, { email: validatedData.email });
       return NextResponse.json(
         { error: authError?.message || "Invalid credentials" },
         { status: 401 }

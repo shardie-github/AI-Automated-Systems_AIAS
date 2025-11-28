@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import { createPOSTHandler, createGETHandler } from '@/lib/api/route-handler';
 import { autopilotWorkflowService } from '@/lib/lead-generation/autopilot-workflows';
+import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 const createWorkflowSchema = z.object({

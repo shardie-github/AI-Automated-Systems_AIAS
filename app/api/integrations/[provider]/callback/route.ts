@@ -80,7 +80,7 @@ export const GET = createGETHandler(
         .single();
 
       if (dbError) {
-        logger.error("Failed to store integration", { error: dbError, userId, provider });
+        logger.error("Failed to store integration", dbError instanceof Error ? dbError : new Error(String(dbError)), { userId, provider });
         return NextResponse.json(
           { error: "Failed to connect integration" },
           { status: 500 }

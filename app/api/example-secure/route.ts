@@ -3,6 +3,7 @@
  * Demonstrates enterprise security and performance features
  */
 
+import { NextResponse } from 'next/server';
 import { createGETHandler, createPOSTHandler } from '@/lib/api/route-handler';
 import { tenantIsolation } from '@/lib/security/tenant-isolation';
 import { queryOptimizer } from '@/lib/performance/query-optimizer';

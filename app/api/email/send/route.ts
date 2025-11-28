@@ -3,6 +3,7 @@
  * Send emails using templates
  */
 
+import { NextResponse } from 'next/server';
 import { createPOSTHandler } from '@/lib/api/route-handler';
 import { emailService } from '@/lib/email/email-service';
 import { z } from 'zod';
@@ -30,7 +31,7 @@ export const POST = createPOSTHandler(async (context) => {
   const result = await emailService.sendTemplate(templateId, to, variables || {}, options);
 
   if (!result.success) {
-    return Response.json(
+    return NextResponse.json(
       {
         success: false,
         error: result.error || 'Failed to send email',
@@ -39,7 +40,7 @@ export const POST = createPOSTHandler(async (context) => {
     );
   }
 
-  return Response.json({
+  return NextResponse.json({
     success: true,
     messageId: result.messageId,
   });

@@ -294,3 +294,19 @@ export function createPOSTHandler(
     cache: { enabled: false }, // Don't cache POST requests
   });
 }
+
+/**
+ * Handle API errors consistently
+ * Helper function for error handling in API routes
+ */
+export function handleApiError(error: unknown, message: string): NextResponse {
+  const systemError = new SystemError(
+    message,
+    error instanceof Error ? error : new Error(String(error))
+  );
+  const formatted = formatError(systemError);
+  return NextResponse.json(
+    { error: formatted.message },
+    { status: formatted.statusCode }
+  );
+}

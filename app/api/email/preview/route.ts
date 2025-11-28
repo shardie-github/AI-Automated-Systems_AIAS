@@ -3,6 +3,7 @@
  * Preview email templates with variables
  */
 
+import { NextResponse } from 'next/server';
 import { createPOSTHandler } from '@/lib/api/route-handler';
 import { getTemplateById, replaceTemplateVariables } from '@/lib/email-templates';
 import { z } from 'zod';
@@ -18,14 +19,14 @@ export const POST = createPOSTHandler(async (context) => {
 
   const template = getTemplateById(templateId);
   if (!template) {
-    return Response.json({ error: 'Template not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Template not found' }, { status: 404 });
   }
 
   const subject = replaceTemplateVariables(template.subject, variables);
   const html = replaceTemplateVariables(template.body, variables);
   const text = template.textBody ? replaceTemplateVariables(template.textBody, variables) : undefined;
 
-  return Response.json({
+  return NextResponse.json({
     template: {
       id: template.id,
       name: template.name,

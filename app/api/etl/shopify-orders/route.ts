@@ -205,7 +205,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       tags: { status: "error" },
     });
 
-    logger.error("Shopify Orders ETL failed", { error: systemError.message, duration });
+    logger.error("Shopify Orders ETL failed", systemError, { duration });
 
     const formatted = formatError(systemError);
     return NextResponse.json(
