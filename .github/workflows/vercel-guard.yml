@@ -3,13 +3,16 @@ name: Vercel Guard
 on:
   pull_request:
     branches: [main]
-  push:
-    branches: [main]
+  # Skip test builds on main merges - only run on PRs
+  # push:
+  #   branches: [main]
 
 jobs:
   guard:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Only run on pull requests, skip on main branch merges
+    if: github.event_name == 'pull_request'
     
     steps:
       - name: Checkout code

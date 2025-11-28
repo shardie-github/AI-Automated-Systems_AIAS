@@ -3,8 +3,9 @@ name: Vercel Build Check
 on:
   pull_request:
     branches: [main, develop]
-  push:
-    branches: [main, develop]
+  # Skip test builds on main merges - only run on PRs
+  # push:
+  #   branches: [main, develop]
 
 env:
   NODE_VERSION: '20'
@@ -15,6 +16,8 @@ jobs:
     name: Vercel Build Validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Only run on pull requests, skip on main branch merges
+    if: github.event_name == 'pull_request'
     
     steps:
       - name: Checkout code
