@@ -79,9 +79,9 @@ describe('API Security Utilities', () => {
       const data = { name: 'Test', age: 25 };
       const result = validateRequestBody(schema, data);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toEqual(data);
+      expect((result as any).success).toBe(true);
+      if ((result as any).success) {
+        expect((result as any).data).toEqual(data);
       }
     });
 
@@ -93,7 +93,7 @@ describe('API Security Utilities', () => {
       const data = { email: 'invalid-email' };
       const result = validateRequestBody(schema, data);
 
-      expect(result.success).toBe(false);
+      expect((result as any).success).toBe(false);
     });
   });
 });

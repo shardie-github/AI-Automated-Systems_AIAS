@@ -44,8 +44,8 @@ pnpm install --frozen-lockfile --prefer-offline || {
 echo "🔨 Generating Prisma client..."
 pnpm run db:generate || echo "⚠️ Prisma generation skipped (DATABASE_URL may not be available)"
 
-# Build the application
-echo "🏗️ Building application..."
+# Build the application using Turborepo
+echo "🏗️ Building application with Turborepo..."
 pnpm run build
 
 # Validate build output

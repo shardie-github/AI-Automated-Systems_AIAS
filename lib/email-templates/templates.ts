@@ -810,7 +810,7 @@ AIAS Platform • Built in Canada 🇨🇦 • aias-platform.com
   {
     id: 'onboarding-welcome',
     name: 'Onboarding Welcome',
-    subject: 'Welcome to AIAS Platform — Let's Get You Started',
+    subject: 'Welcome to AIAS Platform — Let\'s Get You Started',
     stage: 'onboarding',
     category: 'onboarding',
     variables: ['firstName', 'planName'],
@@ -1145,7 +1145,7 @@ AIAS Platform • Built in Canada 🇨🇦 • aias-platform.com
   {
     id: 'win-back-inactive',
     name: 'Win-Back: Inactive User',
-    subject: 'We Miss You — Here's What's New at AIAS',
+    subject: 'We Miss You — Here\'s What\'s New at AIAS',
     stage: 'reengagement',
     category: 'win-back',
     variables: ['firstName'],

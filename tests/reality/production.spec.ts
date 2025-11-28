@@ -42,7 +42,7 @@ test.describe('Contract Tests - Webhooks', () => {
   test('Stripe webhook signature validation', async ({ request }) => {
     // Test webhook signature validation
     const payload = JSON.stringify({ type: 'test' });
-    const response = await request.post('/api/webhooks/stripe', {
+    await request.post('/api/webhooks/stripe', {
       data: payload,
       headers: {
         'stripe-signature': 'test-signature',

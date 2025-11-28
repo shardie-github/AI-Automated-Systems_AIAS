@@ -507,11 +507,30 @@ export const createReferralLink = (partnerId: string, campaign?: string): string
               process.env.NEXTAUTH_URL || 
               process.env.VITE_APP_URL || 
               'https://aias-consultancy.com';
-  } else if (typeof import !== 'undefined' && import.meta && import.meta.env) {
-    baseUrl = import.meta.env.VITE_APP_URL || 
-              import.meta.env.NEXT_PUBLIC_SITE_URL || 
-              'https://aias-consultancy.com';
   } else {
+    // Try Vite environment variables using eval to avoid TypeScript parsing issues
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-eval
+      const hasImportMeta = typeof eval !== 'undefined' && typeof eval('typeof import') !== 'undefined';
+      if (hasImportMeta) {
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-eval
+        const importMeta = eval('import.meta');
+        if (importMeta && importMeta.env) {
+          baseUrl = importMeta.env.VITE_APP_URL || 
+                    importMeta.env.NEXT_PUBLIC_SITE_URL || 
+                    'https://aias-consultancy.com';
+        } else {
+          baseUrl = 'https://aias-consultancy.com';
+        }
+      } else {
+        baseUrl = 'https://aias-consultancy.com';
+      }
+    } catch {
+      baseUrl = 'https://aias-consultancy.com';
+    }
+  }
+  
+  if (!baseUrl) {
     baseUrl = 'https://aias-consultancy.com';
   }
   

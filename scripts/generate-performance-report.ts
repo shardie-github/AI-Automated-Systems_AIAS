@@ -203,8 +203,7 @@ ${regressions.length === 0
 ${r.recommendations.map((rec) => `- ${rec}`).join("\n")}
 `
         )
-        .join("\n")
-}
+        .join("\n")}
 
 ---
 
