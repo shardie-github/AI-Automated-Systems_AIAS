@@ -151,7 +151,7 @@ export class AnalyticsService {
     }
   }
 
-  private async getRevenueMetrics(startDate: Date, endDate: Date) {
+  private async getRevenueMetrics(startDate: Date, endDate: Date): Promise<{ mrr: number; arr: number; total: number; growth: number }> {
     const { data: subscriptions } = await this.supabase
       .from('subscriptions')
       .select('amount, status, created_at')
@@ -165,9 +165,9 @@ export class AnalyticsService {
       .gte('created_at', startDate.toISOString())
       .lte('created_at', endDate.toISOString());
 
-    const activeSubscriptions = subscriptions?.filter(s => s.status === 'active') || [];
-    const mrr = activeSubscriptions.reduce((sum, s) => sum + s.amount, 0);
-    const total = mrr + (oneTimePayments?.reduce((sum, p) => sum + p.amount, 0) || 0);
+    const activeSubscriptions = subscriptions?.filter((s: any) => s.status === 'active') || [];
+    const mrr = activeSubscriptions.reduce((sum: number, s: any) => sum + s.amount, 0);
+    const total = mrr + (oneTimePayments?.reduce((sum: number, p: any) => sum + p.amount, 0) || 0);
 
     // Calculate growth (simplified)
     const previousPeriod = await this.getRevenueMetrics(

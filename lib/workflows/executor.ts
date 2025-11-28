@@ -40,7 +40,7 @@ export interface WorkflowAction {
 export async function executeWorkflow(
   workflowId: string,
   userId: string,
-  trigger?: WorkflowTrigger
+  _trigger?: WorkflowTrigger
 ): Promise<WorkflowExecution> {
   const executionId = `exec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   const execution: WorkflowExecution = {
@@ -91,10 +91,10 @@ export async function executeWorkflow(
         const stepResult = await executeStep(step, userId, results);
         results[step.id] = stepResult;
       } catch (stepError) {
-        logger.error("Workflow step failed", {
+        const errorObj: Error = (stepError as any) instanceof Error ? (stepError as Error) : new Error(String(stepError));
+        logger.error("Workflow step failed", errorObj, {
           workflowId,
           stepId: step.id,
-          error: stepError,
           userId,
         });
 
@@ -144,10 +144,10 @@ export async function executeWorkflow(
     execution.completedAt = new Date();
     execution.error = error instanceof Error ? error.message : String(error);
 
-    logger.error("Workflow execution failed", {
+    const errorObj: Error = error instanceof Error ? error : new Error(String(error));
+    logger.error("Workflow execution failed", errorObj, {
       workflowId,
       executionId,
-      error,
       userId,
     });
 
@@ -195,10 +195,10 @@ async function executeStep(
       return { triggered: true };
 
     case "action":
-      return await executeAction(integration || "", processedConfig, userId);
+      return await executeAction(integration || "", processedConfig as Record<string, unknown>, userId);
 
     case "condition":
-      return await evaluateCondition(processedConfig, previousResults);
+      return await evaluateCondition(processedConfig as Record<string, unknown>, previousResults);
 
     default:
       throw new Error(`Unknown step type: ${type}`);
@@ -246,7 +246,7 @@ async function executeAction(
  */
 async function executeShopifyAction(
   config: Record<string, unknown>,
-  integrationData: Record<string, unknown>
+  _integrationData: Record<string, unknown>
 ): Promise<unknown> {
   const action = config.action as string;
 
@@ -270,7 +270,7 @@ async function executeShopifyAction(
  */
 async function executeWaveAction(
   config: Record<string, unknown>,
-  integrationData: Record<string, unknown>
+  _integrationData: Record<string, unknown>
 ): Promise<unknown> {
   const action = config.action as string;
 
@@ -289,7 +289,7 @@ async function executeWaveAction(
  */
 async function executeSlackAction(
   config: Record<string, unknown>,
-  integrationData: Record<string, unknown>
+  _integrationData: Record<string, unknown>
 ): Promise<unknown> {
   const action = config.action as string;
 
@@ -308,7 +308,7 @@ async function executeSlackAction(
  */
 async function executeGmailAction(
   config: Record<string, unknown>,
-  integrationData: Record<string, unknown>
+  _integrationData: Record<string, unknown>
 ): Promise<unknown> {
   const action = config.action as string;
 
@@ -399,7 +399,8 @@ async function storeExecution(execution: WorkflowExecution): Promise<void> {
       results: execution.results,
     });
   } catch (error) {
-    logger.error("Failed to store workflow execution", { error, executionId: execution.id });
+    const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+    logger.error("Failed to store workflow execution", errorObj, { executionId: execution.id });
   }
 }
 

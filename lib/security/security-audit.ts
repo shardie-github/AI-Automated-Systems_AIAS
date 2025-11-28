@@ -157,7 +157,7 @@ function generateSecurityRecommendations(issues: SecurityIssue[]): SecurityRecom
 
   if (issues.some(i => i.category === 'auth')) {
     recommendations.push({
-      priority: 'critical',
+      priority: 'high',
       category: 'auth',
       description: 'Implement rate limiting and CSRF protection',
       implementation: 'Add rate limiting middleware and CSRF tokens',
