@@ -28,9 +28,6 @@
     "silent": false
   },
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web/ && git diff --quiet HEAD^ HEAD -- vercel.json vercel-build.sh .vercelignore pnpm-lock.yaml",
-  "preview": {
-    "automaticDeployment": true
-  },
   "headers": [
     {
       "source": "/(.*)",
