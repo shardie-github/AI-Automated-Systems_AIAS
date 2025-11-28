@@ -67,7 +67,12 @@ jobs:
       - name: Build application
         run: |
           set -euo pipefail
-          pnpm run build
+          echo "🔨 Building application..."
+          if ! pnpm run build; then
+            echo "❌ Build failed"
+            exit 1
+          fi
+          echo "✅ Build completed successfully"
         env:
           # Make DATABASE_URL optional for build
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
@@ -78,7 +83,11 @@ jobs:
         run: |
           set -euo pipefail
           echo "🔍 Validating build output..."
-          pnpm run validate:build
+          if ! pnpm run validate:build; then
+            echo "❌ Build validation failed"
+            exit 1
+          fi
+          echo "✅ Build validation passed"
         continue-on-error: false
 
       - name: Upload build artifacts
@@ -104,6 +113,7 @@ jobs:
           echo "🔍 Validating required secrets..."
           MISSING_SECRETS=()
           
+          # Required Vercel secrets
           if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
             MISSING_SECRETS+=("VERCEL_TOKEN")
           fi
@@ -118,11 +128,33 @@ jobs:
           
           if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
             echo "❌ Missing required secrets: ${MISSING_SECRETS[*]}"
+            echo ""
             echo "Please add these secrets in GitHub → Settings → Secrets → Actions"
+            echo ""
+            echo "Required secrets for Vercel deployment:"
+            echo "  - VERCEL_TOKEN: Vercel API token"
+            echo "  - VERCEL_ORG_ID: Vercel organization ID"
+            echo "  - VERCEL_PROJECT_ID: Vercel project ID"
+            echo ""
+            echo "Optional but recommended:"
+            echo "  - DATABASE_URL: Database connection string (for Prisma)"
+            echo "  - NEXT_PUBLIC_SUPABASE_URL: Supabase project URL"
+            echo "  - NEXT_PUBLIC_SUPABASE_ANON_KEY: Supabase anonymous key"
             exit 1
           fi
           
           echo "✅ All required secrets are present"
+          
+          # Check optional secrets and warn if missing
+          OPTIONAL_MISSING=()
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            OPTIONAL_MISSING+=("DATABASE_URL")
+          fi
+          
+          if [ ${#OPTIONAL_MISSING[@]} -gt 0 ]; then
+            echo "⚠️  Optional secrets not set (build may have limited functionality):"
+            printf '  - %s\n' "${OPTIONAL_MISSING[@]}"
+          fi
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -175,14 +207,21 @@ jobs:
         run: |
           set -euo pipefail
           echo "🔨 Building for Vercel..."
-          npx vercel@latest build --token="${{ secrets.VERCEL_TOKEN }}"
+          
+          # Run Vercel build
+          if ! npx vercel@latest build --token="${{ secrets.VERCEL_TOKEN }}"; then
+            echo "❌ Vercel build failed"
+            exit 1
+          fi
           
           # Validate build output after Vercel build
           echo "🔍 Validating Vercel build output..."
-          pnpm run validate:build || {
+          if ! pnpm run validate:build; then
             echo "❌ Build validation failed"
             exit 1
-          }
+          fi
+          
+          echo "✅ Vercel build and validation successful"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -195,7 +234,13 @@ jobs:
         run: |
           set -euo pipefail
           echo "🚀 Deploying to Vercel Preview..."
-          DEPLOYMENT_OUTPUT=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=false 2>&1)
+          
+          if ! DEPLOYMENT_OUTPUT=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=false 2>&1); then
+            echo "❌ Vercel deployment failed"
+            echo "$DEPLOYMENT_OUTPUT"
+            exit 1
+          fi
+          
           echo "$DEPLOYMENT_OUTPUT"
           
           DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | grep -oP 'https://[^\s]+\.vercel\.app' | head -1 || echo "")
@@ -236,7 +281,13 @@ jobs:
         run: |
           set -euo pipefail
           echo "🚀 Deploying to Vercel Production..."
-          DEPLOYMENT_OUTPUT=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=true 2>&1)
+          
+          if ! DEPLOYMENT_OUTPUT=$(npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=true 2>&1); then
+            echo "❌ Vercel production deployment failed"
+            echo "$DEPLOYMENT_OUTPUT"
+            exit 1
+          fi
+          
           echo "$DEPLOYMENT_OUTPUT"
           
           DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | grep -oP 'https://[^\s]+\.vercel\.app' | head -1 || echo "")

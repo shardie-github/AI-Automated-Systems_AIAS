@@ -142,12 +142,29 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build application
-        run: pnpm run build
+        run: |
+          set -euo pipefail
+          echo "🔨 Building application..."
+          if ! pnpm run build; then
+            echo "❌ Build failed"
+            exit 1
+          fi
+          echo "✅ Build completed successfully"
         env:
           # Make DATABASE_URL optional for build
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
           # Skip Prisma generation if DB not available
           SKIP_PRISMA_GENERATE: ${{ !secrets.DATABASE_URL }}
+
+      - name: Validate build output
+        run: |
+          set -euo pipefail
+          echo "🔍 Validating build output..."
+          if ! pnpm run validate:build; then
+            echo "❌ Build validation failed"
+            exit 1
+          fi
+          echo "✅ Build validation passed"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
