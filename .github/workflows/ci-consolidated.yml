@@ -127,10 +127,25 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
+      - run: |
+          set -euo pipefail
+          echo "🔨 Building application..."
+          if ! pnpm run build; then
+            echo "❌ Build failed"
+            exit 1
+          fi
+          echo "✅ Build completed successfully"
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
           SKIP_PRISMA_GENERATE: ${{ !secrets.DATABASE_URL }}
+      - run: |
+          set -euo pipefail
+          echo "🔍 Validating build output..."
+          if ! pnpm run validate:build; then
+            echo "❌ Build validation failed"
+            exit 1
+          fi
+          echo "✅ Build validation passed"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -205,27 +220,58 @@ jobs:
           path: .next/
       - name: Pull Vercel environment
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            npx vercel@latest pull --yes --environment=preview --token="${{ secrets.VERCEL_TOKEN }}"
+            if ! npx vercel@latest pull --yes --environment=preview --token="${{ secrets.VERCEL_TOKEN }}"; then
+              echo "❌ Failed to pull Vercel preview environment"
+              exit 1
+            fi
           else
-            npx vercel@latest pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+            if ! npx vercel@latest pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"; then
+              echo "❌ Failed to pull Vercel production environment"
+              exit 1
+            fi
           fi
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       - name: Build for Vercel
-        run: npx vercel@latest build --token="${{ secrets.VERCEL_TOKEN }}"
+        run: |
+          set -euo pipefail
+          echo "🔨 Building for Vercel..."
+          if ! npx vercel@latest build --token="${{ secrets.VERCEL_TOKEN }}"; then
+            echo "❌ Vercel build failed"
+            exit 1
+          fi
+          echo "✅ Vercel build successful"
+          
+          # Validate build output
+          echo "🔍 Validating Vercel build output..."
+          if ! pnpm run validate:build; then
+            echo "❌ Build validation failed"
+            exit 1
+          fi
+          echo "✅ Build validation passed"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       - name: Deploy to Vercel
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=false
+            if ! npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=false; then
+              echo "❌ Preview deployment failed"
+              exit 1
+            fi
+            echo "✅ Preview deployment successful"
           else
-            npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=true
+            if ! npx vercel@latest deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}" --prod=true; then
+              echo "❌ Production deployment failed"
+              exit 1
+            fi
+            echo "✅ Production deployment successful"
           fi
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

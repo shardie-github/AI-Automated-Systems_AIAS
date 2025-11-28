@@ -46,12 +46,16 @@ pnpm run db:generate || echo "⚠️ Prisma generation skipped (DATABASE_URL may
 
 # Build the application using Turborepo
 echo "🏗️ Building application with Turborepo..."
-pnpm run build
+if ! pnpm run build; then
+  echo "❌ Build failed"
+  exit 1
+fi
 
 # Validate build output
 echo "🔍 Validating build output..."
-pnpm run validate:build || {
-  echo "⚠️ Build validation failed, but continuing..."
-}
+if ! pnpm run validate:build; then
+  echo "❌ Build validation failed"
+  exit 1
+fi
 
 echo "✅ Build completed successfully!"

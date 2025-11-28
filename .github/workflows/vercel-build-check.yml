@@ -1,0 +1,199 @@
+name: Vercel Build Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  vercel-build-validation:
+    name: Vercel Build Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          export ENABLE_EXPERIMENTAL_COREPACK=1
+          corepack enable || true
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate || true
+          pnpm install --frozen-lockfile
+
+      - name: Validate vercel.json
+        run: |
+          set -euo pipefail
+          echo "🔍 Validating vercel.json..."
+          if [ ! -f vercel.json ]; then
+            echo "❌ vercel.json not found"
+            exit 1
+          fi
+          
+          # Check if vercel.json is valid JSON
+          if ! node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"; then
+            echo "❌ vercel.json is not valid JSON"
+            exit 1
+          fi
+          
+          # Check if buildCommand exists
+          BUILD_CMD=$(node -e "console.log(JSON.parse(require('fs').readFileSync('vercel.json', 'utf8')).buildCommand || '')")
+          if [ -z "$BUILD_CMD" ]; then
+            echo "⚠️  buildCommand not specified in vercel.json"
+          else
+            echo "✅ buildCommand: $BUILD_CMD"
+          fi
+          
+          # Check if build script exists
+          if [ -f vercel-build.sh ]; then
+            if [ ! -x vercel-build.sh ]; then
+              echo "⚠️  vercel-build.sh is not executable"
+              chmod +x vercel-build.sh
+            fi
+            echo "✅ vercel-build.sh exists and is executable"
+          else
+            echo "⚠️  vercel-build.sh not found"
+          fi
+          
+          echo "✅ vercel.json validation passed"
+
+      - name: Generate Prisma Client (if needed)
+        run: |
+          set -euo pipefail
+          echo "🔨 Generating Prisma client..."
+          pnpm run db:generate || echo "⚠️ Prisma generation skipped (DATABASE_URL may not be available)"
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+
+      - name: Build application (simulating Vercel build)
+        run: |
+          set -euo pipefail
+          echo "🔨 Building application (simulating Vercel build environment)..."
+          
+          # Set environment variables similar to Vercel
+          export NODE_ENV=production
+          export PRISMA_CLIENT_ENGINE_TYPE=wasm
+          export ENABLE_EXPERIMENTAL_COREPACK=1
+          
+          # Run the same build command that Vercel would use
+          if [ -f vercel-build.sh ]; then
+            bash vercel-build.sh
+          else
+            # Fallback to standard build if vercel-build.sh doesn't exist
+            pnpm run build
+          fi
+          
+          echo "✅ Build completed successfully"
+
+      - name: Validate build output
+        run: |
+          set -euo pipefail
+          echo "🔍 Validating build output..."
+          
+          if ! pnpm run validate:build; then
+            echo "❌ Build validation failed"
+            exit 1
+          fi
+          
+          echo "✅ Build validation passed"
+
+      - name: Check build artifacts
+        run: |
+          set -euo pipefail
+          echo "🔍 Checking build artifacts..."
+          
+          REQUIRED_FILES=(
+            ".next/BUILD_ID"
+            ".next/package.json"
+          )
+          
+          REQUIRED_DIRS=(
+            ".next/static"
+            ".next/server"
+          )
+          
+          MISSING_FILES=()
+          MISSING_DIRS=()
+          
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              MISSING_FILES+=("$file")
+            fi
+          done
+          
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [ ! -d "$dir" ]; then
+              MISSING_DIRS+=("$dir")
+            fi
+          done
+          
+          if [ ${#MISSING_FILES[@]} -gt 0 ] || [ ${#MISSING_DIRS[@]} -gt 0 ]; then
+            echo "❌ Missing required build artifacts:"
+            [ ${#MISSING_FILES[@]} -gt 0 ] && printf '  Files: %s\n' "${MISSING_FILES[@]}"
+            [ ${#MISSING_DIRS[@]} -gt 0 ] && printf '  Directories: %s\n' "${MISSING_DIRS[@]}"
+            exit 1
+          fi
+          
+          echo "✅ All required build artifacts present"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vercel-build-check-artifacts
+          path: .next/
+          retention-days: 7
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Vercel Build Check')
+            );
+            
+            const body = `## ✅ Vercel Build Check Passed\n\nThis PR has been validated for Vercel deployment:\n\n- ✅ vercel.json configuration valid\n- ✅ Build script executable\n- ✅ Application builds successfully\n- ✅ Build output validated\n- ✅ All required artifacts present\n\n**Ready for Vercel deployment!**`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+        continue-on-error: true
