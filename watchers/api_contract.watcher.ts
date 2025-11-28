@@ -144,7 +144,8 @@ class APIContractWatcher {
     const specPaths = openApiSpec.paths || {};
 
     for (const [path, methods] of Object.entries(specPaths)) {
-      for (const [method, spec] of Object.entries(methods as any)) {
+      for (const [method, spec] of Object.entries(methods as Record<string, any>)) {
+        const specObj = spec as any;
         const deployedEndpoint = deployedEndpoints.find(
           ep => ep.path === path && ep.method.toLowerCase() === method.toLowerCase()
         );
@@ -160,7 +161,7 @@ class APIContractWatcher {
         }
 
         // Check parameter mismatches
-        const specParams = spec.parameters || [];
+        const specParams = specObj.parameters || [];
         const deployedParams = deployedEndpoint.parameters || [];
 
         if (specParams.length !== deployedParams.length) {
@@ -175,7 +176,7 @@ class APIContractWatcher {
         }
 
         // Check response mismatches
-        const specResponses = spec.responses || {};
+        const specResponses = specObj.responses || {};
         const deployedResponses = deployedEndpoint.responses || {};
 
         const specStatusCodes = Object.keys(specResponses);
@@ -228,7 +229,7 @@ class APIContractWatcher {
   /**
    * Check for breaking changes
    */
-  private async checkBreakingChanges(openApiSpec: any, deployedEndpoints: APIContract[]): Promise<ContractViolation[]> {
+  private async checkBreakingChanges(_openApiSpec: any, _deployedEndpoints: APIContract[]): Promise<ContractViolation[]> {
     const violations: ContractViolation[] = [];
 
     // This would compare with previous versions
@@ -266,9 +267,10 @@ class APIContractWatcher {
   /**
    * Store report in database
    */
-  private async storeReport(report: ContractReport): Promise<void> {
+  private async storeReport(_report: ContractReport): Promise<void> {
     try {
       // This would store in a database
+      // TODO: Implement database storage for contract reports
       console.log('Contract report stored successfully');
     } catch (error) {
       console.error('Error storing contract report:', error);

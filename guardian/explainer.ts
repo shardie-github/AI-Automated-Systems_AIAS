@@ -3,7 +3,7 @@
  * Local LLM wrapper for explaining privacy events
  */
 
-import { guardianService, type GuardianEvent } from './core';
+import { type GuardianEvent } from './core';
 import { guardianInspector, type TrustReport } from './inspector';
 
 export interface Explanation {

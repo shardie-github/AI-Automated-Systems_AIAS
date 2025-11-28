@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { tenantIsolation } from '@/lib/security/tenant-isolation';
+import { describe, it, expect } from 'vitest';
+// import { tenantIsolation } from '@/lib/security/tenant-isolation';
 
 describe('Tenant Isolation', () => {
   it('should validate tenant context', async () => {

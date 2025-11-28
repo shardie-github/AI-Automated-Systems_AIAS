@@ -109,13 +109,13 @@ export class DependencyHealthChecker {
     try {
       // Run pnpm outdated (if pnpm is available)
       try {
-        const outdatedOutput = execSync('pnpm outdated --json', {
+        const _outdatedOutput = execSync('pnpm outdated --json', {
           cwd: dir,
           encoding: 'utf-8',
           stdio: 'pipe'
         });
 
-        const outdated = JSON.parse(outdatedOutput);
+        const outdated = JSON.parse(_outdatedOutput);
         Object.entries(outdated).forEach(([name, info]: [string, any]) => {
           if (info.wanted && info.latest) {
             const type = this.getUpdateType(info.current, info.wanted, info.latest);
@@ -147,8 +147,7 @@ export class DependencyHealthChecker {
     }
   }
 
-  private async checkWorkspace(workspaceDir: string, report: DependencyReport): Promise<void> {
-    const workspacePath = join(process.cwd(), workspaceDir);
+  private async checkWorkspace(_workspaceDir: string, _report: DependencyReport): Promise<void> {
     // Implementation would scan each workspace package
   }
 
@@ -218,8 +217,8 @@ export class DependencyHealthChecker {
   }
 
   private getUpdateType(current: string, wanted: string, latest: string): 'patch' | 'minor' | 'major' {
-    const [currMajor, currMinor, currPatch] = current.split('.').map(Number);
-    const [wantMajor, wantMinor, wantPatch] = wanted.split('.').map(Number);
+    const [currMajor, currMinor, _currPatch] = current.split('.').map(Number);
+    const [_wantMajor, wantMinor, wantPatch] = wanted.split('.').map(Number);
     const [latMajor, latMinor, latPatch] = latest.split('.').map(Number);
 
     if (latMajor > currMajor) return 'major';

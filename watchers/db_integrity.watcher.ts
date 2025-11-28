@@ -97,12 +97,12 @@ class DatabaseIntegrityWatcher {
           severity: 'medium'
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       checks.push({
         table: 'ai_health_metrics',
         constraint: 'deployment_id_fk',
         status: 'fail',
-        message: `Error checking orphaned records: ${error.message}`,
+        message: `Error checking orphaned records: ${error instanceof Error ? error.message : String(error)}`,
         severity: 'high'
       });
     }
@@ -132,16 +132,16 @@ class DatabaseIntegrityWatcher {
           constraint: 'unique_namespace_content',
           status: 'warning',
           message: `Found ${duplicates.length} duplicate embedding groups`,
-          affected_rows: duplicates.reduce((sum, dup) => sum + dup.count, 0),
+          affected_rows: duplicates.reduce((sum: number, dup: { count: number }) => sum + dup.count, 0),
           severity: 'low'
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       checks.push({
         table: 'ai_embeddings',
         constraint: 'unique_namespace_content',
         status: 'fail',
-        message: `Error checking duplicates: ${error.message}`,
+        message: `Error checking duplicates: ${error instanceof Error ? error.message : String(error)}`,
         severity: 'high'
       });
     }
@@ -181,12 +181,12 @@ class DatabaseIntegrityWatcher {
               severity: 'high'
             });
           }
-        } catch (error) {
+        } catch (error: unknown) {
           checks.push({
             table: table.name,
             constraint: `${field}_not_null`,
             status: 'fail',
-            message: `Error checking null constraints: ${error.message}`,
+            message: `Error checking null constraints: ${error instanceof Error ? error.message : String(error)}`,
             severity: 'high'
           });
         }
@@ -212,7 +212,7 @@ class DatabaseIntegrityWatcher {
       if (error) throw error;
 
       if (invalidJson) {
-        const invalidCount = invalidJson.filter(record => {
+        const invalidCount = invalidJson.filter((record: { metadata: string }) => {
           try {
             JSON.parse(record.metadata);
             return false;
@@ -232,12 +232,12 @@ class DatabaseIntegrityWatcher {
           });
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       checks.push({
         table: 'ai_embeddings',
         constraint: 'metadata_json_valid',
         status: 'fail',
-        message: `Error checking JSON validity: ${error.message}`,
+        message: `Error checking JSON validity: ${error instanceof Error ? error.message : String(error)}`,
         severity: 'high'
       });
     }
@@ -281,12 +281,12 @@ class DatabaseIntegrityWatcher {
           severity: 'low'
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       checks.push({
         table: 'ai_health_metrics',
         constraint: 'timestamp_consistency',
         status: 'fail',
-        message: `Error checking timestamp consistency: ${error.message}`,
+        message: `Error checking timestamp consistency: ${error instanceof Error ? error.message : String(error)}`,
         severity: 'high'
       });
     }
@@ -335,7 +335,7 @@ class DatabaseIntegrityWatcher {
       if (error) throw error;
       
       console.log('Integrity report stored successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error storing integrity report:', error);
     }
   }
@@ -366,7 +366,7 @@ class DatabaseIntegrityWatcher {
       if (status === 201) {
         console.log(`Critical integrity issue created: ${data.html_url}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating critical issue:', error);
     }
   }
@@ -424,7 +424,7 @@ ${criticalChecks.map(check => `
       }
       
       console.log('Database integrity watcher completed');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Database integrity watcher failed:', error);
       throw error;
     }

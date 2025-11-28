@@ -19,7 +19,7 @@ export function IntegrationCard({
   name,
   icon,
   description,
-  provider,
+  provider: _provider,
   status = "disconnected",
   onConnect,
   connected = false,

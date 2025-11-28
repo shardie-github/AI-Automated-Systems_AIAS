@@ -585,7 +585,7 @@ class AuroraPrime {
           issues.push({
             file: workflowFile,
             issue: `Secrets used but not properly referenced: ${requiredSecretsInWorkflow.join(', ')}`,
-            fix: `Update workflow to use ${{ secrets.${requiredSecretsInWorkflow[0]} }}`,
+            fix: `Update workflow to use $\{\{ secrets.${requiredSecretsInWorkflow[0]} \}\}`,
           });
         }
 
@@ -691,17 +691,17 @@ jobs:
     environment: production
     
     env:
-      SUPABASE_ACCESS_TOKEN: \${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_REF: \${{ secrets.SUPABASE_PROJECT_REF }}
-      SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: \${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      SUPABASE_ANON_KEY: \${{ secrets.SUPABASE_ANON_KEY }}
-      VERCEL_TOKEN: \${{ secrets.VERCEL_TOKEN }}
-      VERCEL_PROJECT_ID: \${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_ORG_ID: \${{ secrets.VERCEL_ORG_ID }}
-      EXPO_TOKEN: \${{ secrets.EXPO_TOKEN }}
-      NEXT_PUBLIC_SUPABASE_URL: \${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      EXPO_PUBLIC_SUPABASE_URL: \${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
       PRISMA_CLIENT_ENGINE_TYPE: wasm
     
     steps:
@@ -725,14 +725,14 @@ jobs:
       - name: Check Supabase Schema
         run: |
           npm install -g supabase
-          echo "\${{ secrets.SUPABASE_ACCESS_TOKEN }}" | supabase login --token -
-          supabase link --project-ref \${{ secrets.SUPABASE_PROJECT_REF }}
+          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | supabase login --token -
+          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
           supabase db remote commit --dry-run || echo "Schema drift detected"
 
       - name: Verify Vercel Project
         run: |
           npm install -g vercel
-          vercel projects ls --token \${{ secrets.VERCEL_TOKEN }} | grep -q "\${{ secrets.VERCEL_PROJECT_ID }}" || echo "Vercel project mismatch"
+          vercel projects ls --token ${{ secrets.VERCEL_TOKEN }} | grep -q "${{ secrets.VERCEL_PROJECT_ID }}" || echo "Vercel project mismatch"
 
       - name: Verify Expo Configs
         run: |

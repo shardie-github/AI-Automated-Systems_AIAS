@@ -26,7 +26,8 @@ export default defineConfig(({ mode }) => ({
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
-              cacheKeyWillBeUsed: async ({ request }) => {
+              // @ts-expect-error - cacheKeyWillBeUsed may not be in type definition but is valid for workbox
+              cacheKeyWillBeUsed: async ({ request }: { request: { url: string } }) => {
                 return `${request.url}?v=1`;
               }
             }

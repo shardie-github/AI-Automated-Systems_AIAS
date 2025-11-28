@@ -198,7 +198,7 @@ export class CostForecaster {
 
       return {
         actions_minutes: usage?.included_minutes || 0,
-        storage_gb: usage?.included_storage_gb || 0,
+        storage_gb: (usage as any)?.included_storage_gb || 0,
         cost: this.calculateGitHubCost(usage)
       };
     } catch (error) {
@@ -372,7 +372,7 @@ export class CostForecaster {
     }
   }
 
-  private calculateUptime(data: any[]): number {
+  private calculateUptime(_data: any[]): number {
     // Simplified - would calculate from health check data
     return 99.95;
   }

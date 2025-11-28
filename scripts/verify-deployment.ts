@@ -80,7 +80,6 @@ async function verifyDeployment(deploymentUrl: string): Promise<VerificationResu
     message: healthCheck.success 
       ? `Status: ${healthCheck.status}` 
       : `Error: ${healthCheck.error}`,
-  ,
   });
   if (!healthCheck.success) {
     result.warnings.push(`Health check endpoint not accessible: ${healthCheck.error}`);

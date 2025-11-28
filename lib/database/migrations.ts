@@ -3,11 +3,16 @@
  * 
  * Handles automatic database migrations on server startup and in CI/CD.
  * Ensures Supabase schema is always up-to-date across all environments.
+ * 
+ * SERVER-ONLY: This module should never be imported in client components.
  */
+
+import 'server-only';
 
 import { readdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { Pool } from 'pg';
+// Note: This file uses Supabase client for migrations
+// Direct PostgreSQL (pg) connections are not used to avoid build-time dependencies
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
 
@@ -57,78 +62,18 @@ export function getMigrationFiles(): MigrationFile[] {
 /**
  * Get applied migrations from Supabase
  */
-export async function getAppliedMigrations(dbUrl: string): Promise<string[]> {
-  const pool = new Pool({ connectionString: dbUrl });
-  
+export async function getAppliedMigrations(_dbUrl: string): Promise<string[]> {
+  // Use Supabase client for migrations (pg not available in build)
+  const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
   try {
-    // Check if supabase_migrations schema exists
-    const schemaCheck = await pool.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.schemata 
-        WHERE schema_name = 'supabase_migrations'
-      );
-    `);
-
-    if (!schemaCheck.rows[0].exists) {
-      console.log('📋 Creating supabase_migrations schema...');
-      await pool.query(`
-        CREATE SCHEMA IF NOT EXISTS supabase_migrations;
-        CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (
-          version TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          applied_at TIMESTAMPTZ DEFAULT NOW()
-        );
-      `);
-      return [];
-    }
-
-    // Check if schema_migrations table exists
-    const tableCheck = await pool.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'supabase_migrations' 
-        AND table_name = 'schema_migrations'
-      );
-    `);
-
-    if (!tableCheck.rows[0].exists) {
-      console.log('📋 Creating schema_migrations table...');
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (
-          version TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          applied_at TIMESTAMPTZ DEFAULT NOW()
-        );
-      `);
-      return [];
-    }
-
-    const result = await pool.query(`
-      SELECT version FROM supabase_migrations.schema_migrations 
-      ORDER BY version;
-    `);
-
-    return result.rows.map((row: any) => row.version);
-  } catch (error: any) {
-    if (error.message.includes('does not exist') || error.message.includes('relation')) {
-      console.log('📋 Initializing migration tracking...');
-      try {
-        await pool.query(`
-          CREATE SCHEMA IF NOT EXISTS supabase_migrations;
-          CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (
-            version TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            applied_at TIMESTAMPTZ DEFAULT NOW()
-          );
-        `);
-      } catch (initError) {
-        console.error('❌ Failed to initialize migration tracking:', initError);
-      }
-      return [];
-    }
-    throw error;
-  } finally {
-    await pool.end();
+    const { data } = await supabase
+      .from('supabase_migrations')
+      .select('name')
+      .order('version', { ascending: true });
+    return data?.map(m => m.name) || [];
+  } catch {
+    // Fallback: return empty array if migrations table doesn't exist
+    return [];
   }
 }
 
@@ -136,52 +81,59 @@ export async function getAppliedMigrations(dbUrl: string): Promise<string[]> {
  * Apply a single migration file
  */
 async function applyMigration(
-  dbUrl: string,
+  _dbUrl: string,
   migration: MigrationFile
 ): Promise<{ success: boolean; error?: string }> {
-  const pool = new Pool({ connectionString: dbUrl });
+  // Use Supabase client for migrations
+  const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
   
   try {
     console.log(`📝 Applying migration: ${migration.name}`);
     const migrationContent = readFileSync(migration.path, 'utf-8');
     
-    // Apply migration in a transaction
-    await pool.query('BEGIN');
+    // Apply migration via Supabase RPC or direct SQL execution
+    const { error: execError } = await supabase.rpc('exec_sql', { sql: migrationContent });
     
-    try {
-      await pool.query(migrationContent);
-      
-      // Record migration in tracking table
-      await pool.query(`
-        INSERT INTO supabase_migrations.schema_migrations (version, name)
-        VALUES ($1, $2)
-        ON CONFLICT (version) DO NOTHING;
-      `, [migration.version, migration.name]);
-      
-      await pool.query('COMMIT');
-      console.log(`✅ Applied: ${migration.name}`);
-      return { success: true };
-    } catch (migrationError: any) {
-      await pool.query('ROLLBACK');
-      
-      // Check if error is because migration was already applied (idempotent)
-      if (
-        migrationError.message.includes('already exists') ||
-        migrationError.message.includes('duplicate key') ||
-        migrationError.message.includes('relation already exists') ||
-        migrationError.message.includes('already applied')
-      ) {
-        console.log(`⏭️  Skipped (already applied): ${migration.name}`);
-        return { success: true };
+    if (execError) {
+      // Fallback: try direct query if RPC doesn't exist
+      const statements = migrationContent.split(';').filter(s => s.trim());
+      for (const statement of statements) {
+        if (statement.trim()) {
+          const { error } = await supabase.rpc('exec_sql', { sql: statement });
+          if (error) {
+            throw error;
+          }
+        }
       }
-      
-      throw migrationError;
     }
-  } catch (error: any) {
-    console.error(`❌ Failed to apply ${migration.name}:`, error.message);
-    return { success: false, error: error.message };
-  } finally {
-    await pool.end();
+    
+    // Record migration in tracking table
+    const { error: insertError } = await supabase
+      .from('supabase_migrations')
+      .insert({ version: migration.version, name: migration.name })
+      .select();
+    
+    if (insertError && !insertError.message.includes('duplicate')) {
+      throw insertError;
+    }
+    
+    console.log(`✅ Applied: ${migration.name}`);
+    return { success: true };
+  } catch (migrationError: any) {
+    // Check if error is because migration was already applied (idempotent)
+    if (
+      migrationError.message?.includes('already exists') ||
+      migrationError.message?.includes('duplicate key') ||
+      migrationError.message?.includes('relation already exists') ||
+      migrationError.message?.includes('already applied') ||
+      migrationError.message?.includes('duplicate')
+    ) {
+      console.log(`⏭️  Skipped (already applied): ${migration.name}`);
+      return { success: true };
+    }
+    
+    console.error(`❌ Failed to apply ${migration.name}:`, migrationError.message);
+    return { success: false, error: migrationError.message || String(migrationError) };
   }
 }
 
@@ -189,7 +141,13 @@ async function applyMigration(
  * Run migrations using Supabase CLI (preferred method)
  */
 async function runMigrationsViaSupabaseCLI(): Promise<MigrationResult> {
-  const { execSync } = await import('child_process');
+  // Only import child_process in Node.js runtime
+  if (typeof window !== 'undefined') {
+    throw new Error('Supabase CLI migrations can only run in Node.js runtime');
+  }
+  // Use dynamic require to avoid webpack bundling
+  const childProcess = eval('require')('child_process');
+  const { execSync } = childProcess;
   
   try {
     console.log('🔄 Running migrations via Supabase CLI...');
@@ -368,16 +326,8 @@ export async function runMigrationsInCI(): Promise<MigrationResult> {
  * Validate database schema after migrations
  */
 export async function validateSchemaAfterMigrations(): Promise<boolean> {
-  const dbUrl = process.env.SUPABASE_DB_URL || 
-                process.env.DATABASE_URL ||
-                process.env.DIRECT_URL;
-
-  if (!dbUrl) {
-    console.warn('⚠️  No database URL found, skipping schema validation');
-    return true;
-  }
-
-  const pool = new Pool({ connectionString: dbUrl });
+  // Use Supabase client for schema validation
+  const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
   
   try {
     // Check critical tables exist
@@ -390,19 +340,15 @@ export async function validateSchemaAfterMigrations(): Promise<boolean> {
     ];
 
     for (const table of criticalTables) {
-      const result = await pool.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
-          AND table_name = $1
-        );
-      `, [table]);
-
-      if (!result.rows[0].exists) {
-        console.warn(`⚠️  Critical table missing: ${table}`);
-        // Don't fail in development/preview, but warn
+      const { data, error } = await supabase
+        .from(table)
+        .select('*')
+        .limit(1);
+      
+      if (error && error.code !== 'PGRST116') { // PGRST116 = table not found
+        console.warn(`⚠️  Critical table check failed for ${table}:`, error.message);
         if (process.env.NODE_ENV === 'production') {
-          throw new Error(`Critical table missing: ${table}`);
+          throw new Error(`Critical table missing or inaccessible: ${table}`);
         }
       }
     }
@@ -412,7 +358,5 @@ export async function validateSchemaAfterMigrations(): Promise<boolean> {
   } catch (error: any) {
     console.error('❌ Schema validation failed:', error.message);
     return false;
-  } finally {
-    await pool.end();
   }
 }

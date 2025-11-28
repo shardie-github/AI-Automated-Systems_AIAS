@@ -6,9 +6,25 @@
  * 
  * NOTE: Migrations do NOT run automatically on PR commits or merges to main.
  * They only run on server startup in deployed environments.
+ * 
+ * SERVER-ONLY: This module should never be imported in client components.
  */
 
-import { runMigrationsOnStartup } from '@/lib/database/migrations';
+import 'server-only';
+
+// Lazy load migrations to avoid webpack bundling
+async function getRunMigrations() {
+  if (typeof window !== 'undefined') {
+    return null;
+  }
+  try {
+    // Use eval to prevent webpack from analyzing this import
+    const migrations = await eval('import')('@/lib/database/migrations');
+    return migrations.runMigrationsOnStartup;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Check if we're in a CI/CD environment that should skip migrations
@@ -52,8 +68,13 @@ export async function register() {
     // Only run migrations in Node.js runtime (not Edge runtime)
     try {
       console.log('🔄 [Instrumentation] Checking for pending database migrations...');
-      await runMigrationsOnStartup();
-      console.log('✅ [Instrumentation] Database migrations check completed');
+      const runMigrations = await getRunMigrations();
+      if (runMigrations) {
+        await runMigrations();
+        console.log('✅ [Instrumentation] Database migrations check completed');
+      } else {
+        console.log('⚠️  [Instrumentation] Migrations module not available');
+      }
     } catch (error) {
       // Log error but don't crash the server
       // Migrations will be retried on next startup or via CI/CD

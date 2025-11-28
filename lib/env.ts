@@ -45,13 +45,9 @@ function getEnvVar(key: string, required: boolean = true, defaultValue?: string)
   }
   
   // Check import.meta.env (Vite/Edge runtime)
-  try {
-    if (typeof import !== 'undefined' && import.meta && import.meta.env) {
-      value = value || import.meta.env[key] || import.meta.env[`VITE_${key}`];
-    }
-  } catch (e) {
-    // import.meta may not be available in all contexts
-  }
+  // Note: import.meta is only available in Vite builds, not in Next.js/Node.js
+  // Skip this check to avoid Edge runtime issues
+  // Vite environment variables should be prefixed with VITE_ and will be available via process.env in Next.js
   
   // Use default if provided
   if (!value && defaultValue !== undefined) {

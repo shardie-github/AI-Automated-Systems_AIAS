@@ -6,7 +6,7 @@ import { createGETHandler } from "@/lib/api/route-handler";
 
 const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
 
-export const runtime = "edge";
+export const runtime = "nodejs"; // Use Node.js runtime for route-handler compatibility
 
 /**
  * GET /api/admin/metrics

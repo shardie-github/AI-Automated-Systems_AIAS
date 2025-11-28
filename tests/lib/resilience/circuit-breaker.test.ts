@@ -2,8 +2,8 @@
  * Circuit Breaker Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { CircuitBreaker, CircuitBreakerRegistry, withCircuitBreaker } from '@/lib/resilience/circuit-breaker';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { CircuitBreaker, circuitBreakerRegistry, withCircuitBreaker } from '@/lib/resilience/circuit-breaker';
 
 describe('CircuitBreaker', () => {
   let breaker: CircuitBreaker;
@@ -173,11 +173,11 @@ describe('CircuitBreaker', () => {
   });
 });
 
-describe('CircuitBreakerRegistry', () => {
-  let registry: CircuitBreakerRegistry;
+describe('circuitBreakerRegistry', () => {
+  let registry: typeof circuitBreakerRegistry;
 
   beforeEach(() => {
-    registry = new CircuitBreakerRegistry();
+    registry = circuitBreakerRegistry;
   });
 
   it('should create circuit breaker on get', () => {

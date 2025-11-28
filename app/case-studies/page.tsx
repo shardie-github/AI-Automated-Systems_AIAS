@@ -223,57 +223,58 @@ export default function CaseStudiesPage() {
           </p>
         </div>
 
-      <div className="space-y-12 max-w-4xl mx-auto">
-        {caseStudies.map((study) => (
-          <Card key={study.title} className="overflow-hidden">
-            <CardHeader className="bg-muted/50">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-2xl mb-2">{study.title}</CardTitle>
-                  <CardDescription className="text-base flex items-center gap-2">
-                    {study.company} • {study.industry} • {study.location} {study.flag}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-6">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">The Challenge</h3>
-                    <span className="text-2xl">{study.flag}</span>
-                  </div>
-                  <p className="text-muted-foreground">{study.challenge}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">The Solution</h3>
-                  <p className="text-muted-foreground">{study.solution}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">The Results</h3>
-                  <ul className="space-y-2">
-                    {study.results.map((result, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-primary mt-1">✓</span>
-                        <span className="text-muted-foreground">{result}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="border-t pt-6">
-                  <blockquote className="text-lg italic text-muted-foreground mb-4">
-                    &ldquo;{study.quote}&rdquo;
-                  </blockquote>
+        <div className="space-y-12 max-w-4xl mx-auto">
+          {caseStudies.map((study) => (
+            <Card key={study.title} className="overflow-hidden">
+              <CardHeader className="bg-muted/50">
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-semibold">{study.author}</p>
-                    <p className="text-sm text-muted-foreground">{study.role}, {study.company}</p>
+                    <CardTitle className="text-2xl mb-2">{study.title}</CardTitle>
+                    <CardDescription className="text-base flex items-center gap-2">
+                      {study.company} • {study.industry} • {study.location} {study.flag}
+                    </CardDescription>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold">The Challenge</h3>
+                      <span className="text-2xl">{study.flag}</span>
+                    </div>
+                    <p className="text-muted-foreground">{study.challenge}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">The Solution</h3>
+                    <p className="text-muted-foreground">{study.solution}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">The Results</h3>
+                    <ul className="space-y-2">
+                      {study.results.map((result, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-primary mt-1">✓</span>
+                          <span className="text-muted-foreground">{result}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="border-t pt-6">
+                    <blockquote className="text-lg italic text-muted-foreground mb-4">
+                      &ldquo;{study.quote}&rdquo;
+                    </blockquote>
+                    <div>
+                      <p className="font-semibold">{study.author}</p>
+                      <p className="text-sm text-muted-foreground">{study.role}, {study.company}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
       <div className="mt-12 text-center space-y-4 bg-muted/50 rounded-lg p-8">
         <h2 className="text-2xl font-bold">Ready to Work with AIAS Consultancy?</h2>

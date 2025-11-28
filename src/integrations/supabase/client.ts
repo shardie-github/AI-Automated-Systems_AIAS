@@ -18,9 +18,20 @@ import type { Database } from './types';
 // Support both Vite (import.meta.env) and Next.js (process.env) patterns
 function getEnvVar(key: string, viteKey?: string): string {
   // Try Vite environment variables first (for Vite-based builds)
-  if (typeof import !== 'undefined' && import.meta && import.meta.env) {
-    const viteValue = import.meta.env[viteKey || key] || import.meta.env[`VITE_${key}`];
-    if (viteValue) return viteValue;
+  // Using eval to avoid TypeScript parsing issues with import.meta
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-eval
+    const hasImportMeta = typeof eval !== 'undefined' && typeof eval('typeof import') !== 'undefined';
+    if (hasImportMeta) {
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-eval
+      const importMeta = eval('import.meta');
+      if (importMeta && importMeta.env) {
+        const viteValue = importMeta.env[viteKey || key] || importMeta.env[`VITE_${key}`];
+        if (viteValue) return viteValue;
+      }
+    }
+  } catch {
+    // import.meta may not be available
   }
   
   // Try Next.js environment variables

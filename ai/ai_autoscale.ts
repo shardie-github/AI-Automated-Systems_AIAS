@@ -89,7 +89,7 @@ class AIAutoScale {
   /**
    * Process and normalize metrics
    */
-  private processMetrics(supabaseMetrics: any[], vercelMetrics: any[]): UsageMetrics[] {
+  private processMetrics(supabaseMetrics: any[], _vercelMetrics: any[]): UsageMetrics[] {
     const processed: UsageMetrics[] = [];
 
     // Process Supabase metrics
@@ -164,7 +164,7 @@ class AIAutoScale {
 
     // Simple linear regression
     const costs = metrics.map(m => m.cost_current);
-    const timestamps = metrics.map((m, i) => i);
+    const timestamps = metrics.map((_m, i) => i);
     
     const { slope, intercept, rSquared } = this.linearRegression(timestamps, costs);
     
@@ -195,7 +195,7 @@ class AIAutoScale {
     const sumY = y.reduce((a, b) => a + b, 0);
     const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
     const sumXX = x.reduce((sum, xi) => sum + xi * xi, 0);
-    const sumYY = y.reduce((sum, yi) => sum + yi * yi, 0);
+    // const sumYY = y.reduce((sum, yi) => sum + yi * yi, 0); // Not used in current calculation
 
     const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
@@ -309,7 +309,8 @@ class AIAutoScale {
         category: 'general'
       };
 
-      const { data, status } = await this.octokit.rest.discussions.create({
+      // discussions API may not be available in all Octokit versions
+      const { data, status } = await (this.octokit.rest as any).discussions?.create({
         owner: process.env.GITHUB_OWNER || 'your-org',
         repo: process.env.GITHUB_REPO || 'aias-platform',
         title: discussion.title,
