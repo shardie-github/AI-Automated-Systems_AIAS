@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { createPOSTHandler } from "@/lib/api/route-handler";
 import { z } from "zod";

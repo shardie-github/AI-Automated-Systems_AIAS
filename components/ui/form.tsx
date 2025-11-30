@@ -44,8 +44,6 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const { formState } = useFormContext()
-
   return (
     <Label
       ref={ref}
@@ -60,8 +58,6 @@ const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const { formState } = useFormContext()
-
   return <Slot ref={ref} {...props} />
 })
 FormControl.displayName = "FormControl"

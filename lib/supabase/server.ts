@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from '@/types/supabase';
 
@@ -36,13 +36,13 @@ export async function createServerSupabaseClient() {
       );
     }
     // Build-time: Return placeholder to prevent build failures
-    return createServerClient<Database>(
+    return createSupabaseServerClient<Database>(
       'https://placeholder.supabase.co',
       'placeholder-key',
       {
         cookies: {
           getAll() { return cookieStore.getAll() },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
             // Note: This often throws in Server Components, handle gracefully
             try {
               cookiesToSet.forEach(({ name, value, options }) => 
@@ -57,13 +57,13 @@ export async function createServerSupabaseClient() {
     );
   }
   
-  return createServerClient<Database>(
+  return createSupabaseServerClient<Database>(
     supabaseUrl,
     supabaseKey,
     {
       cookies: {
         getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
           // Note: This often throws in Server Components, handle gracefully
           try {
             cookiesToSet.forEach(({ name, value, options }) => 
@@ -78,7 +78,7 @@ export async function createServerSupabaseClient() {
   );
 }
 
-// Legacy export for backwards compatibility
+// Legacy export for backwards compatibility - renamed to avoid conflict
 export async function createServerClient() {
   return createServerSupabaseClient();
 }

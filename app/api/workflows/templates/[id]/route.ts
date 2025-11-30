@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createGETHandler } from "@/lib/api/route-handler";
 import { getTemplate } from "@/lib/workflows/templates";
 

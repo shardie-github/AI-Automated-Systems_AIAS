@@ -5,11 +5,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createServerClient();
-    const workflowId = params.id;
+    const { id } = await params;
+    const workflowId = id;
 
     // Get workflow (public workflows only for embeds)
     const { data: workflow, error } = await supabase

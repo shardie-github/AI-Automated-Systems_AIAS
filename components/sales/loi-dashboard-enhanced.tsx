@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { LOIForm } from "./loi-form";
 import { TrendingUp, FileText, CheckCircle2, Clock, Sparkles, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -259,12 +258,12 @@ export function LOIDashboardEnhanced() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {lois.map((loi, index) => (
+                {lois.map((loi, loiIndex) => (
                   <motion.div
                     key={loi.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: loiIndex * 0.1 }}
                     className="border-2 rounded-xl p-6 space-y-4 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-all"
                   >
                     <div className="flex items-center justify-between">
@@ -349,7 +348,7 @@ export function LOIDashboardEnhanced() {
                       <YAxis />
                       <Tooltip />
                       <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                        {["Starter", "Pro", "Enterprise"].map((tier, index) => (
+                        {["Starter", "Pro", "Enterprise"].map((tier) => (
                           <Cell key={tier} fill={COLORS[tier as keyof typeof COLORS]} />
                         ))}
                       </Bar>

@@ -199,8 +199,8 @@ export class AnalyticsService {
       .lte('updated_at', endDate.toISOString());
 
     const total = customers?.length || 0;
-    const active = customers?.filter(c => c.status === 'active').length || 0;
-    const newCustomers = customers?.filter(c => 
+    const active = customers?.filter((c: any) => c.status === 'active').length || 0;
+    const newCustomers = customers?.filter((c: any) => 
       new Date(c.created_at) >= startDate
     ).length || 0;
     const churned = churnedCustomers?.length || 0;
@@ -243,7 +243,7 @@ export class AnalyticsService {
     return {
       totalWorkflows: workflows?.length || 0,
       totalExecutions: executions?.length || 0,
-      activeUsers: new Set(users?.map(u => u.user_id) || []).size,
+      activeUsers: new Set(users?.map((u: any) => u.user_id) || []).size,
       apiCalls: apiCalls?.length || 0
     };
   }
@@ -274,7 +274,7 @@ export class AnalyticsService {
     const trialToPaid = trials?.length > 0 ? 
       (paidSubscriptions?.length / trials.length) * 100 : 0;
     
-    const uniqueVisitors = new Set(visitors?.map(v => v.session_id) || []).size;
+    const uniqueVisitors = new Set(visitors?.map((v: any) => v.session_id) || []).size;
     const visitorToTrial = uniqueVisitors > 0 ? 
       (trials?.length / uniqueVisitors) * 100 : 0;
     
@@ -304,14 +304,14 @@ export class AnalyticsService {
 
     const totalSessions = sessions?.length || 0;
     const avgSessionDuration = totalSessions > 0 ? 
-      sessions.reduce((sum, s) => sum + (s.duration || 0), 0) / totalSessions : 0;
+      sessions.reduce((sum: number, s: any) => sum + (s.duration || 0), 0) / totalSessions : 0;
     
-    const totalPageViews = sessions?.reduce((sum, s) => sum + (s.page_views || 0), 0) || 0;
+    const totalPageViews = sessions?.reduce((sum: number, s: any) => sum + (s.page_views || 0), 0) || 0;
     
     const bounceRate = totalSessions > 0 ? 
-      (sessions.filter(s => s.is_bounce).length / totalSessions) * 100 : 0;
+      (sessions.filter((s: any) => s.is_bounce).length / totalSessions) * 100 : 0;
     
-    const uniqueUsers = new Set(returnVisitors?.map(r => r.user_id) || []).size;
+    const uniqueUsers = new Set(returnVisitors?.map((r: any) => r.user_id) || []).size;
     const returnVisitorsCount = returnVisitors?.length || 0;
 
     return {
