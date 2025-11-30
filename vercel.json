@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd apps/web && prisma generate && cd ../.. && next build",
+  "buildCommand": "cd apps/web && prisma generate --schema=./prisma/schema.prisma && cd ../.. && next build",
   "devCommand": "pnpm run dev",
   "installCommand": "export ENABLE_EXPERIMENTAL_COREPACK=1 && corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install --frozen-lockfile",
   "cleanUrls": true,
@@ -18,7 +18,8 @@
     "env": {
       "PRISMA_CLIENT_ENGINE_TYPE": "library",
       "NEXT_TELEMETRY_DISABLED": "1",
-      "SKIP_ENV_VALIDATION": "1"
+      "SKIP_ENV_VALIDATION": "1",
+      "NEXT_PRIVATE_STANDALONE": "true"
     }
   },
   "git": {
