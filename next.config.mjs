@@ -68,8 +68,6 @@ const nextConfig = {
     "recharts",
     "@tanstack/react-query",
     ],
-    // Build speed optimizations
-    swcMinify: true, // Already default in Next.js 15, but explicit
   },
   // Ensure proper file tracing for Vercel deployments (optimized for speed)
   outputFileTracingIncludes: {
