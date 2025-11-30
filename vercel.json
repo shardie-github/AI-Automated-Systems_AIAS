@@ -18,8 +18,7 @@
     "env": {
       "PRISMA_CLIENT_ENGINE_TYPE": "library",
       "NEXT_TELEMETRY_DISABLED": "1",
-      "SKIP_ENV_VALIDATION": "1",
-      "NEXT_PRIVATE_STANDALONE": "true"
+      "SKIP_ENV_VALIDATION": "1"
     }
   },
   "git": {
