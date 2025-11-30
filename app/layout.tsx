@@ -15,6 +15,7 @@ import { OrganizationSchema, WebSiteSchema } from "@/components/seo/structured-d
 import { EnhancedErrorBoundary } from "@/lib/error-handling/error-boundary-enhanced";
 import { TelemetryProvider } from "@/lib/monitoring/telemetry-provider";
 import { UTMTracker } from "@/components/analytics/utm-tracker";
+import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { env, getOptionalEnv } from "@/lib/env";
 
 const siteUrl = env.app.siteUrl || "https://aiautomatedsystems.ca";
@@ -173,32 +174,34 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <EnhancedErrorBoundary>
           <TelemetryProvider>
             <ThemeProvider>
-              {/* Accessibility: Skip to main content link */}
-              <a 
-                href="#main" 
-                className="skip-link"
-                aria-label="Skip to main content"
-              >
-                Skip to content
-              </a>
-              <Header />
-              <main 
-                id="main" 
-                className="min-h-[calc(100vh-8rem)]"
-                role="main"
-                aria-label="Main content"
-              >
-                {children}
-              </main>
-              <Footer />
-              <EnhancedStickyCTA />
-              <Toaster />
-              <PWARegistration />
-              <PerformanceHUD />
-              <PerformanceBeacon />
-              <WebVitalsTracker />
-              <AgentProvider />
-              <UTMTracker />
+              <SmoothScroll>
+                {/* Accessibility: Skip to main content link */}
+                <a 
+                  href="#main" 
+                  className="skip-link"
+                  aria-label="Skip to main content"
+                >
+                  Skip to content
+                </a>
+                <Header />
+                <main 
+                  id="main" 
+                  className="min-h-[calc(100vh-8rem)]"
+                  role="main"
+                  aria-label="Main content"
+                >
+                  {children}
+                </main>
+                <Footer />
+                <EnhancedStickyCTA />
+                <Toaster />
+                <PWARegistration />
+                <PerformanceHUD />
+                <PerformanceBeacon />
+                <WebVitalsTracker />
+                <AgentProvider />
+                <UTMTracker />
+              </SmoothScroll>
             </ThemeProvider>
           </TelemetryProvider>
         </EnhancedErrorBoundary>

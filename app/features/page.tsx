@@ -2,6 +2,10 @@ import { Metadata } from "next";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { TextReveal } from "@/components/ui/TextReveal";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { BentoGrid, BentoGridItem } from "@/components/ui/BentoGrid";
+import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
 
 export const metadata: Metadata = {
   title: "Features — Systems Thinking + AI | AIAS Platform",
@@ -167,11 +171,16 @@ const featureCategories = [
 
 export default function FeaturesPage() {
   return (
-    <div className="container py-16">
+    <ParallaxBackground className="container py-16">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <TextReveal
+          as="h1"
+          className="text-4xl md:text-5xl font-bold mb-4 block"
+          delay={0.1}
+          staggerDelay={0.03}
+        >
           Systems Thinking + AI: The Complete Solution
-        </h1>
+        </TextReveal>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
           Systems thinking is THE critical skill for the AI age. It's what makes you stand out in the job market, 
           succeed in business, and achieve optimal outcomes. Combined with AI automation, it's unstoppable.
@@ -184,19 +193,30 @@ export default function FeaturesPage() {
       {featureCategories.map((category) => (
         <section key={category.title} className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2">{category.title}</h2>
+            <TextReveal
+              as="h2"
+              className="text-3xl font-bold mb-2"
+              delay={0.2}
+              staggerDelay={0.02}
+            >
+              {category.title}
+            </TextReveal>
             <p className="text-muted-foreground">{category.description}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <BentoGrid columns={2} className="gap-6">
             {category.features.map((feature) => (
-              <Card key={feature.name}>
-                <CardHeader>
-                  <CardTitle>{feature.name}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardHeader>
-              </Card>
+              <BentoGridItem key={feature.name} colSpan={1} rowSpan={1}>
+                <SpotlightCard>
+                  <Card className="border-0 bg-transparent shadow-none h-full">
+                    <CardHeader>
+                      <CardTitle>{feature.name}</CardTitle>
+                      <CardDescription>{feature.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </SpotlightCard>
+              </BentoGridItem>
             ))}
-          </div>
+          </BentoGrid>
         </section>
       ))}
 
@@ -215,6 +235,6 @@ export default function FeaturesPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </ParallaxBackground>
   );
 }

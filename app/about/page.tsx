@@ -1,5 +1,9 @@
 import { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TextReveal } from "@/components/ui/TextReveal";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { BentoGrid, BentoGridItem } from "@/components/ui/BentoGrid";
+import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
 
 export const metadata: Metadata = {
   title: "About — AIAS Platform | Made in Canada",
@@ -8,12 +12,17 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="container py-16">
+    <ParallaxBackground className="container py-16">
       <div className="max-w-3xl mx-auto space-y-12">
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <TextReveal
+            as="h1"
+            className="text-4xl md:text-5xl font-bold mb-4 block"
+            delay={0.1}
+            staggerDelay={0.03}
+          >
             About AIAS Platform
-          </h1>
+          </TextReveal>
           <p className="text-lg text-muted-foreground">
             Systems thinking + AI automation. The critical skill for the AI age. Built in Canada, serving the world. 🇨🇦 🌍
           </p>
@@ -99,49 +108,72 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4">Our Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Privacy First</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  PIPEDA compliance, Canadian data residency, transparent privacy policies.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Multi-Currency Pricing</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Starting at $49/month (CAD/USD/EUR) — accessible globally with transparent pricing in your local currency.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>No-Code First</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Build AI agents without coding. 30-minute setup. Deploy in minutes.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Global Perspective</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Built in Canada with global perspective. Serving businesses across 40+ countries with multi-currency and international integrations.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <TextReveal
+            as="h2"
+            className="text-2xl font-bold mb-4"
+            delay={0.2}
+            staggerDelay={0.02}
+          >
+            Our Values
+          </TextReveal>
+          <BentoGrid columns={2} className="gap-4">
+            <BentoGridItem colSpan={1} rowSpan={1}>
+              <SpotlightCard>
+                <Card className="border-0 bg-transparent shadow-none h-full">
+                  <CardHeader>
+                    <CardTitle>Privacy First</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      PIPEDA compliance, Canadian data residency, transparent privacy policies.
+                    </p>
+                  </CardContent>
+                </Card>
+              </SpotlightCard>
+            </BentoGridItem>
+            <BentoGridItem colSpan={1} rowSpan={1}>
+              <SpotlightCard>
+                <Card className="border-0 bg-transparent shadow-none h-full">
+                  <CardHeader>
+                    <CardTitle>Multi-Currency Pricing</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Starting at $49/month (CAD/USD/EUR) — accessible globally with transparent pricing in your local currency.
+                    </p>
+                  </CardContent>
+                </Card>
+              </SpotlightCard>
+            </BentoGridItem>
+            <BentoGridItem colSpan={1} rowSpan={1}>
+              <SpotlightCard>
+                <Card className="border-0 bg-transparent shadow-none h-full">
+                  <CardHeader>
+                    <CardTitle>No-Code First</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Build AI agents without coding. 30-minute setup. Deploy in minutes.
+                    </p>
+                  </CardContent>
+                </Card>
+              </SpotlightCard>
+            </BentoGridItem>
+            <BentoGridItem colSpan={1} rowSpan={1}>
+              <SpotlightCard>
+                <Card className="border-0 bg-transparent shadow-none h-full">
+                  <CardHeader>
+                    <CardTitle>Global Perspective</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Built in Canada with global perspective. Serving businesses across 40+ countries with multi-currency and international integrations.
+                    </p>
+                  </CardContent>
+                </Card>
+              </SpotlightCard>
+            </BentoGridItem>
+          </BentoGrid>
         </section>
 
         <section>
@@ -223,6 +255,6 @@ export default function AboutPage() {
           </Card>
         </section>
       </div>
-    </div>
+    </ParallaxBackground>
   );
 }

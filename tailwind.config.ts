@@ -33,6 +33,18 @@ export default {
         },
         border: "hsl(var(--border))",
         ring: "hsl(var(--ring))",
+        // Modern High-Tech Theme Colors
+        neon: {
+          cyan: "#06b6d4",
+          purple: "#a855f7",
+          pink: "#ec4899",
+          blue: "#3b82f6",
+        },
+        electric: {
+          cyan: "#22d3ee",
+          purple: "#c084fc",
+          pink: "#f472b6",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -21,20 +21,20 @@
 }
 
 .dark {
-  --bg: 224 71% 4%;
+  --bg: 222 47% 11%; /* Deep slate-900 */
   --fg: 210 40% 98%;
-  --muted: 220 14% 14%;
-  --card: 224 71% 4%;
-  --primary: 217 90% 56%;
+  --muted: 217 16% 18%;
+  --card: 222 47% 11%;
+  --primary: 188 94% 43%; /* Electric cyan */
   --primary-fg: 210 40% 98%;
   --secondary: 217 16% 18%;
   --secondary-fg: 210 40% 96%;
-  --accent: 269 83% 62%;
+  --accent: 271 81% 56%; /* Electric purple */
   --accent-fg: 210 40% 98%;
   --destructive: 0 72% 50%;
   --destructive-fg: 210 40% 98%;
   --border: 217 16% 24%;
-  --ring: 217 90% 56%;
+  --ring: 188 94% 43%; /* Electric cyan */
 }
 
 * { 
@@ -112,7 +112,7 @@ a, button {
     animation: shimmer 2s infinite;
   }
   
-  /* Glass morphism */
+  /* Enhanced Glass morphism */
   .glass {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -123,6 +123,25 @@ a, button {
   .dark .glass {
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Modern Glassmorphism Utility */
+  .glass-morphism {
+    @apply backdrop-blur-md bg-white/10 border border-white/10;
+  }
+
+  .dark .glass-morphism {
+    @apply bg-black/20 border-white/10;
+  }
+
+  /* Spotlight gradient effect */
+  .spotlight-gradient {
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(6, 182, 212, 0.15),
+      rgba(168, 85, 247, 0.1),
+      transparent 40%
+    );
   }
   
   /* Smooth fade-in */

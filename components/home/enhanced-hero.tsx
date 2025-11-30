@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield, Globe, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { TextReveal } from "@/components/ui/TextReveal";
+import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
 
 const socialProof = [
   { icon: "👥", text: "2,000+ Active Users" },
@@ -27,45 +29,16 @@ export function EnhancedHero() {
   }, []);
 
   return (
-    <section 
-      className="relative py-16 md:py-24 lg:py-32 xl:py-40 overflow-hidden min-h-[90vh] flex items-center"
-      aria-label="Hero section"
-    >
-      {/* Enhanced animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background via-50% to-accent/10" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.2),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.15),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]" />
-      
-      {/* Floating animated elements */}
-      <motion.div
-        className="absolute top-20 left-10 w-72 h-72 bg-primary/30 rounded-full blur-3xl"
-        animate={{
-          x: [0, 100, 0],
-          y: [0, 50, 0],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        aria-hidden="true"
-      />
-      <motion.div
-        className="absolute bottom-20 right-10 w-96 h-96 bg-accent/30 rounded-full blur-3xl"
-        animate={{
-          x: [0, -80, 0],
-          y: [0, -40, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        aria-hidden="true"
-      />
+    <ParallaxBackground className="relative py-16 md:py-24 lg:py-32 xl:py-40 overflow-hidden min-h-[90vh] flex items-center">
+      <section 
+        className="relative w-full"
+        aria-label="Hero section"
+      >
+        {/* Enhanced animated background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background via-50% to-accent/10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.2),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]" />
       
       <div className="relative container text-center space-y-8 max-w-6xl mx-auto z-10 px-4">
         {/* Social proof bar - mobile optimized */}
@@ -100,20 +73,25 @@ export function EnhancedHero() {
           <span>Custom AI Platforms Built by AI Automated Systems</span>
         </motion.div>
         
-        {/* Main headline - mobile responsive */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.1] px-2"
-        >
-          <span className="block">Custom AI Platforms</span>
-          <span 
+        {/* Main headline - mobile responsive with TextReveal */}
+        <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.1] px-2">
+          <TextReveal
+            as="h1"
+            className="block"
+            delay={0.3}
+            staggerDelay={0.05}
+          >
+            Custom AI Platforms
+          </TextReveal>
+          <TextReveal
+            as="h1"
             className="block mt-2 md:mt-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient"
+            delay={0.5}
+            staggerDelay={0.05}
           >
             That Transform Your Business
-          </span>
-        </motion.h1>
+          </TextReveal>
+        </div>
         
         {/* Subheadline */}
         <motion.p
@@ -243,6 +221,7 @@ export function EnhancedHero() {
           </div>
         </motion.div>
       </div>
-    </section>
+      </section>
+    </ParallaxBackground>
   );
 }
