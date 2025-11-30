@@ -113,14 +113,23 @@ export function MobileNav() {
           >
             Demo
           </Link>
-          <div className="pt-4 border-t">
-            <Button className="w-full min-h-[44px]" asChild>
+          <div className="pt-4 border-t space-y-3">
+            <Button className="w-full min-h-[48px] font-bold text-base shadow-lg" asChild>
               <Link 
-                href="/pricing" 
+                href="/signup" 
                 onClick={() => setOpen(false)}
-                aria-label="Start your free trial"
+                aria-label="Start your 14-day free trial - no credit card required"
               >
-                Start Free
+                Start Free Trial
+              </Link>
+            </Button>
+            <Button variant="outline" className="w-full min-h-[48px] font-semibold text-base" asChild>
+              <Link 
+                href="/demo" 
+                onClick={() => setOpen(false)}
+                aria-label="Schedule a free strategy call"
+              >
+                Schedule Call
               </Link>
             </Button>
           </div>

@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { StickyCTA } from "@/components/layout/sticky-cta";
+import { EnhancedStickyCTA } from "@/components/layout/enhanced-sticky-cta";
 import { Toaster } from "@/components/ui/toaster";
 import { PWARegistration } from "@/components/pwa-registration";
 import { PerformanceHUD } from "@/components/dev/performance-hud";
@@ -21,11 +21,50 @@ const siteUrl = env.app.siteUrl || "https://aias-platform.com";
 
 export const metadata: Metadata = {
   title: {
-    default: "Custom AI Platform Development | AIAS Consultancy",
+    default: "Custom AI Platform Development | AIAS Consultancy | Transform Your Business",
     template: "%s | AIAS Platform",
   },
-  description: "We build custom AI platforms — not integrations. See TokPulse and Hardonia Suite. From strategy to deployment. Schedule a strategy call.",
-  keywords: ["custom AI platforms", "AI development", "AIAS Consultancy", "TokPulse", "Hardonia Suite", "AI automation", "systems thinking", "AI age skills", "job market advantage", "business success", "systems thinking training", "critical thinking skills", "holistic problem solving", "root cause analysis", "multi-perspective thinking", "career differentiation", "systems thinking methodology", "genai content engine", "automated website creation", "ai blog analysis", "website automation", "genai website generator"],
+  description: "We build custom AI platforms — not integrations. See TokPulse and Hardonia Suite. Save 10+ hours/week. 40% ROI increase. From strategy to deployment. Schedule a free strategy call. No credit card required.",
+  keywords: [
+    "custom AI platforms",
+    "AI development",
+    "AIAS Consultancy",
+    "TokPulse",
+    "Hardonia Suite",
+    "AI automation",
+    "workflow automation",
+    "custom AI solutions",
+    "AI platform development",
+    "business automation",
+    "Canadian AI development",
+    "enterprise AI",
+    "AI agents",
+    "no-code AI",
+    "systems thinking",
+    "AI age skills",
+    "job market advantage",
+    "business success",
+    "ROI increase",
+    "time savings",
+    "PIPEDA compliant",
+    "Canadian data residency",
+    "enterprise security",
+    "99.9% uptime",
+    "free trial",
+    "no credit card required",
+    "systems thinking training",
+    "critical thinking skills",
+    "holistic problem solving",
+    "root cause analysis",
+    "multi-perspective thinking",
+    "career differentiation",
+    "systems thinking methodology",
+    "genai content engine",
+    "automated website creation",
+    "ai blog analysis",
+    "website automation",
+    "genai website generator",
+  ],
   authors: [{ name: "AIAS Platform Team", url: siteUrl }],
   creator: "AIAS Platform",
   publisher: "AIAS Platform",
@@ -152,7 +191,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 {children}
               </main>
               <Footer />
-              <StickyCTA />
+              <EnhancedStickyCTA />
               <Toaster />
               <PWARegistration />
               <PerformanceHUD />
