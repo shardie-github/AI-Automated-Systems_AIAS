@@ -2,25 +2,14 @@
 set -e
 export ENABLE_EXPERIMENTAL_COREPACK=1 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true PUPPETEER_SKIP_DOWNLOAD=true
 
-# Speed optimizations: Use frozen lockfile for faster, more reliable installs
-# Vercel caches node_modules, so frozen lockfile is safe and faster
-LOCKFILE_EXISTS=true
-if [ ! -f "pnpm-lock.yaml" ]; then
-  LOCKFILE_EXISTS=false
-fi
-
+# Install dependencies with optimizations
+# - Use --no-frozen-lockfile to allow lockfile updates when package.json changes
+# - Prefer offline for cached packages
+# Note: Lockfile may be out of sync with package.json, so we allow updates
 corepack enable || true
 corepack prepare pnpm@8.15.0 --activate || npm install -g pnpm@8.15.0
 
-# Install dependencies with optimizations
-# - Use frozen lockfile when available (faster, uses cache better)
-# - Prefer offline for cached packages
-INSTALL_FLAGS="--prefer-offline"
-if [ "$LOCKFILE_EXISTS" = true ]; then
-  INSTALL_FLAGS="$INSTALL_FLAGS --frozen-lockfile"
-else
-  INSTALL_FLAGS="$INSTALL_FLAGS --no-frozen-lockfile"
-fi
+INSTALL_FLAGS="--prefer-offline --no-frozen-lockfile"
 
 # Install dependencies. Canvas may fail due to Python distutils issue on Node 24/Python 3.12+,
 # but canvas-confetti works fine without it (uses DOM fallback). We'll handle the error gracefully.
