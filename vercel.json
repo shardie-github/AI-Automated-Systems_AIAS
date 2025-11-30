@@ -39,7 +39,7 @@
     "autoJobCancelation": true,
     "silent": false
   },
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- app/ components/ lib/ public/ && git diff --quiet HEAD^ HEAD -- vercel.json vercel-build.sh .vercelignore pnpm-lock.yaml next.config.mjs",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- app/ components/ lib/ public/ && git diff --quiet HEAD^ HEAD -- vercel.json vercel-build.sh .vercelignore pnpm-lock.yaml next.config.mjs patches/",
   "headers": [
     {
       "source": "/(.*)",
