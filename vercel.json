@@ -93,7 +93,7 @@
       "source": "/api/(.*)"
     }
   ],
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- app/ components/ lib/ public/ && git diff --quiet HEAD^ HEAD -- vercel.json vercel-build.sh .vercelignore pnpm-lock.yaml next.config.mjs patches/",
+  "ignoreCommand": "./scripts/vercel-ignore.sh",
   "installCommand": "./scripts/vercel-install.sh",
   "outputDirectory": ".next",
   "regions": [
