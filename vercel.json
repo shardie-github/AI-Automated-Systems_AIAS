@@ -8,7 +8,7 @@
       "SKIP_ENV_VALIDATION": "1"
     }
   },
-  "buildCommand": "prisma generate --schema=./prisma/schema.prisma && next build",
+  "buildCommand": "prisma generate --schema=./apps/web/prisma/schema.prisma && next build",
   "cleanUrls": true,
   "devCommand": "pnpm run dev",
   "env": {

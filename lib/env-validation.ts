@@ -53,3 +53,21 @@ function getEnv() {
 }
 
 export const validatedEnv = getEnv();
+
+/**
+ * Validate environment variables on startup
+ * Throws if required variables are missing (only at runtime, not during build)
+ */
+export function validateEnvOnStartup(): void {
+  if (skipValidation) {
+    return; // Skip during build
+  }
+  
+  const parsed = envSchema.safeParse(process.env);
+  
+  if (!parsed.success) {
+    const errors = parsed.error.flatten().fieldErrors;
+    const errorMessage = `Environment validation failed:\n${JSON.stringify(errors, null, 2)}`;
+    throw new Error(errorMessage);
+  }
+}

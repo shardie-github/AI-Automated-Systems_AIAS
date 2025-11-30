@@ -6,7 +6,7 @@
  */
 
 import { execSync } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { join } from 'path';
 import { Octokit } from '@octokit/rest';
 import type { ModuleResult } from '../orchestrator';
