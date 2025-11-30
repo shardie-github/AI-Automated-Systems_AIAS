@@ -77,25 +77,47 @@ const plans = [
 
 export default function PricingPage() {
   return (
-    <div className="container py-16">
+    <div className="container py-12 md:py-16 px-4">
       <PricingAnalytics />
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
           Multi-currency support: CAD, USD, EUR, GBP, and more. Prices shown in your local currency. Transparent pricing. Cancel anytime.
         </p>
-        <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          🇨🇦 Built in Canada • 🌍 Global Pricing • Multi-Currency Support
+        <div className="mt-4 inline-flex flex-wrap items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-primary/10 text-primary text-sm md:text-base font-semibold border border-primary/20">
+          <span>🇨🇦 Built in Canada</span>
+          <span>•</span>
+          <span>🌍 Global Pricing</span>
+          <span>•</span>
+          <span>💳 Multi-Currency Support</span>
+        </div>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm md:text-base text-muted-foreground">
+          <span className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
+            No credit card required
+          </span>
+          <span className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
+            14-day free trial
+          </span>
+          <span className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
+            Cancel anytime
+          </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto mb-12">
         {plans.map((plan) => (
           <Card
             key={plan.name}
-            className={`relative ${plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
+            className={`relative transition-all hover:shadow-xl ${
+              plan.popular 
+                ? "border-2 border-primary shadow-2xl scale-105 md:scale-110 bg-gradient-to-br from-primary/5 to-transparent" 
+                : "border-2 hover:border-primary/50"
+            }`}
           >
             {plan.popular && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -136,13 +158,20 @@ export default function PricingPage() {
                 ))}
               </ul>
               <Button
-                className="w-full"
+                className="w-full h-12 md:h-14 text-base md:text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105"
                 variant={plan.popular ? "default" : "outline"}
                 size="lg"
                 asChild
               >
-                <Link href="/signup">{plan.cta}</Link>
+                <Link href="/signup" aria-label={`${plan.cta} - ${plan.name} plan`}>
+                  {plan.cta}
+                </Link>
               </Button>
+              {plan.popular && (
+                <p className="text-center text-xs md:text-sm text-muted-foreground mt-3">
+                  ✨ Most popular choice
+                </p>
+              )}
             </CardContent>
           </Card>
         ))}

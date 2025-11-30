@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { moderateComment, generateSystemsThinkingInsight, type Comment } from "@/lib/blog/comments";
 
+export const dynamic = 'force-dynamic';
+
 // GET comments for an RSS item
 export async function GET(request: NextRequest) {
   try {
@@ -16,8 +18,13 @@ export async function GET(request: NextRequest) {
 
     // Fetch from database
     const { createClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing required Supabase environment variables');
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: comments, error } = await supabase
@@ -83,8 +90,13 @@ export async function POST(request: NextRequest) {
 
     // Save to database
     const { createClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing required Supabase environment variables');
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: _savedComment, error: saveError } = await supabase

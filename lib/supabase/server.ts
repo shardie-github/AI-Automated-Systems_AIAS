@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from '@/types/supabase';
 
@@ -8,12 +8,9 @@ import type { Database } from '@/types/supabase';
  * CRITICAL: Throws hard error immediately if required env vars are missing.
  * This ensures runtime failures are caught early, not silently ignored.
  * 
- * Uses async cookies() for Next.js 15 compatibility.
+ * Uses @supabase/ssr for Next.js 15 compatibility with proper cookie handling.
  * Build-safe: During build (when SKIP_ENV_VALIDATION=true), returns placeholder
  * to prevent build failures. At runtime, throws hard error if vars are missing.
- * 
- * NOTE: For full Next.js 15 cookie handling, consider installing @supabase/ssr
- * and using createServerClient from that package instead.
  */
 export async function createServerSupabaseClient() {
   // Next.js 15: cookies() must be awaited
@@ -39,27 +36,43 @@ export async function createServerSupabaseClient() {
       );
     }
     // Build-time: Return placeholder to prevent build failures
-    return createClient<Database>(
+    return createServerClient<Database>(
       'https://placeholder.supabase.co',
       'placeholder-key',
       {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+          setAll(cookiesToSet) {
+            // Note: This often throws in Server Components, handle gracefully
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => 
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // Ignore cookie setting errors during build/SSR
+            }
+          },
         },
       }
     );
   }
   
-  return createClient<Database>(
+  return createServerClient<Database>(
     supabaseUrl,
     supabaseKey,
     {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll(cookiesToSet) {
+          // Note: This often throws in Server Components, handle gracefully
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => 
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Ignore cookie setting errors during build/SSR
+          }
+        },
       },
     }
   );

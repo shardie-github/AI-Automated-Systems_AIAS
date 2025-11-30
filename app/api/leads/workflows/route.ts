@@ -8,6 +8,8 @@ import { autopilotWorkflowService } from '@/lib/lead-generation/autopilot-workfl
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const createWorkflowSchema = z.object({
   name: z.string(),
   trigger: z.enum(['lead_captured', 'lead_scored', 'lead_qualified', 'lead_unqualified', 'conversion', 'schedule']),
@@ -40,9 +42,16 @@ export const GET = createGETHandler(
     const tenantId = context.tenantId || undefined;
     
     // Get workflows for tenant
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing required Supabase environment variables');
+    }
+    
     const { data: workflows } = await createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      supabaseUrl,
+      supabaseKey
     )
       .from('autopilot_workflows')
       .select('*')

@@ -1,7 +1,9 @@
 import dynamic from "next/dynamic";
-import { Hero } from "@/components/home/hero";
+import { EnhancedHero } from "@/components/home/enhanced-hero";
 import { Features } from "@/components/home/features";
 import { StatsSection } from "@/components/home/stats-section";
+import { TrustBadges } from "@/components/home/trust-badges";
+import { ConversionCTA } from "@/components/home/conversion-cta";
 import { SoftwareApplicationSchema } from "@/components/seo/structured-data";
 import { FAQSchema } from "@/components/seo/structured-data";
 
@@ -45,15 +47,15 @@ export default function HomePage() {
     <>
       <SoftwareApplicationSchema />
       <FAQSchema faqs={homepageFAQs} />
-      <Hero />
+      <EnhancedHero />
       <StatsSection />
-      <TrustSignals />
+      <TrustBadges />
       <CaseStudyPreview />
       <ROICalculator />
       <Features />
       <Testimonials />
       <FAQ />
-      <CTASection />
+      <ConversionCTA />
     </>
   );
 }

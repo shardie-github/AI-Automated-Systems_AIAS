@@ -1,4 +1,4 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from '@/types/supabase';
 
 /**
@@ -10,10 +10,8 @@ import type { Database } from '@/types/supabase';
  * Build-safe: During build (when SKIP_ENV_VALIDATION=true), returns placeholder
  * to prevent build failures. At runtime, throws hard error if vars are missing.
  * 
- * NOTE: For full Next.js 15 compatibility, consider installing @supabase/ssr
- * and using createBrowserClient from that package instead.
+ * Uses @supabase/ssr for Next.js 15 compatibility with proper cookie handling.
  */
-
 export function createClient() {
   // Type-safe access: process.env is string | undefined
   const supabaseUrl: string | undefined = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -36,16 +34,14 @@ export function createClient() {
     }
     // Build-time: Return placeholder to prevent build failures
     // This will fail at runtime if actually used, which is the desired behavior
-    return createSupabaseClient<Database>(
+    return createBrowserClient<Database>(
       'https://placeholder.supabase.co',
-      'placeholder-key',
-      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+      'placeholder-key'
     );
   }
   
-  return createSupabaseClient<Database>(
+  return createBrowserClient<Database>(
     supabaseUrl,
-    supabaseKey,
-    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+    supabaseKey
   );
 }

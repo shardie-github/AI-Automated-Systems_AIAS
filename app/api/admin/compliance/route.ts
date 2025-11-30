@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs'; // Requires Node.js runtime for fs operations
 
 export async function GET() {
@@ -16,10 +17,14 @@ export async function GET() {
     }
 
     // Fallback: get from latest security audit
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY!
-    );
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing required Supabase environment variables');
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: latestAudit } = await supabase
       .from('security_audits')
