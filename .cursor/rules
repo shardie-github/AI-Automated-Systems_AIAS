@@ -1,0 +1,323 @@
+# Vercel + Supabase + Next.js + TypeScript Build Doctor
+# STRICT PRODUCTION BUILD SAFETY RULES
+
+## Priority Directive
+When ANY build error occurs, or when asked to fix builds, execute this sequence:
+
+1. Run `npx tsc --noEmit` and capture ALL errors
+2. Run `npm run build 2>&1` and capture ALL errors  
+3. Categorize errors (Type/Lint/Prisma/Env/Next/Import)
+4. Fix in dependency order: env → prisma → types → components → config
+5. Verify with full build before declaring success
+
+## 🚨 CRITICAL: ENVIRONMENT VARIABLE SAFETY
+
+**Vercel builds fail when code tries to access environment variables that are not available during the "Build Step" (CI/CD), or when Type Safety fails because a variable might be undefined.**
+
+### Rules:
+- **NEVER** destructure `process.env` directly in component props or global scope without validation
+- **ALWAYS** treat all `process.env` variables as `string | undefined`
+- In `lib/supabase/client.ts` (or similar), throw a **HARD ERROR immediately** if `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` are missing. Do not let it fail silently later
+- For Environment Variables used in Server Components, ensure you check `if (!process.env.VAR) { ... }` before usage to satisfy TypeScript
+
+### Examples:
+```typescript
+// ❌ BAD - Direct destructuring
+const { NEXT_PUBLIC_SUPABASE_URL } = process.env;
+
+// ✅ GOOD - Type-safe access
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+if (!supabaseUrl) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_URL is required');
+}
+
+// ❌ BAD - No validation
+const url = process.env.API_URL;
+
+// ✅ GOOD - With validation
+const url = process.env.API_URL;
+if (!url) {
+  throw new Error('API_URL is required');
+}
+```
+
+## 🚨 CRITICAL: NEXT.JS APP ROUTER & SERVER ACTIONS
+
+### Rules:
+- **ALWAYS** explicitly mark all Server Actions with `"use server"` at the very top of the file
+- **ALWAYS** explicitly mark all Client Components with `"use client"` at the very top
+- **NEVER** import server-only modules (like `fs`, `path`, or `headers()/cookies()`) into a file marked `"use client"`
+- If a Page uses Supabase Auth helpers (cookies) or reads dynamic headers, you **MUST** strictly define the output mode to prevent Static Site Generation (SSG) failures:
+  ```typescript
+  export const dynamic = 'force-dynamic';
+  // OR
+  export const revalidate = 0;
+  ```
+- **NEVER** pass complex functions or non-serializable data (like Class instances) from Server Components to Client Components. Only pass plain JSON-serializable objects (Strings, Numbers, Booleans, Arrays, Objects)
+
+### Examples:
+```typescript
+// ✅ Server Action
+"use server"
+export async function createUser(formData: FormData) {
+  // ...
+}
+
+// ✅ Client Component
+"use client"
+export function UserForm() {
+  // ...
+}
+
+// ✅ Page with dynamic data
+export const dynamic = 'force-dynamic';
+export default async function Page() {
+  const headersList = await headers();
+  // ...
+}
+```
+
+## 🚨 CRITICAL: SUPABASE & TYPESCRIPT
+
+### Rules:
+- **NEVER** use `any`. Vercel builds run `tsc --noEmit` and will fail on implicit `any`
+- **ALWAYS** use the generated Database type from Supabase:
+  ```typescript
+  import { Database } from '@/types/supabase';
+  const supabase = createClient<Database>(...);
+  ```
+- When mapping over data from Supabase, ensure the data is not null before accessing properties. Supabase returns data as `T[] | null`:
+  ```typescript
+  // ❌ BAD
+  data.map(item => ...)
+  
+  // ✅ GOOD
+  (data || []).map(item => ...)
+  ```
+
+### Examples:
+```typescript
+// ❌ BAD
+const { data } = await supabase.from('users').select('*');
+data.map(user => user.name); // Error: data might be null
+
+// ✅ GOOD
+const { data } = await supabase.from('users').select('*');
+(data || []).map(user => user.name);
+
+// ❌ BAD
+function processData(data: any) { }
+
+// ✅ GOOD
+function processData(data: Database['public']['Tables']['users']['Row']) { }
+```
+
+## 🚨 CRITICAL: LINTING & BUILD PRE-CHECKS
+
+### Rules:
+- **NO** unused imports. **NO** unused variables. These trigger ESLint errors which fail Vercel builds
+- All `<img>` tags must be converted to `<Image />` (next/image) with proper width, height, and alt tags, OR explicitly unoptimized if external sources are dynamic
+- If using `<a>` tags for internal navigation, **REPLACE** them with `<Link>` from `next/link`
+
+### Examples:
+```typescript
+// ❌ BAD
+import { unused } from './module';
+const unusedVar = 123;
+
+// ✅ GOOD - Remove unused imports/variables
+// Or prefix with _ if intentionally unused
+const _unusedVar = 123;
+
+// ❌ BAD
+<img src="/logo.png" />
+
+// ✅ GOOD
+import Image from 'next/image';
+<Image src="/logo.png" width={100} height={100} alt="Logo" />
+
+// ❌ BAD
+<a href="/about">About</a>
+
+// ✅ GOOD
+import Link from 'next/link';
+<Link href="/about">About</Link>
+```
+
+## 🚨 CRITICAL: SUPABASE AUTH & MIDDLEWARE
+
+### Rules:
+- Middleware (`middleware.ts`) in Next.js runs on the Edge. You **CANNOT** use Node.js specific APIs here
+- When using `@supabase/ssr` in middleware, ensure you are creating the response object, handling cookies on that response, and returning that specific response instance
+
+### Examples:
+```typescript
+// ✅ Middleware pattern
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse } from 'next/server';
+
+export async function middleware(request: Request) {
+  let response = NextResponse.next({
+    request: { headers: request.headers },
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
+
+  return response;
+}
+```
+
+## 🚨 CRITICAL: ERROR HANDLING
+
+### Rules:
+- All Server Actions must return a structured response object (e.g., `{ success: boolean, error?: string, data?: any }`) rather than throwing raw errors, so the UI can handle failures gracefully without crashing the build or the client
+
+### Examples:
+```typescript
+// ❌ BAD
+"use server"
+export async function createUser(formData: FormData) {
+  if (!formData.get('email')) {
+    throw new Error('Email required'); // Crashes client
+  }
+  // ...
+}
+
+// ✅ GOOD
+"use server"
+export async function createUser(formData: FormData): Promise<{ success: boolean; error?: string; data?: User }> {
+  try {
+    const email = formData.get('email');
+    if (!email) {
+      return { success: false, error: 'Email required' };
+    }
+    // ...
+    return { success: true, data: user };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+```
+
+## Automatic Fixes to Apply
+
+### next.config.ts / next.config.mjs
+- Set `eslint.ignoreDuringBuilds: true`
+- Set `output: 'standalone'` (for Vercel)
+- Add Supabase image domains to `remotePatterns`
+- Add webpack config for Prisma edge compatibility
+
+### tsconfig.json
+- Set `moduleResolution: "bundler"`
+- Set `strict: true`
+- Ensure `skipLibCheck: true`
+- Set `noUncheckedIndexedAccess: false` (optional, for compatibility)
+- Set `forceConsistentCasingInFileNames: true`
+- Set `noImplicitAny: true`
+
+### package.json
+- Add `"postinstall": "prisma generate || true"`
+- Add `"type-check": "tsc --noEmit"`
+- Add `"vercel-build": "prisma generate && prisma migrate deploy --skip-seed && next build"`
+
+### prisma/schema.prisma
+- Add `binaryTargets: ["native", "rhel-openssl-3.0.x", "rhel-openssl-1.0.x"]`
+- Ensure `directUrl` is configured in datasource
+
+### vercel.json
+- Set `buildCommand: "prisma generate && next build"`
+- Set `installCommand` with `--legacy-peer-deps` if needed
+- Add build env vars: `PRISMA_CLIENT_ENGINE_TYPE`, `SKIP_ENV_VALIDATION`
+
+## Next.js 15 Async Patterns
+
+Always use async/await for:
+- `params` in page/layout components (params is now a Promise)
+- `searchParams` in page components (searchParams is now a Promise)
+- `cookies()` from next/headers (must be awaited)
+- `headers()` from next/headers (must be awaited)
+
+Example fixes:
+```typescript
+// ❌ Wrong (Next.js 14)
+export default function Page({ params }) {
+  const { id } = params;
+}
+
+// ✅ Correct (Next.js 15)
+export default async function Page({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const { id } = await params;
+}
+```
+
+## Type Error Priorities
+
+Fix in this order:
+1. Import/module resolution errors → Run `npm install && npx prisma generate`
+2. Prisma type generation → Run `npx prisma generate`
+3. Async params/searchParams types → Update to Promise types
+4. Null/undefined safety → Add optional chaining and nullish coalescing
+5. Implicit any types → Add explicit types or `unknown` with type guards
+6. Unused variables (warnings) → Remove or prefix with `_`
+
+## Environment Variable Handling
+
+- Use `SKIP_ENV_VALIDATION=true` during build if env vars are missing
+- **CRITICAL**: In production runtime, throw hard errors for missing required env vars
+- Validate env vars at runtime, not build time (for build safety)
+- Use zod for env validation with build-safe fallbacks
+
+## Never Do
+
+- Use `@ts-ignore` or `@ts-expect-error` without fixing root cause
+- Set `ignoreBuildErrors: true` in production (only for separate CI type-check)
+- Commit without running `tsc --noEmit`
+- Push without successful local build
+- Hardcode API keys or secrets
+- Remove type safety for convenience
+- Use `any` type
+- Pass non-serializable data from Server to Client Components
+- Import server-only modules in client components
+
+## Error Recovery Patterns
+
+If build fails:
+1. "Module not found" → Run `npm install` then `npx prisma generate`
+2. "Type error" → Run `npx tsc --noEmit` and fix each error systematically
+3. "Cannot find name" → Check imports, run `npx prisma generate`
+4. "ENOENT .prisma/client" → Delete `node_modules/.prisma`, reinstall
+5. "Connection refused" → Env vars missing, add `SKIP_ENV_VALIDATION=true`
+6. "Dynamic server usage" → Add `export const dynamic = 'force-dynamic'`
+7. "Metadata export" → Ensure metadata is not in client components
+8. "Unused variable" → Remove or prefix with `_`
+9. "Implicit any" → Add explicit type annotation
+
+## Success Criteria
+
+✅ `npx tsc --noEmit` exits with code 0
+✅ `npm run build` completes without errors
+✅ No TypeScript errors in output
+✅ No ESLint errors (unused imports/variables)
+✅ Vercel build shows green checkmark
+✅ All CI checks pass on GitHub
+✅ All Server Actions return structured responses
+✅ All environment variables are type-safe and validated

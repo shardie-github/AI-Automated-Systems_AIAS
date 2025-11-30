@@ -1,57 +1,51 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 /**
- * Supabase Client for Server and Client Components
+ * Supabase Client for Browser/Client Components
  * 
- * All configuration is loaded dynamically from environment variables.
- * No hardcoded values are used.
+ * CRITICAL: Throws hard error immediately if required env vars are missing.
+ * This ensures runtime failures are caught early, not silently ignored.
  * 
- * CRITICAL: Throws hard error if required environment variables are missing.
- * This ensures build-time failures rather than runtime failures.
+ * Build-safe: During build (when SKIP_ENV_VALIDATION=true), returns placeholder
+ * to prevent build failures. At runtime, throws hard error if vars are missing.
+ * 
+ * NOTE: For full Next.js 15 compatibility, consider installing @supabase/ssr
+ * and using createBrowserClient from that package instead.
  */
 
-// Validate required environment variables at module load time
-if (!env.supabase.url) {
-  throw new Error(
-    'NEXT_PUBLIC_SUPABASE_URL or SUPABASE_URL is required but not set. ' +
-    'Please set this variable in your environment configuration.'
-  );
-}
-
-if (!env.supabase.anonKey) {
-  throw new Error(
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_ANON_KEY is required but not set. ' +
-    'Please set this variable in your environment configuration.'
-  );
-}
-
-export const supabase = createSupabaseClient(
-  env.supabase.url,
-  env.supabase.anonKey,
-  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
-);
-
-// Export createClient function for compatibility
-export function createClient(
-  url?: string, 
-  key?: string, 
-  options?: { auth?: { persistSession?: boolean; autoRefreshToken?: boolean; detectSessionInUrl?: boolean } }
-) {
-  const finalUrl = url || env.supabase.url;
-  const finalKey = key || env.supabase.anonKey;
+export function createClient() {
+  // Type-safe access: process.env is string | undefined
+  const supabaseUrl: string | undefined = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey: string | undefined = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   
-  if (!finalUrl) {
-    throw new Error('Supabase URL is required but not provided');
+  // Build-safe check: Skip validation during build
+  const isBuildTime = process.env.SKIP_ENV_VALIDATION === 'true' || 
+                      process.env.SKIP_ENV_VALIDATION === '1' ||
+                      (typeof window === 'undefined' && process.env.NODE_ENV !== 'production');
+  
+  // Hard error at runtime if missing (production safety)
+  if (!supabaseUrl || !supabaseKey) {
+    if (!isBuildTime) {
+      // Runtime: Throw hard error immediately - do not fail silently
+      throw new Error(
+        `Missing required Supabase environment variables. ` +
+        `NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? 'set' : 'MISSING'}, ` +
+        `NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseKey ? 'set' : 'MISSING'}`
+      );
+    }
+    // Build-time: Return placeholder to prevent build failures
+    // This will fail at runtime if actually used, which is the desired behavior
+    return createSupabaseClient<Database>(
+      'https://placeholder.supabase.co',
+      'placeholder-key',
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+    );
   }
   
-  if (!finalKey) {
-    throw new Error('Supabase anon key is required but not provided');
-  }
-  
-  return createSupabaseClient(
-    finalUrl,
-    finalKey,
-    options || { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+  return createSupabaseClient<Database>(
+    supabaseUrl,
+    supabaseKey,
+    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
   );
 }

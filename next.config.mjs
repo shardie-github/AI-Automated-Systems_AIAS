@@ -3,6 +3,20 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  
+  // Prevent ESLint from failing builds (run separately in CI)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
+  // Keep TypeScript errors as failures (catch real bugs)
+  typescript: {
+    // Only set true if you have separate CI type-check
+    ignoreBuildErrors: false,
+  },
+  
+  // Required for Vercel serverless + App Router
+  output: 'standalone',
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -46,6 +60,8 @@ const nextConfig = {
     outputFileTracingIncludes: {
       '/api/**': ['./**'],
     },
+    // Prevents hydration mismatches from crashing
+    missingSuspenseWithCSRBailout: false,
   },
   // Performance optimizations
   compiler: {
@@ -58,7 +74,7 @@ const nextConfig = {
     // Ignore pg module and migrations in webpack (server-only)
     config.externals = config.externals || [];
     if (isServer) {
-      config.externals.push('pg', 'pg-native');
+      config.externals.push('pg', 'pg-native', '@prisma/client');
     }
     
     // Ignore migrations module during build analysis

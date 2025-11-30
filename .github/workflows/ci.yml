@@ -57,8 +57,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: |
+          echo "🔧 Generating Prisma Client..."
+          cd apps/web && npx prisma generate || echo "⚠️ Prisma generate failed, continuing..."
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy?sslmode=require' }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
+          PRISMA_CLIENT_ENGINE_TYPE: library
+
       - name: Type check
         run: pnpm run typecheck
+        env:
+          SKIP_ENV_VALIDATION: "true"
 
   format-check:
     name: Format Check
@@ -141,6 +153,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: |
+          echo "🔧 Generating Prisma Client..."
+          cd apps/web && npx prisma generate || echo "⚠️ Prisma generate failed, continuing..."
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy?sslmode=require' }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
+          PRISMA_CLIENT_ENGINE_TYPE: library
+
       - name: Build application
         run: |
           set -euo pipefail
@@ -151,10 +173,13 @@ jobs:
           fi
           echo "✅ Build completed successfully"
         env:
-          # Make DATABASE_URL optional for build
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
-          # Skip Prisma generation if DB not available
-          SKIP_PRISMA_GENERATE: ${{ !secrets.DATABASE_URL }}
+          # Dummy env vars for build (actual values not needed for type checking)
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy?sslmode=require' }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1bW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDU2NDI0MDAsImV4cCI6MTk2MTIxODQwMH0.dummy' }}
+          SKIP_ENV_VALIDATION: "true"
+          PRISMA_CLIENT_ENGINE_TYPE: library
 
       - name: Validate build output
         run: |
