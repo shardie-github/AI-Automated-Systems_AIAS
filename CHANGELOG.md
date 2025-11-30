@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **CFO Mode:** Financial ledger table with credit/debit model for immutable transaction tracking
+- **CFO Mode:** Idempotency key system to prevent duplicate financial transactions
+- **CFO Mode:** Stripe integration updated with idempotency keys on all payment operations
+- **CRO Mode:** `lifecycle_stage` field added to leads table (subscriber, lead, mql, sql, customer)
+- **CRO Mode:** Automatic logging of lead status and lifecycle_stage changes to activity_logs
+- **CTO Mode:** Fixed environment variable violations (3 API routes now use centralized env module)
+- **PM Mode:** Architecture diagrams (Mermaid) for Auth, Payments, Financial Ledger, and Lead Lifecycle flows
 - Comprehensive accelerator lens analysis (Techstars, 500 Global, Antler, EF, Lean Startup, DE, JTBD, PLG)
 - YC readiness documentation and tracking
 - Performance monitoring and security enhancements
@@ -19,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment doctor script
 
 ### Changed
+- **CFO Mode:** All Stripe API calls now support idempotency keys
+- **CFO Mode:** Currency amounts stored as integers (cents) - no floating point math
+- **CTO Mode:** Stripe billing service uses centralized env module instead of direct process.env access
 - Enhanced performance, accessibility, and SEO
 - Improved UI with animations and polish
 - Standardized CI/CD workflows
@@ -26,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated to Node.js 20
 
 ### Fixed
+- **CTO Mode:** Environment variable safety violations in API routes (leads/workflows, blog/comments, blog/rss-comments)
 - CI/CD workflow stability
 - Vercel deployment reliability
 - Test flakiness

@@ -227,25 +227,49 @@ export class BillingService {
     this.supabase = supabase;
   }
 
-  async createCustomer(email: string, name: string) {
-    return await this.stripe.customers.create({
+  async createCustomer(email: string, name: string, idempotencyKey?: string) {
+    // CFO Mode: Use idempotency key to prevent duplicate customer creation
+    const params: Stripe.CustomerCreateParams = {
       email,
       name,
       metadata: {
         source: 'aias_consultancy'
       }
-    });
+    };
+    
+    if (idempotencyKey) {
+      // Stripe supports idempotency via Idempotency-Key header
+      return await this.stripe.customers.create(params, {
+        idempotencyKey,
+      });
+    }
+    
+    return await this.stripe.customers.create(params);
   }
 
-  async createSubscription(customerId: string, priceId: string, trialDays: number = 14) {
-    return await this.stripe.subscriptions.create({
+  async createSubscription(
+    customerId: string,
+    priceId: string,
+    trialDays: number = 14,
+    idempotencyKey?: string
+  ) {
+    // CFO Mode: Use idempotency key to prevent duplicate subscriptions
+    const params: Stripe.SubscriptionCreateParams = {
       customer: customerId,
       items: [{ price: priceId }],
       trial_period_days: trialDays,
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent']
-    });
+    };
+    
+    if (idempotencyKey) {
+      return await this.stripe.subscriptions.create(params, {
+        idempotencyKey,
+      });
+    }
+    
+    return await this.stripe.subscriptions.create(params);
   }
 
   async updateSubscription(subscriptionId: string, newPriceId: string) {
@@ -266,15 +290,32 @@ export class BillingService {
     });
   }
 
-  async createPaymentIntent(amount: number, currency: string = 'usd', metadata: any = {}) {
-    return await this.stripe.paymentIntents.create({
-      amount: amount * 100, // Convert to cents
+  async createPaymentIntent(
+    amount: number,
+    currency: string = 'usd',
+    metadata: any = {},
+    idempotencyKey?: string
+  ) {
+    // CFO Mode: Use idempotency key to prevent duplicate payment intents
+    // CFO Principle: Amount stored as integer (cents) - no floating point
+    const amountCents = Math.round(amount * 100); // Ensure integer
+    
+    const params: Stripe.PaymentIntentCreateParams = {
+      amount: amountCents,
       currency,
       metadata: {
         ...metadata,
         source: 'aias_consultancy'
       }
-    });
+    };
+    
+    if (idempotencyKey) {
+      return await this.stripe.paymentIntents.create(params, {
+        idempotencyKey,
+      });
+    }
+    
+    return await this.stripe.paymentIntents.create(params);
   }
 
   async trackUsage(tenantId: string, metric: string, amount: number = 1) {
