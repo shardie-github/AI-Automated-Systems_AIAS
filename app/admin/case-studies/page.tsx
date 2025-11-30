@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { CaseStudyDashboard } from "@/components/sales/case-study-dashboard";
 
 export const metadata: Metadata = {
-  title: "Case Studies — Admin | AIAS Platform",
+  title: "Case Studies — Admin | AI Automated Systems",
   description: "Manage customer success stories for sales and marketing",
 };
 

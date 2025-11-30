@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { LOIDashboardEnhanced } from "@/components/sales/loi-dashboard-enhanced";
 
 export const metadata: Metadata = {
-  title: "LOI Management — Admin | AIAS Platform",
+  title: "LOI Management — Admin | AI Automated Systems",
   description: "Track and manage Letters of Intent for Seed Round fundraising",
 };
 

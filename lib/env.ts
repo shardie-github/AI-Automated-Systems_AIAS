@@ -140,9 +140,11 @@ export const env = {
   
   // Email Configuration
   email: {
-    fromEmail: getEnvVar('EMAIL_FROM', false, 'noreply@aias-platform.com'),
-    fromName: getEnvVar('EMAIL_FROM_NAME', false, 'AIAS Platform'),
-    replyTo: getEnvVar('EMAIL_REPLY_TO', false),
+    fromEmail: getEnvVar('EMAIL_FROM', false, 'inquiries@aiautomatedsystems.ca'),
+    fromName: getEnvVar('EMAIL_FROM_NAME', false, 'AI Automated Systems'),
+    replyTo: getEnvVar('EMAIL_REPLY_TO', false, 'inquiries@aiautomatedsystems.ca'),
+    supportEmail: getEnvVar('SUPPORT_EMAIL', false, 'support@aiautomatedsystems.ca'),
+    inquiriesEmail: getEnvVar('INQUIRIES_EMAIL', false, 'inquiries@aiautomatedsystems.ca'),
   },
   
   // Resend Configuration

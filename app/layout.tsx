@@ -17,18 +17,18 @@ import { TelemetryProvider } from "@/lib/monitoring/telemetry-provider";
 import { UTMTracker } from "@/components/analytics/utm-tracker";
 import { env, getOptionalEnv } from "@/lib/env";
 
-const siteUrl = env.app.siteUrl || "https://aias-platform.com";
+const siteUrl = env.app.siteUrl || "https://aiautomatedsystems.ca";
 
 export const metadata: Metadata = {
   title: {
-    default: "Custom AI Platform Development | AIAS Consultancy | Transform Your Business",
-    template: "%s | AIAS Platform",
+    default: "AI Automated Systems | Custom AI Platform Development | Transform Your Business",
+    template: "%s | AI Automated Systems",
   },
   description: "We build custom AI platforms — not integrations. See TokPulse and Hardonia Suite. Save 10+ hours/week. 40% ROI increase. From strategy to deployment. Schedule a free strategy call. No credit card required.",
   keywords: [
     "custom AI platforms",
     "AI development",
-    "AIAS Consultancy",
+    "AI Automated Systems",
     "TokPulse",
     "Hardonia Suite",
     "AI automation",
@@ -65,9 +65,9 @@ export const metadata: Metadata = {
     "website automation",
     "genai website generator",
   ],
-  authors: [{ name: "AIAS Platform Team", url: siteUrl }],
-  creator: "AIAS Platform",
-  publisher: "AIAS Platform",
+  authors: [{ name: "AI Automated Systems", url: siteUrl }],
+  creator: "AI Automated Systems",
+  publisher: "AI Automated Systems",
   category: "Technology",
   classification: "Business Software",
   icons: [
@@ -86,11 +86,11 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "AIAS Platform — Custom AI Platform Development | Canadian-Built",
+    title: "AI Automated Systems — Custom AI Platform Development | Canadian-Built",
     description: "We build custom AI platforms — not integrations. See TokPulse and Hardonia Suite. From strategy to deployment. Schedule a strategy call.",
     type: "website",
     url: siteUrl,
-    siteName: "AIAS Platform",
+    siteName: "AI Automated Systems",
     locale: "en_US",
     alternateLocale: ["en_CA"],
     images: [
@@ -98,14 +98,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AIAS Platform — Custom AI Platform Development",
+        alt: "AI Automated Systems — Custom AI Platform Development",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AIAS Platform — Custom AI Platform Development",
+    title: "AI Automated Systems — Custom AI Platform Development",
     description: "We build custom AI platforms — not integrations. See TokPulse and Hardonia Suite. From strategy to deployment.",
     creator: "@aias_platform",
     site: "@aias_platform",

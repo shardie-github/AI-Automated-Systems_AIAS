@@ -29,8 +29,8 @@ const FAQ = dynamic(() => import("@/components/home/faq").then(mod => ({ default
 
 const homepageFAQs = [
   {
-    question: "What's the difference between AIAS Consultancy and AIAS Platform?",
-    answer: "AIAS Consultancy builds custom AI platforms from scratch (like TokPulse and Hardonia Suite). We architect, develop, and deploy complete solutions tailored to your business. AIAS Platform is our SaaS product for businesses that want ready-made automation tools.",
+    question: "What's the difference between AI Automated Systems consulting and the AIAS Platform?",
+    answer: "AI Automated Systems builds custom AI platforms from scratch (like TokPulse and Hardonia Suite). We architect, develop, and deploy complete solutions tailored to your business. The AIAS Platform is our SaaS product for businesses that want ready-made automation tools.",
   },
   {
     question: "How long does it take to build a custom AI platform?",

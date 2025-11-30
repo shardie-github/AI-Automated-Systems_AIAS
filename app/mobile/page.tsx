@@ -6,8 +6,8 @@ import { Workflow, Zap, Shield, Smartphone } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Mobile App — AIAS Platform",
-  description: "Secure mobile-first experience for AIAS Platform",
+  title: "Mobile App — AI Automated Systems",
+  description: "Secure mobile-first experience for AI Automated Systems",
 };
 
 export default function MobilePage() {
@@ -18,7 +18,7 @@ export default function MobilePage() {
           <div className="flex justify-center">
             <Smartphone className="h-16 w-16 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold">AIAS Platform Mobile</h1>
+          <h1 className="text-3xl font-bold">AI Automated Systems Mobile</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Access your workflows and automations securely from any device. 
             Optimized for mobile with offline support and enterprise-grade security.
@@ -97,7 +97,7 @@ export default function MobilePage() {
           <CardHeader>
             <CardTitle>Install as App</CardTitle>
             <CardDescription>
-              Install AIAS Platform as a Progressive Web App (PWA) for a native app experience
+              Install AI Automated Systems as a Progressive Web App (PWA) for a native app experience
             </CardDescription>
           </CardHeader>
           <CardContent>

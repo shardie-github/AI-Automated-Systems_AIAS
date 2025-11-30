@@ -233,7 +233,7 @@ export class BillingService {
       email,
       name,
       metadata: {
-        source: 'aias_consultancy'
+        source: 'aias'
       }
     };
     
@@ -305,7 +305,7 @@ export class BillingService {
       currency,
       metadata: {
         ...metadata,
-        source: 'aias_consultancy'
+        source: 'aias'
       }
     };
     

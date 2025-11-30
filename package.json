@@ -5,18 +5,18 @@
   "private": true,
   "license": "MIT",
   "author": {
-    "name": "AIAS Platform Team",
-    "email": "team@aias-platform.com",
-    "url": "https://aias-platform.com"
+    "name": "AI Automated Systems",
+    "email": "inquiries@aiautomatedsystems.ca",
+    "url": "https://aiautomatedsystems.ca"
   },
-  "homepage": "https://aias-platform.com",
+  "homepage": "https://aiautomatedsystems.ca",
   "repository": {
     "type": "git",
     "url": "https://github.com/your-org/aias-platform.git"
   },
   "bugs": {
     "url": "https://github.com/your-org/aias-platform/issues",
-    "email": "support@aias-platform.com"
+    "email": "support@aiautomatedsystems.ca"
   },
   "keywords": [
     "ai",
@@ -162,8 +162,8 @@
     "perf:analyze": "npm run build:analyze && open dist/stats.html",
     "clean": "rm -rf node_modules dist .next",
     "install:all": "pnpm install",
-    "docker:build": "docker build -t aias-consultancy .",
-    "docker:run": "docker run -p 3000:3000 aias-consultancy",
+    "docker:build": "docker build -t aias .",
+    "docker:run": "docker run -p 3000:3000 aias",
     "docker:compose:up": "docker-compose up -d",
     "docker:compose:down": "docker-compose down",
     "deploy:staging": "npm run build && npm run docker:build && npm run docker:run",
