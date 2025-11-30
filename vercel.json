@@ -1,29 +1,25 @@
 {
-  "buildCommand": "prisma generate --schema=./prisma/schema.prisma && next build",
-  "devCommand": "pnpm run dev",
-  "installCommand": "./scripts/vercel-install.sh",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "framework": "nextjs",
-  "regions": ["iad1"],
-  "outputDirectory": ".next",
-  "env": {
-    "NODE_ENV": "production",
-    "PRISMA_CLIENT_ENGINE_TYPE": "library",
-    "ENABLE_EXPERIMENTAL_COREPACK": "1",
-    "NEXT_TELEMETRY_DISABLED": "1",
-    "SKIP_ENV_VALIDATION": "1",
-    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
-  },
   "build": {
     "env": {
-      "PRISMA_CLIENT_ENGINE_TYPE": "library",
       "NEXT_TELEMETRY_DISABLED": "1",
-      "SKIP_ENV_VALIDATION": "1",
+      "PRISMA_CLIENT_ENGINE_TYPE": "library",
       "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
-      "PUPPETEER_SKIP_DOWNLOAD": "true"
+      "PUPPETEER_SKIP_DOWNLOAD": "true",
+      "SKIP_ENV_VALIDATION": "1"
     }
   },
+  "buildCommand": "prisma generate --schema=./prisma/schema.prisma && next build",
+  "cleanUrls": true,
+  "devCommand": "pnpm run dev",
+  "env": {
+    "ENABLE_EXPERIMENTAL_COREPACK": "1",
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "NODE_ENV": "production",
+    "PRISMA_CLIENT_ENGINE_TYPE": "library",
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
+    "SKIP_ENV_VALIDATION": "1"
+  },
+  "framework": "nextjs",
   "git": {
     "deploymentEnabled": {
       "main": false,
@@ -31,18 +27,16 @@
     }
   },
   "github": {
+    "autoAlias": true,
+    "autoJobCancelation": true,
     "deploymentEnabled": {
       "main": false,
       "preview": false
     },
-    "autoAlias": true,
-    "autoJobCancelation": true,
     "silent": false
   },
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- app/ components/ lib/ public/ && git diff --quiet HEAD^ HEAD -- vercel.json vercel-build.sh .vercelignore pnpm-lock.yaml next.config.mjs patches/",
   "headers": [
     {
-      "source": "/(.*)",
       "headers": [
         {
           "key": "X-Content-Type-Options",
@@ -68,40 +62,48 @@
           "key": "Permissions-Policy",
           "value": "geolocation=(), microphone=(), camera=()"
         }
-      ]
+      ],
+      "source": "/(.*)"
     },
     {
-      "source": "/_next/static/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
         }
-      ]
+      ],
+      "source": "/_next/static/(.*)"
     },
     {
-      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
         }
-      ]
+      ],
+      "source": "/assets/(.*)"
     },
     {
-      "source": "/api/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "no-store, no-cache, must-revalidate"
         }
-      ]
+      ],
+      "source": "/api/(.*)"
     }
+  ],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- app/ components/ lib/ public/ && git diff --quiet HEAD^ HEAD -- vercel.json vercel-build.sh .vercelignore pnpm-lock.yaml next.config.mjs patches/",
+  "installCommand": "./scripts/vercel-install.sh",
+  "outputDirectory": ".next",
+  "regions": [
+    "iad1"
   ],
   "rewrites": [
     {
-      "source": "/sitemap.xml",
-      "destination": "/sitemap"
+      "destination": "/sitemap",
+      "source": "/sitemap.xml"
     }
-  ]
+  ],
+  "trailingSlash": false
 }
