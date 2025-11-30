@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
       let customers;
       try {
         const dbCustomers = await seedRoundDB.getCustomerHealthScores();
-        customers = dbCustomers.map((c: any) => ({
+        customers = (dbCustomers || []).map((c) => ({
           id: c.id,
           company: c.company_name,
           tier: c.tier,

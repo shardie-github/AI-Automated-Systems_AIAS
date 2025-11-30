@@ -15,8 +15,9 @@ import { OrganizationSchema, WebSiteSchema } from "@/components/seo/structured-d
 import { EnhancedErrorBoundary } from "@/lib/error-handling/error-boundary-enhanced";
 import { TelemetryProvider } from "@/lib/monitoring/telemetry-provider";
 import { UTMTracker } from "@/components/analytics/utm-tracker";
+import { env, getOptionalEnv } from "@/lib/env";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aias-platform.com";
+const siteUrl = env.app.siteUrl || "https://aias-platform.com";
 
 export const metadata: Metadata = {
   title: {
@@ -83,9 +84,9 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
-    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
-    yahoo: process.env.NEXT_PUBLIC_YAHOO_VERIFICATION,
+    google: getOptionalEnv('NEXT_PUBLIC_GOOGLE_VERIFICATION'),
+    yandex: getOptionalEnv('NEXT_PUBLIC_YANDEX_VERIFICATION'),
+    yahoo: getOptionalEnv('NEXT_PUBLIC_YAHOO_VERIFICATION'),
   },
   other: {
     "mobile-web-app-capable": "yes",

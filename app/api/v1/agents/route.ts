@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       return handleApiError(error, "Failed to retrieve agents");
     }
 
-    return NextResponse.json({ agents: agents || [] });
+    return NextResponse.json({ agents: (agents || []) });
   } catch (error) {
     logger.error("Error in GET /api/v1/agents", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve agents");

@@ -17,7 +17,7 @@ export const seedRoundDB = {
       .order("health_score", { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data || [];
   },
 
   async getCustomerHealthScore(id: string) {
@@ -31,7 +31,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async upsertCustomerHealthScore(score: any) {
+  async upsertCustomerHealthScore(score: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("customer_health_scores")
       .upsert(score, { onConflict: "id" })
@@ -50,7 +50,7 @@ export const seedRoundDB = {
       .order("date_created", { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data || [];
   },
 
   async getLOI(id: string) {
@@ -64,7 +64,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async createLOI(loi: any) {
+  async createLOI(loi: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("lois")
       .insert(loi)
@@ -75,7 +75,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async updateLOI(id: string, updates: any) {
+  async updateLOI(id: string, updates: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("lois")
       .update(updates)
@@ -95,7 +95,7 @@ export const seedRoundDB = {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data || [];
   },
 
   async getInvestor(id: string) {
@@ -109,7 +109,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async createInvestor(investor: any) {
+  async createInvestor(investor: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("investors")
       .insert(investor)
@@ -120,7 +120,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async updateInvestor(id: string, updates: any) {
+  async updateInvestor(id: string, updates: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("investors")
       .update(updates)
@@ -140,7 +140,7 @@ export const seedRoundDB = {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data || [];
   },
 
   async getCaseStudy(id: string) {
@@ -154,7 +154,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async createCaseStudy(caseStudy: any) {
+  async createCaseStudy(caseStudy: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("case_studies")
       .insert(caseStudy)
@@ -165,7 +165,7 @@ export const seedRoundDB = {
     return data;
   },
 
-  async updateCaseStudy(id: string, updates: any) {
+  async updateCaseStudy(id: string, updates: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("case_studies")
       .update(updates)

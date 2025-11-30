@@ -1,13 +1,15 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { env } from "@/lib/env";
 
 /**
  * Admin Authentication Helper
  * Verifies user has admin role for protected admin routes
  */
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+// Use centralized env management - throws error if missing
+const supabaseUrl = env.supabase.url;
+const supabaseServiceKey = env.supabase.serviceRoleKey;
 
 export interface AdminUser {
   id: string;
@@ -28,7 +30,7 @@ export async function verifyAdminAuth(
 
     if (!token) {
       // In development, allow access if no token (for testing)
-      if (process.env.NODE_ENV === "development") {
+      if (env.runtime.isDevelopment) {
         return {
           user: {
             id: "dev-admin",
@@ -88,7 +90,7 @@ export async function verifyAdminAuth(
  */
 export function isAdminRequest(request: NextRequest): boolean {
   // In development, always allow
-  if (process.env.NODE_ENV === "development") {
+  if (env.runtime.isDevelopment) {
     return true;
   }
 

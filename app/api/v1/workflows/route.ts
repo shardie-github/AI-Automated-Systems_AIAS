@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       return handleApiError(error, "Failed to retrieve workflows");
     }
 
-    return NextResponse.json({ workflows: workflows || [] });
+    return NextResponse.json({ workflows: (workflows || []) });
   } catch (error) {
     logger.error("Error in GET /api/v1/workflows", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve workflows");
@@ -158,14 +158,14 @@ export async function POST(request: NextRequest) {
         .eq("status", "connected")
         .limit(1);
 
-      const { data: workflows } = await supabase
+      const { data: existingWorkflows } = await supabase
         .from("workflows")
         .select("id")
         .eq("user_id", user.id)
         .limit(1);
 
       // User is activated if they have at least one integration and one workflow
-      if (integrations && integrations.length > 0 && workflows && workflows.length > 0) {
+      if ((integrations && integrations.length > 0) && (existingWorkflows && existingWorkflows.length > 0)) {
         await track(user.id, {
           type: "user_activated",
           path: "/api/v1/workflows",
