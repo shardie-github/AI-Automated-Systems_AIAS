@@ -70,18 +70,15 @@ if [ ! -f "pnpm-lock.yaml" ]; then
   exit 1
 fi
 
-# Install dependencies with frozen lockfile
+# Install dependencies without frozen lockfile
 # This prevents workspace protocol errors by using pnpm instead of npm
 info "📦 Installing dependencies with pnpm..."
-if ! pnpm install --frozen-lockfile --prefer-offline; then
-  warn "Frozen lockfile install failed, trying without frozen..."
-  if ! pnpm install --prefer-offline; then
-    warn "Install with --prefer-offline failed, trying standard install..."
-    pnpm install || {
-      error "Dependency installation failed"
-      exit 1
-    }
-  fi
+if ! pnpm install --no-frozen-lockfile --prefer-offline; then
+  warn "Install with --prefer-offline failed, trying standard install..."
+  pnpm install || {
+    error "Dependency installation failed"
+    exit 1
+  }
 fi
 
 info "✅ Dependencies installed successfully"
