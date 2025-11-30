@@ -93,8 +93,8 @@
       "source": "/api/(.*)"
     }
   ],
-  "ignoreCommand": "./scripts/vercel-ignore.sh",
-  "installCommand": "./scripts/vercel-install.sh",
+  "ignoreCommand": "bash scripts/vercel-ignore.sh",
+  "installCommand": "bash scripts/vercel-install.sh",
   "outputDirectory": ".next",
   "regions": [
     "iad1"
