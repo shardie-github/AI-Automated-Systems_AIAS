@@ -2,7 +2,6 @@
   "buildCommand": "prisma generate --schema=./prisma/schema.prisma && next build",
   "devCommand": "pnpm run dev",
   "installCommand": "./scripts/vercel-install.sh",
-  "rootDirectory": "apps/web",
   "cleanUrls": true,
   "trailingSlash": false,
   "framework": "nextjs",
