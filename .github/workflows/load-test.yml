@@ -1,0 +1,112 @@
+name: Load Test (Scalability)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_users:
+        description: 'Number of concurrent users (10x peak load)'
+        required: false
+        default: '1000'
+      duration:
+        description: 'Test duration in seconds'
+        required: false
+        default: '300'
+  schedule:
+    # Run weekly on Sundays at 2 AM
+    - cron: '0 2 * * 0'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  load-test:
+    name: Scalability Stress Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+
+      - name: Start application
+        run: |
+          pnpm run start &
+          sleep 15
+        env:
+          PORT: 3000
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+
+      - name: Run load test
+        run: |
+          pnpm run load-test \
+            --users ${{ github.event.inputs.target_users || '1000' }} \
+            --duration ${{ github.event.inputs.duration || '300' }} \
+            --base-url http://localhost:3000
+        continue-on-error: true
+
+      - name: Generate HTML report
+        run: pnpm run load-test:report
+        if: always()
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-results
+          path: reports/load-test-*.json
+          retention-days: 30
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-html-report
+          path: reports/load-test-report-*.html
+          retention-days: 30
+
+      - name: Check test results
+        run: |
+          LATEST_REPORT=$(ls -t reports/load-test-*.json | head -1)
+          if [ -z "$LATEST_REPORT" ]; then
+            echo "❌ No test report found"
+            exit 1
+          fi
+          
+          ERROR_RATE=$(jq -r '.summary.errorRate' "$LATEST_REPORT")
+          P95=$(jq -r '.summary.p95' "$LATEST_REPORT")
+          
+          echo "Error Rate: $ERROR_RATE"
+          echo "P95 Latency: ${P95}ms"
+          
+          # Fail if error rate > 5% or P95 > 3s
+          if (( $(echo "$ERROR_RATE > 0.05" | bc -l) )); then
+            echo "❌ Error rate exceeds 5%"
+            exit 1
+          fi
+          
+          if (( $(echo "$P95 > 3000" | bc -l) )); then
+            echo "❌ P95 latency exceeds 3s"
+            exit 1
+          fi
+          
+          echo "✅ Load test passed all thresholds"

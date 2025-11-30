@@ -100,15 +100,16 @@ if ! pnpm run build; then
 fi
 
 # Verify build output exists
-BUILD_OUTPUT="apps/web/.next"
+# Check root .next first (standard Next.js location)
+BUILD_OUTPUT=".next"
 if [ ! -d "$BUILD_OUTPUT" ]; then
   error "Build output not found at: $BUILD_OUTPUT"
   error "Checking for alternative locations..."
   
-  # Check root .next as fallback
-  if [ -d ".next" ]; then
-    warn "Found .next at root instead of apps/web/.next"
-    BUILD_OUTPUT=".next"
+  # Check apps/web/.next as fallback (monorepo structure)
+  if [ -d "apps/web/.next" ]; then
+    warn "Found .next at apps/web/.next instead of root"
+    BUILD_OUTPUT="apps/web/.next"
   else
     error "No build output found. Build may have failed silently."
     exit 1

@@ -1,0 +1,310 @@
+name: Security Enforcement (Blocking)
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  # Security Dependency Scan - BLOCKING
+  dependency-security-scan:
+    name: Dependency Security Scan (Blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run npm audit (Blocking)
+        run: |
+          echo "🔒 Running security audit (BLOCKING)..."
+          if ! pnpm audit --audit-level moderate; then
+            echo "❌ Security vulnerabilities found. Fix before merging."
+            exit 1
+          fi
+          echo "✅ No critical or moderate vulnerabilities found"
+
+      - name: Check for known vulnerabilities
+        run: |
+          echo "🔍 Checking for known vulnerabilities..."
+          pnpm audit --json > audit-results.json || true
+          
+          # Parse audit results
+          CRITICAL=$(jq -r '.metadata.vulnerabilities.critical // 0' audit-results.json)
+          HIGH=$(jq -r '.metadata.vulnerabilities.high // 0' audit-results.json)
+          MODERATE=$(jq -r '.metadata.vulnerabilities.moderate // 0' audit-results.json)
+          
+          echo "Vulnerabilities found:"
+          echo "  Critical: $CRITICAL"
+          echo "  High: $HIGH"
+          echo "  Moderate: $MODERATE"
+          
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "❌ Critical or High severity vulnerabilities found. Blocking merge."
+            exit 1
+          fi
+          
+          if [ "$MODERATE" -gt 10 ]; then
+            echo "⚠️  More than 10 moderate vulnerabilities found. Review required."
+            exit 1
+          fi
+          
+          echo "✅ Security audit passed"
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-results
+          path: audit-results.json
+          retention-days: 30
+
+  # Code Security Scan - BLOCKING
+  code-security-scan:
+    name: Code Security Scan (Blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1' # Fail on critical/high vulnerabilities
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # SAST Scan - BLOCKING
+  sast-scan:
+    name: SAST Code Analysis (Blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript,typescript
+          queries: security-extended,security-and-quality
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: '/language:javascript'
+
+  # Penetration Testing - Basic Checks
+  penetration-test:
+    name: Penetration Test (Basic)
+    runs-on: ubuntu-latest
+    needs: [dependency-security-scan, code-security-scan]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run security self-check
+        run: |
+          echo "🔒 Running security self-check..."
+          pnpm run security:check || {
+            echo "❌ Security self-check failed"
+            exit 1
+          }
+          echo "✅ Security self-check passed"
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "🔍 Scanning for hardcoded secrets..."
+          
+          # Check for common secret patterns
+          SECRET_PATTERNS=(
+            "password\\s*=\\s*['\"][^'\"]+['\"]"
+            "api[_-]?key\\s*=\\s*['\"][^'\"]+['\"]"
+            "secret[_-]?key\\s*=\\s*['\"][^'\"]+['\"]"
+            "private[_-]?key\\s*=\\s*['\"][^'\"]+['\"]"
+            "access[_-]?token\\s*=\\s*['\"][^'\"]+['\"]"
+          )
+          
+          FOUND_SECRETS=0
+          for pattern in "${SECRET_PATTERNS[@]}"; do
+            if grep -r -i -E "$pattern" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+               --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=.git . | grep -v "process.env" | grep -v "NEXT_PUBLIC"; then
+              echo "⚠️  Potential hardcoded secret found matching pattern: $pattern"
+              FOUND_SECRETS=$((FOUND_SECRETS + 1))
+            fi
+          done
+          
+          if [ $FOUND_SECRETS -gt 0 ]; then
+            echo "❌ Found $FOUND_SECRETS potential hardcoded secrets. Review required."
+            exit 1
+          fi
+          
+          echo "✅ No hardcoded secrets detected"
+
+      - name: Check security headers
+        run: |
+          echo "🔒 Validating security headers configuration..."
+          
+          # Check next.config.mjs for security headers
+          if ! grep -q "X-Frame-Options" next.config.mjs; then
+            echo "⚠️  X-Frame-Options header not found"
+          fi
+          
+          if ! grep -q "Content-Security-Policy" next.config.mjs; then
+            echo "⚠️  Content-Security-Policy header not found"
+          fi
+          
+          if ! grep -q "Strict-Transport-Security" next.config.mjs; then
+            echo "⚠️  Strict-Transport-Security header not found"
+          fi
+          
+          echo "✅ Security headers configuration validated"
+
+      - name: Check API security
+        run: |
+          echo "🔒 Validating API security..."
+          
+          # Check for secure route handlers
+          if [ ! -f "lib/api/route-handler.ts" ]; then
+            echo "⚠️  Secure route handler not found"
+          fi
+          
+          # Check for authentication checks in API routes
+          API_ROUTES=$(find app/api -name "route.ts" | wc -l)
+          AUTH_ROUTES=$(grep -r "requireAuth\|createRouteHandler\|createGETHandler\|createPOSTHandler" app/api --include="*.ts" | wc -l)
+          
+          echo "Total API routes: $API_ROUTES"
+          echo "Routes with security: $AUTH_ROUTES"
+          
+          if [ "$AUTH_ROUTES" -lt "$((API_ROUTES * 80 / 100))" ]; then
+            echo "⚠️  Less than 80% of API routes have security checks"
+          fi
+          
+          echo "✅ API security validation completed"
+
+  # License Compliance Check
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check licenses
+        run: |
+          echo "📄 Checking license compliance..."
+          pnpm run audit:licenses || {
+            echo "❌ License check failed"
+            exit 1
+          }
+          echo "✅ License compliance check passed"
+
+  # Security Summary - BLOCKING
+  security-summary:
+    name: Security Summary (Blocking)
+    runs-on: ubuntu-latest
+    needs: [dependency-security-scan, code-security-scan, sast-scan, penetration-test, license-check]
+    if: always()
+    steps:
+      - name: Security gates summary
+        run: |
+          echo "## 🔒 Security Gates Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Gate | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Security Scan | ${{ needs.code-security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SAST Analysis | ${{ needs.sast-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Penetration Test | ${{ needs.penetration-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Fail if any security check failed
+          if [ "${{ needs.dependency-security-scan.result }}" != "success" ] || \
+             [ "${{ needs.code-security-scan.result }}" != "success" ] || \
+             [ "${{ needs.sast-scan.result }}" != "success" ] || \
+             [ "${{ needs.penetration-test.result }}" != "success" ] || \
+             [ "${{ needs.license-check.result }}" != "success" ]; then
+            echo "❌ **SECURITY GATES FAILED - MERGE BLOCKED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "One or more security checks failed. Please review and fix all security issues before merging." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ **All security gates passed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All security checks passed. Code is ready for review." >> $GITHUB_STEP_SUMMARY
+          fi

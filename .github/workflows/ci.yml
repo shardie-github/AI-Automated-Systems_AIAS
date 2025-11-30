@@ -118,11 +118,11 @@ jobs:
           flags: unittests
           name: codecov-umbrella
 
-  # Build - run after tests pass
+  # Build - run after tests and security pass
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [test, security-scan]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -258,12 +258,11 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  # Security scan - lightweight, non-blocking
+  # Security scan - now blocking
   security-scan:
-    name: Security Scan (Non-Blocking)
+    name: Security Scan (Blocking)
     runs-on: ubuntu-latest
     needs: [lint, type-check]
-    continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -282,5 +281,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Security audit
-        run: pnpm run audit:security || echo "Security audit completed with warnings"
+      - name: Security audit (Blocking)
+        run: |
+          echo "🔒 Running security audit (BLOCKING)..."
+          if ! pnpm run audit:security; then
+            echo "❌ Security vulnerabilities found. Fix before merging."
+            exit 1
+          fi
+          echo "✅ Security audit passed"
