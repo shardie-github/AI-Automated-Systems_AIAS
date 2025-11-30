@@ -76,7 +76,7 @@ const nextConfig = {
   },
   
   // Build optimizations
-  swcMinify: true,
+  // swcMinify is default in Next.js 15, no need to specify
   
   // TypeScript and ESLint (handled in CI)
   typescript: {
