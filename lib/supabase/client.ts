@@ -45,3 +45,7 @@ export function createClient() {
     supabaseKey
   );
 }
+
+// Backward compatibility: Export a default client instance
+// Note: For better performance in client components, use createClient() directly
+export const supabase = createClient();
