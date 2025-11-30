@@ -1,7 +1,8 @@
 {
-  "buildCommand": "cd apps/web && prisma generate --schema=./prisma/schema.prisma && cd ../.. && next build",
+  "buildCommand": "prisma generate --schema=./prisma/schema.prisma && next build",
   "devCommand": "pnpm run dev",
-  "installCommand": "export ENABLE_EXPERIMENTAL_COREPACK=1 && export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true && export PUPPETEER_SKIP_DOWNLOAD=true && export PUPPETEER_DOWNLOAD_PATH=/tmp/puppeteer_cache && corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install --frozen-lockfile",
+  "installCommand": "./scripts/vercel-install.sh",
+  "rootDirectory": "apps/web",
   "cleanUrls": true,
   "trailingSlash": false,
   "framework": "nextjs",

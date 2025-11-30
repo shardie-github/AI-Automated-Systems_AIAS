@@ -56,9 +56,9 @@ const nextConfig = {
   },
   
   // Transpile packages from workspace root
-  transpilePackages: [],
+  transpilePackages: ['@ai-consultancy/config', '@ai-consultancy/lib'],
   
-  // Experimental features
+  // Experimental features for faster builds
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -69,6 +69,21 @@ const nextConfig = {
       '@radix-ui/react-dropdown-menu',
       'framer-motion',
     ],
+    // Optimize for Vercel
+    outputFileTracingIncludes: {
+      '/api/**': ['./**'],
+    },
+  },
+  
+  // Build optimizations
+  swcMinify: true,
+  
+  // TypeScript and ESLint (handled in CI)
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
