@@ -6,19 +6,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { env } from '@/lib/env';
-import { rateLimiter } from '@/lib/performance/rate-limiter';
-import { validateEnvOnStartup } from '@/lib/env-validation';
+import { checkRateLimitEdge } from '@/lib/performance/rate-limiter-edge';
 
-// Validate environment variables at middleware startup
-if (typeof process !== 'undefined' && process.env) {
-  try {
-    validateEnvOnStartup();
-  } catch (error) {
-    console.error('Environment validation failed in middleware:', error);
-    // Don't throw - allow middleware to continue but log the error
+// Safe env access for Edge runtime
+function getEnvVar(key: string, defaultValue?: string): string | undefined {
+  if (typeof process === 'undefined' || !process.env) {
+    return defaultValue;
   }
+  return process.env[key] || defaultValue;
 }
+
+// Note: Environment validation is skipped in middleware to avoid Edge runtime issues
+// Env vars are accessed safely with fallbacks
 
 // Security headers configuration
 const securityHeaders = {
@@ -75,7 +74,7 @@ function getClientIP(request: NextRequest): string {
 }
 
 /**
- * Check rate limit for request (uses distributed rate limiter with Redis/KV fallback)
+ * Check rate limit for request (Edge-compatible)
  */
 async function checkRateLimit(
   pathname: string,
@@ -84,7 +83,7 @@ async function checkRateLimit(
   const config = rateLimitConfig[pathname as keyof typeof rateLimitConfig] || rateLimitConfig.default;
   
   try {
-    return await rateLimiter.checkRateLimit(pathname, identifier, config);
+    return await checkRateLimitEdge(pathname, identifier, config);
   } catch (error) {
     // If rate limiter fails completely, fail open (allow request)
     // This prevents rate limiting from breaking the application
@@ -138,9 +137,17 @@ async function validateTenantAccess(
   }
   
   try {
+    const supabaseUrl = getEnvVar('NEXT_PUBLIC_SUPABASE_URL') || getEnvVar('SUPABASE_URL');
+    const supabaseServiceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.warn('Supabase credentials not available for tenant validation');
+      return { allowed: false, tenantId: null };
+    }
+    
     const supabase = createClient(
-      env.supabase.url,
-      env.supabase.serviceRoleKey
+      supabaseUrl,
+      supabaseServiceKey
     );
     
     // Check if user is member of tenant
@@ -182,7 +189,7 @@ function checkAdminAccess(request: NextRequest): boolean {
   }
   
   // Get expected credentials from secret (name only, never echo value)
-  const adminAuthSecret = process.env.ADMIN_BASIC_AUTH;
+  const adminAuthSecret = getEnvVar('ADMIN_BASIC_AUTH');
   if (!adminAuthSecret) {
     // No secret configured - deny access
     return false;
@@ -227,9 +234,16 @@ async function getUserId(request: NextRequest): Promise<string | null> {
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
       try {
+        const supabaseUrl = getEnvVar('NEXT_PUBLIC_SUPABASE_URL') || getEnvVar('SUPABASE_URL');
+        const supabaseAnonKey = getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY') || getEnvVar('SUPABASE_ANON_KEY');
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          return null;
+        }
+        
         const supabase = createClient(
-          env.supabase.url,
-          env.supabase.anonKey
+          supabaseUrl,
+          supabaseAnonKey
         );
         const { data: { user } } = await supabase.auth.getUser(token);
         return user?.id || null;
@@ -242,9 +256,16 @@ async function getUserId(request: NextRequest): Promise<string | null> {
   const sessionCookie = request.cookies.get('sb-access-token');
   if (sessionCookie) {
       try {
+        const supabaseUrl = getEnvVar('NEXT_PUBLIC_SUPABASE_URL') || getEnvVar('SUPABASE_URL');
+        const supabaseAnonKey = getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY') || getEnvVar('SUPABASE_ANON_KEY');
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          return null;
+        }
+        
         const supabase = createClient(
-          env.supabase.url,
-          env.supabase.anonKey
+          supabaseUrl,
+          supabaseAnonKey
         );
         const { data: { user } } = await supabase.auth.getUser(sessionCookie.value);
         return user?.id || null;
