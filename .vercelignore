@@ -41,8 +41,8 @@ docs/
 *.md
 !README.md
 
-# Scripts that shouldn't be deployed
-scripts/
+# Scripts that shouldn't be deployed (but Vercel needs vercel-*.sh for build)
+# Note: We don't ignore scripts/ entirely because Vercel needs vercel-ignore.sh and vercel-install.sh
 tests/
 *.test.ts
 *.test.tsx
