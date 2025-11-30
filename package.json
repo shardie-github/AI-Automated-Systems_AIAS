@@ -215,6 +215,7 @@
     "test:critical": "vitest run tests/api/telemetry-ingest.test.ts tests/lib/route-handler.test.ts tests/api/healthz.test.ts",
     "load-test": "tsx scripts/load-test/stress-test.ts",
     "load-test:report": "tsx scripts/load-test/generate-report.ts",
+    "verify:vercel": "tsx scripts/verify-vercel-deployment.ts",
     "preflight": "tsx scripts/agents/preflight.ts",
     "verify:db": "tsx scripts/agents/verify_db.ts",
     "delta:migrate": "tsx scripts/agents/generate_delta_migration.ts",
