@@ -2,8 +2,8 @@
 
 **Build AI agents and automation workflows that actually work.**
 
-[![CI/CD Pipeline](https://github.com/your-org/aias-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/aias-platform/actions/workflows/ci.yml)
-[![Security Scan](https://github.com/your-org/aias-platform/actions/workflows/security.yml/badge.svg)](https://github.com/your-org/aias-platform/actions/workflows/security.yml)
+[![CI/CD Pipeline](https://github.com/shardie-github/aias/actions/workflows/ci.yml/badge.svg)](https://github.com/shardie-github/aias/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/shardie-github/aias/actions/workflows/security.yml/badge.svg)](https://github.com/shardie-github/aias/actions/workflows/security.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -124,8 +124,8 @@ See [USE_CASES.md](./USE_CASES.md) for detailed examples.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/aias-platform.git
-   cd aias-platform
+   git clone https://github.com/shardie-github/aias.git
+   cd aias
    ```
 
 2. **Install dependencies**
@@ -372,10 +372,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
+- **Website:** [aiautomatedsystems.ca](https://aiautomatedsystems.ca)
 - **Documentation:** [docs.aias-platform.com](https://docs.aias-platform.com)
-- **Issues:** [GitHub Issues](https://github.com/your-org/aias-platform/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/your-org/aias-platform/discussions)
-- **Email:** support@aias-platform.com
+- **Issues:** [GitHub Issues](https://github.com/shardie-github/aias/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/shardie-github/aias/discussions)
+- **Email:** support@aiautomatedsystems.ca
 
 ---
 
@@ -415,4 +416,4 @@ Built with gratitude for the open-source community. Special thanks to:
 
 **Built with ❤️ for solo founders and small teams who refuse to accept limitations.**
 
-[Website](https://aias-platform.com) • [Documentation](https://docs.aias-platform.com) • [Twitter](https://twitter.com/aias_platform) • [LinkedIn](https://linkedin.com/company/aias-platform)
+[Website](https://aiautomatedsystems.ca) • [Documentation](https://docs.aias-platform.com) • [GitHub](https://github.com/shardie-github/aias) • [Twitter](https://twitter.com/aias_platform) • [LinkedIn](https://linkedin.com/company/aias-platform)

@@ -11,7 +11,7 @@ Disallow: /account/
 Disallow: /settings/
 
 # Sitemap location
-Sitemap: https://aias-platform.com/sitemap.xml
+Sitemap: https://aiautomatedsystems.ca/sitemap.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1

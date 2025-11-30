@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aias-platform.com";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aiautomatedsystems.ca";
 const now = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {
