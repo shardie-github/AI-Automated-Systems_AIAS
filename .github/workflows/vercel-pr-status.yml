@@ -1,0 +1,379 @@
+name: Vercel PR Build Status
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to update status for'
+        required: false
+        type: string
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  update-pr-status:
+    name: Update Vercel Build Status in PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          export ENABLE_EXPERIMENTAL_COREPACK=1
+          corepack enable || true
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate || true
+          pnpm install --frozen-lockfile
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Get Vercel Deployments
+        id: get_deployments
+        run: |
+          set -euo pipefail
+          
+          PR_NUMBER="${{ github.event.pull_request.number || github.event.inputs.pr_number }}"
+          BRANCH_NAME="${{ github.event.pull_request.head.ref || github.head_ref }}"
+          COMMIT_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          
+          echo "PR Number: $PR_NUMBER"
+          echo "Branch: $BRANCH_NAME"
+          echo "Commit SHA: $COMMIT_SHA"
+          
+          # Get Vercel deployments for this PR
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "⚠️ Vercel secrets not configured, skipping deployment status"
+            echo "preview_status=unknown" >> $GITHUB_OUTPUT
+            echo "preview_url=" >> $GITHUB_OUTPUT
+            echo "preview_logs_url=" >> $GITHUB_OUTPUT
+            echo "production_status=unknown" >> $GITHUB_OUTPUT
+            echo "production_url=" >> $GITHUB_OUTPUT
+            echo "production_logs_url=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Fetch preview deployments (for PR branch)
+          PREVIEW_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            "https://api.vercel.com/v6/deployments?projectId=${{ secrets.VERCEL_PROJECT_ID }}&target=preview&limit=20")
+          
+          # Check if response is valid
+          if ! echo "$PREVIEW_RESPONSE" | jq -e '.deployments' > /dev/null 2>&1; then
+            echo "⚠️ Failed to fetch preview deployments from Vercel API"
+            echo "preview_status=unknown" >> $GITHUB_OUTPUT
+            echo "preview_url=" >> $GITHUB_OUTPUT
+            echo "preview_logs_url=https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}" >> $GITHUB_OUTPUT
+          else
+            # Find deployment matching this commit SHA
+            PREVIEW_DEPLOYMENT=$(echo "$PREVIEW_RESPONSE" | jq -r --arg sha "$COMMIT_SHA" '.deployments[] | select(.meta.githubCommitSha == $sha) | {url: .url, state: .readyState, uid: .uid, createdAt: .createdAt}' | jq -s '.[0] // empty')
+            
+            # If no exact match, try to find by branch name
+            if [ -z "$PREVIEW_DEPLOYMENT" ] || [ "$PREVIEW_DEPLOYMENT" == "null" ]; then
+              PREVIEW_DEPLOYMENT=$(echo "$PREVIEW_RESPONSE" | jq -r --arg branch "$BRANCH_NAME" '.deployments[] | select(.meta.githubCommitRef == $branch) | {url: .url, state: .readyState, uid: .uid, createdAt: .createdAt}' | jq -s '.[0] // empty')
+            fi
+            
+            # If still no match, get the most recent preview deployment
+            if [ -z "$PREVIEW_DEPLOYMENT" ] || [ "$PREVIEW_DEPLOYMENT" == "null" ]; then
+              PREVIEW_DEPLOYMENT=$(echo "$PREVIEW_RESPONSE" | jq -r '.deployments[0] | {url: .url, state: .readyState, uid: .uid, createdAt: .createdAt}')
+            fi
+          fi
+          
+          # Fetch production deployments
+          PROD_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            "https://api.vercel.com/v6/deployments?projectId=${{ secrets.VERCEL_PROJECT_ID }}&target=production&limit=5")
+          
+          # Check if response is valid
+          if ! echo "$PROD_RESPONSE" | jq -e '.deployments' > /dev/null 2>&1; then
+            echo "⚠️ Failed to fetch production deployments from Vercel API"
+            echo "production_status=unknown" >> $GITHUB_OUTPUT
+            echo "production_url=" >> $GITHUB_OUTPUT
+            echo "production_logs_url=https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}" >> $GITHUB_OUTPUT
+          else
+            PROD_DEPLOYMENT=$(echo "$PROD_RESPONSE" | jq -r '.deployments[0] | {url: .url, state: .readyState, uid: .uid, createdAt: .createdAt}')
+          fi
+          
+          # Process preview deployment (only if we got a valid response)
+          if [ -n "$PREVIEW_DEPLOYMENT" ] && [ "$PREVIEW_DEPLOYMENT" != "null" ] && [ "$PREVIEW_DEPLOYMENT" != "" ] && [ "$PREVIEW_DEPLOYMENT" != "{}" ]; then
+            PREVIEW_URL=$(echo "$PREVIEW_DEPLOYMENT" | jq -r '.url // empty')
+            PREVIEW_STATE=$(echo "$PREVIEW_DEPLOYMENT" | jq -r '.state // "BUILDING"')
+            PREVIEW_ID=$(echo "$PREVIEW_DEPLOYMENT" | jq -r '.uid // empty')
+            
+            if [ -n "$PREVIEW_ID" ] && [ "$PREVIEW_ID" != "null" ]; then
+              PREVIEW_LOGS_URL="https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}/$PREVIEW_ID"
+            else
+              PREVIEW_LOGS_URL="https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}"
+            fi
+            
+            echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+            echo "preview_logs_url=$PREVIEW_LOGS_URL" >> $GITHUB_OUTPUT
+            
+            case "$PREVIEW_STATE" in
+              "READY")
+                echo "preview_status=success" >> $GITHUB_OUTPUT
+                ;;
+              "ERROR"|"CANCELED")
+                echo "preview_status=failure" >> $GITHUB_OUTPUT
+                ;;
+              "BUILDING"|"QUEUED"|"INITIALIZING")
+                echo "preview_status=building" >> $GITHUB_OUTPUT
+                ;;
+              *)
+                echo "preview_status=unknown" >> $GITHUB_OUTPUT
+                ;;
+            esac
+          else
+            echo "preview_status=not_deployed" >> $GITHUB_OUTPUT
+            echo "preview_url=" >> $GITHUB_OUTPUT
+            echo "preview_logs_url=https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}" >> $GITHUB_OUTPUT
+          fi
+          
+          # Process production deployment (only if we got a valid response)
+          if [ -n "$PROD_DEPLOYMENT" ] && [ "$PROD_DEPLOYMENT" != "null" ] && [ "$PROD_DEPLOYMENT" != "" ] && [ "$PROD_DEPLOYMENT" != "{}" ]; then
+            PROD_URL=$(echo "$PROD_DEPLOYMENT" | jq -r '.url // empty')
+            PROD_STATE=$(echo "$PROD_DEPLOYMENT" | jq -r '.state // "BUILDING"')
+            PROD_ID=$(echo "$PROD_DEPLOYMENT" | jq -r '.uid // empty')
+            
+            if [ -n "$PROD_ID" ] && [ "$PROD_ID" != "null" ]; then
+              PROD_LOGS_URL="https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}/$PROD_ID"
+            else
+              PROD_LOGS_URL="https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}"
+            fi
+            
+            echo "production_url=$PROD_URL" >> $GITHUB_OUTPUT
+            echo "production_logs_url=$PROD_LOGS_URL" >> $GITHUB_OUTPUT
+            
+            case "$PROD_STATE" in
+              "READY")
+                echo "production_status=success" >> $GITHUB_OUTPUT
+                ;;
+              "ERROR"|"CANCELED")
+                echo "production_status=failure" >> $GITHUB_OUTPUT
+                ;;
+              "BUILDING"|"QUEUED"|"INITIALIZING")
+                echo "production_status=building" >> $GITHUB_OUTPUT
+                ;;
+              *)
+                echo "production_status=unknown" >> $GITHUB_OUTPUT
+                ;;
+            esac
+          else
+            echo "production_status=not_deployed" >> $GITHUB_OUTPUT
+            echo "production_url=" >> $GITHUB_OUTPUT
+            echo "production_logs_url=https://vercel.com/${{ secrets.VERCEL_ORG_ID }}/${{ secrets.VERCEL_PROJECT_ID }}" >> $GITHUB_OUTPUT
+          fi
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        continue-on-error: true
+
+      - name: Generate Status Comment
+        id: generate_comment
+        run: |
+          set -euo pipefail
+          
+          PREVIEW_STATUS="${{ steps.get_deployments.outputs.preview_status }}"
+          PREVIEW_URL="${{ steps.get_deployments.outputs.preview_url }}"
+          PREVIEW_LOGS_URL="${{ steps.get_deployments.outputs.preview_logs_url }}"
+          
+          PROD_STATUS="${{ steps.get_deployments.outputs.production_status }}"
+          PROD_URL="${{ steps.get_deployments.outputs.production_url }}"
+          PROD_LOGS_URL="${{ steps.get_deployments.outputs.production_logs_url }}"
+          
+          # Generate status badges
+          get_badge() {
+            local status=$1
+            case "$status" in
+              "success")
+                echo "![Success](https://img.shields.io/badge/status-success-brightgreen)"
+                ;;
+              "failure")
+                echo "![Failed](https://img.shields.io/badge/status-failed-red)"
+                ;;
+              "building")
+                echo "![Building](https://img.shields.io/badge/status-building-yellow)"
+                ;;
+              "not_deployed")
+                echo "![Not Deployed](https://img.shields.io/badge/status-not%20deployed-lightgrey)"
+                ;;
+              *)
+                echo "![Unknown](https://img.shields.io/badge/status-unknown-lightgrey)"
+                ;;
+            esac
+          }
+          
+          PREVIEW_BADGE=$(get_badge "$PREVIEW_STATUS")
+          PROD_BADGE=$(get_badge "$PROD_STATUS")
+          
+          # Build comment body
+          COMMENT="## 🚀 Vercel Build Status
+          
+          > **Live build status updates** - Click links below to view build logs in Vercel dashboard
+          
+          ### Preview Deployment
+          
+          $PREVIEW_BADGE
+          
+          "
+          
+          if [ -n "$PREVIEW_URL" ] && [ "$PREVIEW_URL" != "" ]; then
+            COMMENT="$COMMENT
+          - **Preview URL:** [$PREVIEW_URL]($PREVIEW_URL)
+          - **Build Logs:** [View in Vercel]($PREVIEW_LOGS_URL)
+          "
+          else
+            COMMENT="$COMMENT
+          - **Status:** Preview deployment not yet available
+          - **Build Logs:** [View in Vercel]($PREVIEW_LOGS_URL)
+          "
+          fi
+          
+          COMMENT="$COMMENT
+          
+          ### Production Deployment
+          
+          $PROD_BADGE
+          
+          "
+          
+          if [ -n "$PROD_URL" ] && [ "$PROD_URL" != "" ]; then
+            COMMENT="$COMMENT
+          - **Production URL:** [$PROD_URL]($PROD_URL)
+          - **Build Logs:** [View in Vercel]($PROD_LOGS_URL)
+          "
+          else
+            COMMENT="$COMMENT
+          - **Status:** Production deployment not yet available
+          - **Build Logs:** [View in Vercel]($PROD_LOGS_URL)
+          "
+          fi
+          
+          COMMENT="$COMMENT
+          
+          ---
+          
+          💡 **Tip:** Click the \"View in Vercel\" links above to check detailed build logs and deployment status.
+          
+          *Last updated: $(date -u +'%Y-%m-%d %H:%M:%S UTC')*
+          "
+          
+          # Save to file for GitHub Actions script
+          echo "$COMMENT" > comment_body.md
+        continue-on-error: true
+
+      - name: Post or Update PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = context.payload.pull_request?.number || context.payload.inputs?.pr_number;
+            
+            if (!prNumber) {
+              console.log('No PR number found, skipping comment');
+              return;
+            }
+            
+            let commentBody;
+            try {
+              commentBody = fs.readFileSync('comment_body.md', 'utf8');
+            } catch (error) {
+              console.log('Could not read comment body, using fallback');
+              commentBody = '## 🚀 Vercel Build Status\n\nStatus update is being generated...';
+            }
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🚀 Vercel Build Status')
+            );
+            
+            if (botComment) {
+              console.log(`Updating existing comment #${botComment.id}`);
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              console.log('Creating new comment');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }
+        continue-on-error: true
+
+      - name: Add Status Check
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request?.number || context.payload.inputs?.pr_number;
+            
+            if (!prNumber) {
+              return;
+            }
+            
+            const previewStatus = '${{ steps.get_deployments.outputs.preview_status }}';
+            const productionStatus = '${{ steps.get_deployments.outputs.production_status }}';
+            
+            // Determine overall status
+            let conclusion = 'success';
+            if (previewStatus === 'failure' || productionStatus === 'failure') {
+              conclusion = 'failure';
+            } else if (previewStatus === 'building' || productionStatus === 'building') {
+              conclusion = 'in_progress';
+            } else if (previewStatus === 'unknown' || productionStatus === 'unknown') {
+              conclusion = 'neutral';
+            }
+            
+            // Create a check run (if we have deployment info)
+            if (previewStatus !== 'unknown' || productionStatus !== 'unknown') {
+              await github.rest.checks.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'Vercel Build Status',
+                head_sha: context.payload.pull_request?.head?.sha || context.sha,
+                status: conclusion === 'in_progress' ? 'in_progress' : 'completed',
+                conclusion: conclusion === 'in_progress' ? null : conclusion,
+                output: {
+                  title: 'Vercel Deployment Status',
+                  summary: `Preview: ${previewStatus} | Production: ${productionStatus}`,
+                },
+              });
+            }
+        continue-on-error: true
