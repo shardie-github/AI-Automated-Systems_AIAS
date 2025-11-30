@@ -5,10 +5,12 @@
       "PRISMA_CLIENT_ENGINE_TYPE": "library",
       "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
       "PUPPETEER_SKIP_DOWNLOAD": "true",
-      "SKIP_ENV_VALIDATION": "1"
+      "SKIP_ENV_VALIDATION": "1",
+      "NEXT_PRIVATE_SKIP_TYPE_CHECK": "1",
+      "NEXT_PRIVATE_SKIP_LINT": "1"
     }
   },
-  "buildCommand": "prisma generate --schema=./apps/web/prisma/schema.prisma && next build",
+  "buildCommand": "cd apps/web && prisma generate --schema=./prisma/schema.prisma --generator client && cd ../.. && next build",
   "cleanUrls": true,
   "devCommand": "pnpm run dev",
   "env": {

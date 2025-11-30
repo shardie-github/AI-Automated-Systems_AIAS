@@ -26,8 +26,9 @@ const nextConfig = {
   // Removed standalone output for faster builds
   images: {
     formats: ["image/avif", "image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Reduced sizes for faster builds (still covers all common breakpoints)
+    deviceSizes: [640, 828, 1200, 1920, 2048],
+    imageSizes: [16, 32, 64, 96, 128, 256],
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
@@ -60,12 +61,30 @@ const nextConfig = {
     "@radix-ui/react-accordion",
     "@radix-ui/react-alert-dialog",
     "@radix-ui/react-dropdown-menu",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-tooltip",
+    "@radix-ui/react-dropdown-menu",
     "framer-motion",
+    "recharts",
+    "@tanstack/react-query",
     ],
+    // Build speed optimizations
+    swcMinify: true, // Already default in Next.js 15, but explicit
   },
-  // Ensure proper file tracing for Vercel deployments
+  // Ensure proper file tracing for Vercel deployments (optimized for speed)
   outputFileTracingIncludes: {
-    '/api/**': ['./**'],
+    '/api/**': ['./lib/**', './components/**'],
+  },
+  // Reduce file tracing overhead
+  outputFileTracingExcludes: {
+    '/api/**': [
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/tests/**',
+      '**/*.test.ts',
+      '**/*.spec.ts',
+      '**/docs/**',
+    ],
   },
   // Performance optimizations
   compiler: {
