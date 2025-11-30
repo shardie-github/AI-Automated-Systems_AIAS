@@ -98,6 +98,9 @@ importers:
       '@stripe/stripe-js':
         specifier: ^8.3.0
         version: 8.3.0
+      '@studio-freight/lenis':
+        specifier: ^1.0.42
+        version: 1.0.42
       '@supabase/ssr':
         specifier: ^0.5.2
         version: 0.5.2(@supabase/supabase-js@2.76.1)
@@ -163,7 +166,7 @@ importers:
         version: 19.2.0
       react-day-picker:
         specifier: ^8.10.0
-        version: 8.10.1(date-fns@4.1.0)(react@19.2.0)
+        version: 8.10.1(date-fns@3.6.0)(react@19.2.0)
       react-dom:
         specifier: ^19.0.0
         version: 19.2.0(react@19.2.0)
@@ -245,7 +248,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
-        version: 3.11.0(vite@7.2.4)
+        version: 3.11.0(vite@5.4.21)
       autoprefixer:
         specifier: ^10.4.16
         version: 10.4.21(postcss@8.5.6)
@@ -362,7 +365,7 @@ importers:
         version: 39.4.2(rollup@2.79.2)
       vite-plugin-pwa:
         specifier: ^0.17.4
-        version: 0.17.5(vite@7.2.4)(workbox-build@7.4.0)(workbox-window@7.4.0)
+        version: 0.17.5(vite@5.4.21)(workbox-build@7.4.0)(workbox-window@7.4.0)
       vitest:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.19.1)(jsdom@23.2.0)(terser@5.44.0)
@@ -449,7 +452,7 @@ importers:
         version: 2.76.1
       ai:
         specifier: ^2.2.29
-        version: 2.2.37(react@19.2.0)(solid-js@1.9.10)(svelte@5.45.2)(vue@3.5.25)
+        version: 2.2.37(react@19.2.0)(solid-js@1.9.10)(svelte@4.2.20)(vue@3.5.25)
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -749,6 +752,14 @@ packages:
   /@alloc/quick-lru@5.2.0:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
+
+  /@ampproject/remapping@2.3.0:
+    resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
+    engines: {node: '>=6.0.0'}
+    dependencies:
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.31
+    dev: false
 
   /@anthropic-ai/sdk@0.9.1:
     resolution: {integrity: sha512-wa1meQ2WSfoY8Uor3EdrJq0jTiZJoKoSii2ZVWRY1oN4Tlr5s59pADg9T79FTbPe1/se5c3pBeZgJL63wmuoBA==}
@@ -7467,6 +7478,11 @@ packages:
     engines: {node: '>=12.16'}
     dev: false
 
+  /@studio-freight/lenis@1.0.42:
+    resolution: {integrity: sha512-HJAGf2DeM+BTvKzHv752z6Z7zy6bA643nZM7W88Ft9tnw2GsJSp6iJ+3cekjyMIWH+cloL2U9X82dKXgdU8kPg==}
+    deprecated: 'The ''@studio-freight/lenis'' package has been renamed to ''lenis''. Please update your dependencies: npm install lenis and visit the documentation: https://www.npmjs.com/package/lenis'
+    dev: false
+
   /@supabase/auth-js@2.76.1:
     resolution: {integrity: sha512-bxmcgPuyjTUBg7+jAohJ15TDh3ph4hXcv7QkRsQgnIpszurD5LYaJPzX638ETQ8zDL4fvHZRHfGrcmHV8C91jA==}
     dependencies:
@@ -7547,14 +7563,6 @@ packages:
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.12
     dev: true
-
-  /@sveltejs/acorn-typescript@1.0.8(acorn@8.15.0):
-    resolution: {integrity: sha512-esgN+54+q0NjB0Y/4BomT9samII7jGwNy/2a3wNZbT2A2RpmXsXwUt24LvLhx6jUq2gVk4cWEvcRO6MFQbOfNA==}
-    peerDependencies:
-      acorn: ^8.9.0
-    dependencies:
-      acorn: 8.15.0
-    dev: false
 
   /@swc/core-darwin-arm64@1.13.5:
     resolution: {integrity: sha512-lKNv7SujeXvKn16gvQqUQI5DdyY8v7xcoO3k06/FJbHJS90zEwZdQiMNRiqpYw/orU543tPaWgz7cIYWhbopiQ==}
@@ -8634,14 +8642,14 @@ packages:
       ts-morph: 12.0.0
     dev: true
 
-  /@vitejs/plugin-react-swc@3.11.0(vite@7.2.4):
+  /@vitejs/plugin-react-swc@3.11.0(vite@5.4.21):
     resolution: {integrity: sha512-YTJCGFdNMHCMfjODYtxRNVAYmTWQ1Lb8PulP/2/f/oEEtglw8oKxKIZmmRkyXrVrHfsKOaVkAc3NT9/dMutO5w==}
     peerDependencies:
       vite: ^4 || ^5 || ^6 || ^7
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@swc/core': 1.13.5
-      vite: 7.2.4(@types/node@22.19.1)(terser@5.44.0)(tsx@4.20.6)
+      vite: 5.4.21(@types/node@22.19.1)(terser@5.44.0)
     transitivePeerDependencies:
       - '@swc/helpers'
     dev: true
@@ -8946,7 +8954,7 @@ packages:
       humanize-ms: 1.2.1
     dev: false
 
-  /ai@2.2.37(react@19.2.0)(solid-js@1.9.10)(svelte@5.45.2)(vue@3.5.25):
+  /ai@2.2.37(react@19.2.0)(solid-js@1.9.10)(svelte@4.2.20)(vue@3.5.25):
     resolution: {integrity: sha512-JIYm5N1muGVqBqWnvkt29FmXhESoO5TcDxw74OE41SsM+uIou6NPDDs0XWb/ABcd1gmp6k5zym64KWMPM2xm0A==}
     engines: {node: '>=14.6'}
     peerDependencies:
@@ -8969,8 +8977,8 @@ packages:
       react: 19.2.0
       solid-js: 1.9.10
       solid-swr-store: 0.10.7(solid-js@1.9.10)(swr-store@0.10.6)
-      sswr: 2.0.0(svelte@5.45.2)
-      svelte: 5.45.2
+      sswr: 2.0.0(svelte@4.2.20)
+      svelte: 4.2.20
       swr: 2.2.0(react@19.2.0)
       swr-store: 0.10.6
       swrv: 1.0.4(vue@3.5.25)
@@ -10271,6 +10279,16 @@ packages:
     resolution: {integrity: sha512-NiujjUFB4SwScJq2bwbYUtXbZhBSlY6vYzm++3Q6oC+U+injTqfPYFK8wS9COOmb2lueqp0ZRB4nK1VYeHgNyw==}
     dev: true
 
+  /code-red@1.0.4:
+    resolution: {integrity: sha512-7qJWqItLA8/VPVlKJlFXU+NBlo/qyfs39aJcuMT/2ere32ZqvF5OSxgdM5xOfJJ7O429gg2HM47y8v9P+9wrNw==}
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.5
+      '@types/estree': 1.0.8
+      acorn: 8.15.0
+      estree-walker: 3.0.3
+      periscopic: 3.1.0
+    dev: false
+
   /color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
     dependencies:
@@ -10593,7 +10611,6 @@ packages:
     dependencies:
       mdn-data: 2.0.30
       source-map-js: 1.2.1
-    dev: true
 
   /css-what@6.2.2:
     resolution: {integrity: sha512-u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA==}
@@ -10769,10 +10786,6 @@ packages:
 
   /date-fns@3.6.0:
     resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
-    dev: false
-
-  /date-fns@4.1.0:
-    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
     dev: false
 
   /dateformat@4.6.3:
@@ -11045,10 +11058,6 @@ packages:
 
   /detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
-    dev: false
-
-  /devalue@5.5.0:
-    resolution: {integrity: sha512-69sM5yrHfFLJt0AZ9QqZXGCPfJ7fQjvpln3Rq5+PS03LD32Ost1Q9N+eEnaQwGRIriKkMImXD56ocjQmfjbV3w==}
     dev: false
 
   /devlop@1.1.0:
@@ -12119,10 +12128,6 @@ packages:
       - supports-color
     dev: true
 
-  /esm-env@1.2.2:
-    resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
-    dev: false
-
   /espree@10.4.0:
     resolution: {integrity: sha512-j6PAQ2uUr79PZhBjP5C5fhl8e39FmRnOjsD5lGnWrFU8i2G776tBK7+nP8KuQUTTyAZUwfQqXAgrVH5MbH9CYQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -12143,12 +12148,6 @@ packages:
     dependencies:
       estraverse: 5.3.0
     dev: true
-
-  /esrap@2.2.0:
-    resolution: {integrity: sha512-WBmtxe7R9C5mvL4n2le8nMUe4mD5V9oiK2vJpQ9I3y20ENPUomPcphBXE8D1x/Bm84oN1V+lOfgXxtqmxTp3Xg==}
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
-    dev: false
 
   /esrecurse@4.3.0:
     resolution: {integrity: sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==}
@@ -12176,7 +12175,6 @@ packages:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
     dependencies:
       '@types/estree': 1.0.8
-    dev: true
 
   /esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
@@ -15114,7 +15112,6 @@ packages:
 
   /mdn-data@2.0.30:
     resolution: {integrity: sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA==}
-    dev: true
 
   /media-engine@1.0.3:
     resolution: {integrity: sha512-aa5tG6sDoK+k70B9iEX1NeyfT8ObCKhNDs6lJVpwF6r8vhUfuKMslIcirq6HIUYuuUYLefcEQOn9bSBOvawtwg==}
@@ -16692,6 +16689,14 @@ packages:
     resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
     dev: false
 
+  /periscopic@3.1.0:
+    resolution: {integrity: sha512-vKiQ8RRtkl9P+r/+oefh25C3fhybptkHKCZSPlcXiJux2tJF55GnEj3BVn4A5gKfq9NWWXXrxkHBwVPUfH0opw==}
+    dependencies:
+      '@types/estree': 1.0.8
+      estree-walker: 3.0.3
+      is-reference: 3.0.3
+    dev: false
+
   /pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
@@ -17420,13 +17425,13 @@ packages:
       strip-json-comments: 2.0.1
     dev: true
 
-  /react-day-picker@8.10.1(date-fns@4.1.0)(react@19.2.0):
+  /react-day-picker@8.10.1(date-fns@3.6.0)(react@19.2.0):
     resolution: {integrity: sha512-TMx7fNbhLk15eqcMt+7Z7S2KF7mfTId/XJDjKE8f+IUcFn0l08/kI4FiYTL/0yuOLmEcbR4Fwe3GJf/NiiMnPA==}
     peerDependencies:
       date-fns: ^2.28.0 || ^3.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      date-fns: 4.1.0
+      date-fns: 3.6.0
       react: 19.2.0
     dev: false
 
@@ -19001,12 +19006,12 @@ packages:
       tweetnacl: 0.14.5
     dev: false
 
-  /sswr@2.0.0(svelte@5.45.2):
+  /sswr@2.0.0(svelte@4.2.20):
     resolution: {integrity: sha512-mV0kkeBHcjcb0M5NqKtKVg/uTIYNlIIniyDfSGrSfxpEdM9C365jK0z55pl9K0xAkNTJi2OAOVFQpgMPUk+V0w==}
     peerDependencies:
       svelte: ^4.0.0
     dependencies:
-      svelte: 5.45.2
+      svelte: 4.2.20
       swrev: 4.0.0
     dev: false
 
@@ -19413,25 +19418,24 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  /svelte@5.45.2:
-    resolution: {integrity: sha512-yyXdW2u3H0H/zxxWoGwJoQlRgaSJLp+Vhktv12iRw2WRDlKqUPT54Fi0K/PkXqrdkcQ98aBazpy0AH4BCBVfoA==}
-    engines: {node: '>=18'}
+  /svelte@4.2.20:
+    resolution: {integrity: sha512-eeEgGc2DtiUil5ANdtd8vPwt9AgaMdnuUFnPft9F5oMvU/FHu5IHFic+p1dR/UOB7XU2mX2yHW+NcTch4DCh5Q==}
+    engines: {node: '>=16'}
     dependencies:
-      '@jridgewell/remapping': 2.3.5
+      '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.5
-      '@sveltejs/acorn-typescript': 1.0.8(acorn@8.15.0)
+      '@jridgewell/trace-mapping': 0.3.31
       '@types/estree': 1.0.8
       acorn: 8.15.0
       aria-query: 5.3.2
       axobject-query: 4.1.0
-      clsx: 2.1.1
-      devalue: 5.5.0
-      esm-env: 1.2.2
-      esrap: 2.2.0
+      code-red: 1.0.4
+      css-tree: 2.3.1
+      estree-walker: 3.0.3
       is-reference: 3.0.3
       locate-character: 3.0.0
       magic-string: 0.30.21
-      zimmerframe: 1.1.4
+      periscopic: 3.1.0
     dev: false
 
   /svg-arc-to-cubic-bezier@3.2.0:
@@ -20674,7 +20678,7 @@ packages:
       - terser
     dev: true
 
-  /vite-plugin-pwa@0.17.5(vite@7.2.4)(workbox-build@7.4.0)(workbox-window@7.4.0):
+  /vite-plugin-pwa@0.17.5(vite@5.4.21)(workbox-build@7.4.0)(workbox-window@7.4.0):
     resolution: {integrity: sha512-UxRNPiJBzh4tqU/vc8G2TxmrUTzT6BqvSzhszLk62uKsf+npXdvLxGDz9C675f4BJi6MbD2tPnJhi5txlMzxbQ==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
@@ -20685,7 +20689,7 @@ packages:
       debug: 4.4.3
       fast-glob: 3.3.3
       pretty-bytes: 6.1.1
-      vite: 7.2.4(@types/node@22.19.1)(terser@5.44.0)(tsx@4.20.6)
+      vite: 5.4.21(@types/node@22.19.1)(terser@5.44.0)
       workbox-build: 7.4.0
       workbox-window: 7.4.0
     transitivePeerDependencies:
@@ -21482,10 +21486,6 @@ packages:
 
   /yoga-layout@2.0.1:
     resolution: {integrity: sha512-tT/oChyDXelLo2A+UVnlW9GU7CsvFMaEnd9kVFsaiCQonFAXd3xrHhkLYu+suwwosrAEQ746xBU+HvYtm1Zs2Q==}
-    dev: false
-
-  /zimmerframe@1.1.4:
-    resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
     dev: false
 
   /zod@3.23.8:
