@@ -28,6 +28,9 @@ info "Setting up pnpm for Vercel build..."
 # Enable corepack (Node.js built-in package manager)
 export ENABLE_EXPERIMENTAL_COREPACK=1
 
+# Skip Puppeteer Chromium download to speed up builds
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 # Try to enable corepack
 if ! corepack enable 2>/dev/null; then
   warn "Corepack enable failed, continuing..."

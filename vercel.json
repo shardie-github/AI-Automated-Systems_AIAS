@@ -1,7 +1,7 @@
 {
   "buildCommand": "cd apps/web && prisma generate --schema=./prisma/schema.prisma && cd ../.. && next build",
   "devCommand": "pnpm run dev",
-  "installCommand": "export ENABLE_EXPERIMENTAL_COREPACK=1 && corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install --frozen-lockfile",
+  "installCommand": "export ENABLE_EXPERIMENTAL_COREPACK=1 && export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true && corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install --frozen-lockfile",
   "cleanUrls": true,
   "trailingSlash": false,
   "framework": "nextjs",
@@ -12,7 +12,8 @@
     "PRISMA_CLIENT_ENGINE_TYPE": "library",
     "ENABLE_EXPERIMENTAL_COREPACK": "1",
     "NEXT_TELEMETRY_DISABLED": "1",
-    "SKIP_ENV_VALIDATION": "1"
+    "SKIP_ENV_VALIDATION": "1",
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
   },
   "build": {
     "env": {

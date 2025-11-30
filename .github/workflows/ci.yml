@@ -9,6 +9,7 @@ on:
 env:
   NODE_VERSION: '20'
   PNPM_VERSION: '8.15.0'
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
 
 jobs:
   # Core checks - run in parallel for fast feedback
