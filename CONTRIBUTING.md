@@ -1,179 +1,69 @@
-# Contributing to AIAS Platform
+# Contributing to AI Automated Systems
 
-Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to AI Automated Systems! We welcome contributions from the community.
 
 ## Getting Started
 
-1. **Fork the repository**
-2. **Clone your fork**
-   ```bash
-   git clone https://github.com/your-username/aias-platform.git
-   cd aias-platform
-   ```
-3. **Create a branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-4. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
-5. **Make your changes**
-6. **Test your changes**
-   ```bash
-   pnpm test
-   pnpm typecheck
-   pnpm lint
-   ```
-7. **Commit your changes**
-   ```bash
-   git commit -m "Add: your feature description"
-   ```
-8. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-9. **Open a Pull Request**
-
-## Development Workflow
-
-### Before You Start
-
-- Check existing [issues](https://github.com/your-org/aias-platform/issues) to see if your idea is already being worked on
-- For major changes, open an issue first to discuss the approach
-- Make sure you can run the project locally
-
-### Making Changes
-
-1. **Follow the code style**
-   - Run `pnpm format` before committing
-   - Follow existing patterns in the codebase
-   - Use TypeScript for all new code
-
-2. **Write tests**
-   - Add tests for new features
-   - Ensure all tests pass
-   - Aim for good test coverage
-
-3. **Update documentation**
-   - Update relevant docs if you change functionality
-   - Add JSDoc comments for new functions
-   - Update README if needed
-
-4. **Keep commits focused**
-   - One feature or fix per commit
-   - Write clear commit messages
-   - Use conventional commit format when possible
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/your-username/aias.git`
+3. Create a branch: `git checkout -b feat/your-feature-name`
+4. Make your changes
+5. Commit your changes: `git commit -m 'feat: Add your feature'`
+6. Push to your fork: `git push origin feat/your-feature-name`
+7. Open a Pull Request
 
 ## Code Standards
 
-### TypeScript
+- Follow TypeScript best practices
+- Use ESLint and Prettier (configured in the project)
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
 
-- Use TypeScript for all new code
-- Avoid `any` types
-- Use proper type definitions
-- Run `pnpm typecheck` before committing
+## Reporting Issues
 
-### Code Style
+### Bug Reports
 
-- Use Prettier for formatting (run `pnpm format`)
-- Follow ESLint rules (run `pnpm lint`)
-- Use meaningful variable and function names
-- Add comments for complex logic
+Please report bugs to: **scottrmhardie@gmail.com**
 
-### Testing
+Include:
+- Description of the bug
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- Environment details (browser, OS, etc.)
+- Screenshots if applicable
 
-- Write tests for new features
-- Use Vitest for unit tests
-- Use Playwright for E2E tests
-- Aim for 80%+ test coverage
+### Feature Requests
 
-## Pull Request Process
+For feature requests, please:
+1. Check if the feature already exists or is planned
+2. Open a GitHub issue with a clear description
+3. Or email: **scottrmhardie@gmail.com**
 
-1. **Update your branch**
-   ```bash
-   git checkout main
-   git pull upstream main
-   git checkout your-branch
-   git rebase main
-   ```
+## Security Issues
 
-2. **Ensure all checks pass**
-   - Type checking: `pnpm typecheck`
-   - Linting: `pnpm lint`
-   - Tests: `pnpm test`
-   - Formatting: `pnpm format:check`
+**Do not** open public issues for security vulnerabilities.
 
-3. **Write a good PR description**
-   - Explain what changes you made
-   - Explain why you made them
-   - Reference related issues
-   - Include screenshots if applicable
+Instead, report security issues to: **scottrmhardie@gmail.com**
 
-4. **Wait for review**
-   - Address feedback promptly
-   - Be open to suggestions
-   - Ask questions if something is unclear
+We will:
+- Acknowledge receipt within 48 hours
+- Work with you to resolve the issue
+- Credit you for responsible disclosure (with your permission)
 
-## Commit Message Format
+## Contact
 
-We prefer conventional commits:
-
-```
-type(scope): subject
-
-body
-
-footer
-```
-
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Test additions or changes
-- `chore`: Maintenance tasks
-
-Examples:
-```
-feat(workflows): add workflow template marketplace
-fix(api): handle edge case in route handler
-docs(readme): update installation instructions
-```
-
-## Project Structure
-
-```
-aias-platform/
-├── apps/web/          # Next.js application
-├── lib/               # Shared libraries
-├── components/       # Shared React components
-├── docs/              # Documentation
-├── scripts/           # Utility scripts
-├── tests/             # Test files
-└── supabase/          # Database migrations and functions
-```
-
-## Getting Help
-
-- **Questions?** Open a [Discussion](https://github.com/your-org/aias-platform/discussions)
-- **Found a bug?** Open an [Issue](https://github.com/your-org/aias-platform/issues)
-- **Need help?** Check the [Documentation](docs/)
+- **Official Website:** https://aiautomatedsystems.ca
+- **Help Center Support:** support@aiautomatedsystems.ca (for existing clients)
+- **Consulting & Inquiries:** inquiries@aiautomatedsystems.ca (for consulting and services)
+- **Feedback & Bug Reports:** scottrmhardie@gmail.com
 
 ## Code of Conduct
 
 - Be respectful and inclusive
-- Welcome newcomers
+- Welcome newcomers and help them learn
 - Focus on constructive feedback
-- Help others learn and grow
+- Respect different viewpoints and experiences
 
-## Recognition
-
-Contributors will be:
-- Listed in the project README
-- Credited in release notes
-- Appreciated by the community
-
-Thank you for contributing! 🎉
+Thank you for contributing to AI Automated Systems! 🚀

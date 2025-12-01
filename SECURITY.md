@@ -132,26 +132,41 @@ We publish security advisories for:
 
 ## Security Contacts
 
-- **Security Team**: security@aias-platform.com
-- **General Support**: support@aias-platform.com
-- **Emergency Contact**: +1-XXX-XXX-XXXX (for critical security issues)
+- **Security Issues**: scottrmhardie@gmail.com
+- **Help Center Support**: support@aiautomatedsystems.ca
+- **General Inquiries**: inquiries@aiautomatedsystems.ca
+- **Official Website**: https://aiautomatedsystems.ca
 
-## Bug Bounty Program
+## Security Reporting
 
-We are working on establishing a bug bounty program for security researchers. Details will be announced soon.
+We take security seriously and appreciate responsible disclosure of security vulnerabilities.
+
+### How to Report
+
+Please report security issues to: **scottrmhardie@gmail.com**
+
+Include:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
 
 ### Scope
 
-The bug bounty program will cover:
+We welcome reports on:
 - Web application vulnerabilities
 - API security issues
 - Authentication and authorization flaws
 - Data protection and privacy issues
 - Infrastructure security vulnerabilities
 
-### Rewards
+### Response
 
-Rewards will be based on:
+We will:
+- Acknowledge receipt within 48 hours
+- Provide updates on our progress
+- Work with you to understand and resolve the issue
+- Credit you for responsible disclosure (with your permission)
 - Severity of the vulnerability
 - Quality of the report
 - Impact on users and data

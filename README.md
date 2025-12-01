@@ -60,7 +60,7 @@ AI Automated Systems is built with:
 
 - **Encrypted Documents:** Internal business and investor relations documents are secured in the `/INVESTOR-RELATIONS-PRIVATE` folder and are encrypted via Git-crypt.
 - **Enterprise Security:** SOC 2, GDPR, CCPA compliance built-in.
-- **Security Reporting:** [Report security vulnerabilities](https://github.com/shardie-github/aias/security/advisories/new)
+- **Security Reporting:** Report security vulnerabilities to scottrmhardie@gmail.com
 
 ## 🛠️ Development
 
@@ -134,11 +134,12 @@ SOC 2, GDPR, CCPA compliance isn't optional—it's included. Advanced threat det
 - ✅ Enterprise security features
 - 🔄 Continuous improvements
 
-## 📞 Contact
+## 📞 Contact & Support
 
-- **Website:** [aiautomatedsystems.ca](https://aiautomatedsystems.ca)
-- **Email:** support@aiautomatedsystems.ca
-- **Sales:** inquiries@aiautomatedsystems.ca
+- **Official Website:** [aiautomatedsystems.ca](https://aiautomatedsystems.ca)
+- **Help Center Support:** support@aiautomatedsystems.ca (for existing clients and technical support)
+- **Consulting & Inquiries:** inquiries@aiautomatedsystems.ca (for consulting, workflow services, and hiring)
+- **Feedback & Bug Reports:** scottrmhardie@gmail.com (for comments, feedback, bug reports, or general inquiries)
 - **GitHub:** [@shardie-github/aias](https://github.com/shardie-github/aias)
 
 ---
