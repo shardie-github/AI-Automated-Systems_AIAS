@@ -130,15 +130,63 @@ curl /api/status/health
 4. **Real-time Ready**: Supabase Realtime subscriptions supported
 5. **Data Enrichment**: External APIs with sample fallbacks
 
+## Quick Setup (Automated)
+
+Run the automated setup script:
+
+```bash
+npm run living-system:setup
+```
+
+This will:
+1. ✅ Validate environment variables
+2. ✅ Provide migration instructions
+3. ✅ Verify migration was applied
+4. ✅ Test sign-up flow
+5. ✅ Check health endpoint
+
+## Available Scripts
+
+```bash
+# Complete setup (recommended)
+npm run living-system:setup
+
+# Individual steps
+npm run living-system:validate-env        # Check environment
+npm run living-system:apply-migration    # Migration instructions
+npm run living-system:verify-migration  # Verify migration
+npm run living-system:test-signup       # Test sign-up flow
+```
+
 ## Next Steps
 
-1. ✅ Apply migration
-2. ✅ Configure environment variables
-3. ✅ Test sign-up flow
-4. ✅ Monitor health endpoint
-5. ⏳ Add Supabase Realtime subscriptions for live updates
-6. ⏳ Enhance dashboard with more visualizations
-7. ⏳ Implement activity tracking on key user interactions
+1. ✅ **Apply Migration**: 
+   - Run `npm run living-system:apply-migration` for instructions
+   - Or apply via Supabase Dashboard SQL Editor
+
+2. ✅ **Validate Environment**: 
+   - Run `npm run living-system:validate-env`
+   - Set required variables in `.env.local` or Vercel
+
+3. ✅ **Verify Migration**: 
+   - Run `npm run living-system:verify-migration`
+   - Ensures all tables, views, and functions exist
+
+4. ✅ **Test Sign-Up Flow**: 
+   - Run `npm run living-system:test-signup`
+   - Verifies end-to-end data flow
+
+5. ✅ **Monitor Health**: 
+   - Visit `/api/status/health` or use `<HealthMonitor />` component
+   - Auto-refreshes every 60 seconds
+
+6. ✅ **Real-time Updates**: 
+   - Already implemented! Check `<RealtimeDashboard />` component
+   - Subscribes to `activity_log` and `posts` tables
+
+7. ✅ **Enhanced Dashboard**: 
+   - Visit `/dashboard` to see all metrics
+   - Includes health monitor and real-time feed
 
 ## Support
 

@@ -4,12 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Eye, Activity, MessageSquare, Zap } from "lucide-react";
 import { enrichWithExternalData, generateSampleMetrics, getIndustryBenchmarks } from "@/lib/data-enrichment";
+import { HealthMonitor } from "@/components/monitoring/health-monitor";
+import { RealtimeDashboard } from "@/components/dashboard/realtime-dashboard";
 
 /**
  * Public Dashboard: "Loud & High" Social Proof Metrics
  * 
  * Server Component that displays real-time aggregated metrics from Supabase.
  * This acts as "smoke signals" showing the ecosystem is alive and active.
+ * 
+ * Now includes Supabase Realtime subscriptions for live updates.
  */
 
 async function getKPIData() {
@@ -140,6 +144,11 @@ export default async function DashboardPage() {
         )}
       </div>
 
+      {/* Health Monitor */}
+      <div className="mb-8">
+        <HealthMonitor autoRefresh={true} refreshInterval={60000} />
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
@@ -218,6 +227,11 @@ export default async function DashboardPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Real-time Dashboard Component */}
+      <div className="mb-8">
+        <RealtimeDashboard />
       </div>
 
       {/* Additional Metrics */}
