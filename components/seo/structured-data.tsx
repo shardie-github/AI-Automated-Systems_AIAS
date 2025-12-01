@@ -9,10 +9,10 @@ interface OrganizationSchemaProps {
 }
 
 export function OrganizationSchema({
-  name = "AIAS Platform",
-  url = "https://aias-platform.com",
-  logo = "https://aias-platform.com/logo.png",
-  email = "support@aias-platform.com",
+  name = "AI Automated Systems",
+  url = "https://aiautomatedsystems.ca",
+  logo = "https://aiautomatedsystems.ca/logo.png",
+  email = "support@aiautomatedsystems.ca",
   phone = "+1-800-AIAS-HELP",
 }: OrganizationSchemaProps) {
   const schema = {
@@ -28,6 +28,7 @@ export function OrganizationSchema({
       addressCountry: "CA",
     },
     sameAs: [
+      "https://github.com/shardie-github/aias",
       "https://twitter.com/aias_platform",
       "https://linkedin.com/company/aias-platform",
     ],
@@ -98,9 +99,9 @@ interface WebSiteSchemaProps {
 }
 
 export function WebSiteSchema({
-  name = "AIAS Platform",
-  url = "https://aias-platform.com",
-  description = "AI automation that speaks Canadian business",
+  name = "AI Automated Systems",
+  url = "https://aiautomatedsystems.ca",
+  description = "Custom AI platform development and automation solutions. Built in Canada, serving the world.",
 }: WebSiteSchemaProps) {
   const schema = {
     "@context": "https://schema.org",
@@ -167,8 +168,8 @@ export function ServiceSchema({
   name = "Custom AI Platform Development",
   description = "We architect and build custom AI platforms from the ground up",
   provider = {
-    name: "AIAS Consultancy",
-    url: "https://aias-platform.com",
+    name: "AI Automated Systems",
+    url: "https://aiautomatedsystems.ca",
   },
   areaServed = "Worldwide",
   serviceType = "Consulting",

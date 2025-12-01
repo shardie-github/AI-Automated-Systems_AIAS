@@ -17,7 +17,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -33,7 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, FileText, Sparkles } from "lucide-react";
+import { X, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 const loiSchema = z.object({

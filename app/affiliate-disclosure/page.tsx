@@ -70,7 +70,7 @@ export default function AffiliateDisclosurePage() {
           <div className="bg-muted/50 p-4 rounded-lg">
             <p className="text-sm">
               <strong>Questions?</strong> If you have questions about our affiliate relationships, please contact us 
-              at <a href="mailto:hello@aias-platform.com" className="text-primary hover:underline">hello@aias-platform.com</a>.
+              at <a href="mailto:inquiries@aiautomatedsystems.ca" className="text-primary hover:underline">inquiries@aiautomatedsystems.ca</a>.
             </p>
           </div>
         </CardContent>

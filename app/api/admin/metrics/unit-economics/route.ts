@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createGETHandler } from '@/lib/api/route-handler';
 
 /**
  * GET /api/admin/metrics/unit-economics
  * Returns real-time unit economics metrics for VC review
  */
-export const GET = createGETHandler(async (context) => {
-  const { tenantId, userId } = context;
+export async function GET(request: NextRequest) {
+  return createGETHandler(async () => {
   
   // In production, fetch from database/analytics
   // For now, return calculated metrics based on recent data
@@ -105,11 +105,12 @@ export const GET = createGETHandler(async (context) => {
     channels,
     historical,
   });
-}, {
-  requireAuth: true,
-  requireTenant: true,
-  cache: {
-    enabled: true,
-    ttl: 60, // Cache for 1 minute
-  },
-});
+  }, {
+    requireAuth: true,
+    requireTenant: true,
+    cache: {
+      enabled: true,
+      ttl: 60, // Cache for 1 minute
+    },
+  })(request);
+}

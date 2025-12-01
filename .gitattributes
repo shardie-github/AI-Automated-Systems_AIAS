@@ -172,3 +172,6 @@ trivy-results.sarif text eol=lf
 # De-emphasize archive in GitHub linguist & tarball exports
 docs/archive/** linguist-documentation
 docs/archive/** export-ignore
+
+# Git-crypt encryption for sensitive investor relations documents
+INVESTOR-RELATIONS-PRIVATE/** filter=git-crypt diff=git-crypt

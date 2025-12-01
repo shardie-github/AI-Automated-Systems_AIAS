@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-consultancy/config": "workspace:*",
     "@prisma/client": "^5.7.1",
     "@supabase/supabase-js": "^2.38.4",
     "stripe": "^14.9.0",
@@ -28,5 +29,8 @@
     "csv-stringify": "^6.4.4",
     "papaparse": "^5.4.1",
     "cheerio": "^1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6"
   }
 }

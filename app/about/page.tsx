@@ -232,14 +232,14 @@ export default function AboutPage() {
             <CardContent className="space-y-2">
               <p>
                 <strong>Email:</strong>{" "}
-                <a href="mailto:support@aias-platform.com" className="text-primary hover:underline">
-                  support@aias-platform.com
+                <a href="mailto:support@aiautomatedsystems.ca" className="text-primary hover:underline">
+                  support@aiautomatedsystems.ca
                 </a>
               </p>
               <p>
                 <strong>Sales:</strong>{" "}
-                <a href="mailto:sales@aias-platform.com" className="text-primary hover:underline">
-                  sales@aias-platform.com
+                <a href="mailto:inquiries@aiautomatedsystems.ca" className="text-primary hover:underline">
+                  inquiries@aiautomatedsystems.ca
                 </a>
               </p>
               <p>

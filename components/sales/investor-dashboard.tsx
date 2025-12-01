@@ -254,7 +254,7 @@ export function InvestorDashboard() {
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {[summary.byType.vc, summary.byType.angel, summary.byType.strategic || 0].map((entry, index) => (
+                        {[summary.byType.vc, summary.byType.angel, (summary.byType as any).strategic || 0].map((_entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>

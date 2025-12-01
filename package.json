@@ -12,10 +12,10 @@
   "homepage": "https://aiautomatedsystems.ca",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/aias-platform.git"
+    "url": "https://github.com/shardie-github/aias.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/aias-platform/issues",
+    "url": "https://github.com/shardie-github/aias/issues",
     "email": "support@aiautomatedsystems.ca"
   },
   "keywords": [
@@ -36,6 +36,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@hookform/resolvers": "^3.3.2",
     "@octokit/rest": "^20.0.2",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-accordion": "^1.2.12",

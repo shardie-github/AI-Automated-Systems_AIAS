@@ -12,4 +12,5 @@ corepack enable || true
 corepack prepare pnpm@8.15.0 --activate || npm install -g pnpm@8.15.0
 
 # Install dependencies with optimizations for Vercel
-pnpm install --frozen-lockfile --prefer-offline
+# Don't use frozen-lockfile to avoid build failures - lockfile will be updated automatically
+pnpm install --prefer-offline

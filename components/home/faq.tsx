@@ -130,7 +130,7 @@ export function FAQ() {
                 Schedule Strategy Call
               </a>
               <a
-                href="mailto:support@aias-platform.com"
+                href="mailto:support@aiautomatedsystems.ca"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-border hover:bg-muted transition-colors"
               >
                 Email Support

@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LTVCACDashboard } from "@/components/metrics/ltv-cac-dashboard";
 
 export const metadata: Metadata = {

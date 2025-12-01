@@ -14,20 +14,7 @@ interface TextRevealProps {
   splitBy?: "words" | "chars" | "none";
 }
 
-const defaultVariants: Variants = {
-  hidden: {
-    y: 20,
-    opacity: 0,
-  },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1], // Custom easing for smooth reveal
-    },
-  },
-};
+// Variants are defined inline in the component
 
 export function TextReveal({
   children,

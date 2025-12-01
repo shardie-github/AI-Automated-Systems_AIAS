@@ -19,7 +19,7 @@ interface BlobProps {
   initialY?: number;
 }
 
-function Blob({ className, speed = 0.5, initialX = 0, initialY = 0 }: BlobProps) {
+function Blob({ className, speed = 0.5, initialX = 0 }: BlobProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,

@@ -17,7 +17,7 @@ const openApiSpec = {
     description: 'Enterprise-grade AI consultancy platform API',
     contact: {
       name: 'AIAS Platform Support',
-      email: 'support@aias-platform.com',
+      email: 'support@aiautomatedsystems.ca',
     },
     license: {
       name: 'MIT',

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGETHandler, createPOSTHandler } from "@/lib/api/route-handler";
+import { createGETHandler, createPOSTHandler, RouteContext } from "@/lib/api/route-handler";
 
 /**
  * LOI (Letter of Intent) Management API
@@ -27,7 +27,7 @@ interface LOI {
 }
 
 export async function GET(request: NextRequest) {
-  return createGETHandler(request, async () => {
+  return createGETHandler(async () => {
     // TODO: Replace with real database queries
     const lois: LOI[] = [
       {
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
       expired: lois.filter((l) => l.status === "expired").length,
     };
 
-    return {
+    return NextResponse.json({
       lois,
       summary: {
         total: totalLOIs,
@@ -152,23 +152,33 @@ export async function GET(request: NextRequest) {
         byTier,
         byStatus,
       },
-    };
-  });
+    });
+  })(request);
 }
 
 export async function POST(request: NextRequest) {
-  return createPOSTHandler(request, async (body) => {
+  return createPOSTHandler(async (context: RouteContext) => {
+    const body = await context.request.json() as Partial<LOI>;
     // TODO: Implement database insert
     const newLOI: LOI = {
       id: `loi_${Date.now()}`,
-      ...body,
+      company: body.company || "",
+      contact: body.contact || "",
+      email: body.email || "",
+      industry: body.industry || "",
+      companySize: body.companySize || "",
+      tier: body.tier || "Starter",
+      monthlyCommitment: body.monthlyCommitment || 0,
+      annualValue: body.annualValue || 0,
+      timeline: body.timeline || 0,
       dateCreated: new Date().toISOString(),
       status: body.status || "draft",
+      requirements: body.requirements || [],
     };
 
-    return {
+    return NextResponse.json({
       success: true,
       loi: newLOI,
-    };
-  });
+    });
+  })(request);
 }

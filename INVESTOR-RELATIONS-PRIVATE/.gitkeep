@@ -1,0 +1,11 @@
+# INVESTOR-RELATIONS-PRIVATE
+# 
+# This directory contains encrypted business documents and investor relations materials.
+# All files in this directory are encrypted using git-crypt.
+#
+# To access these files, you must:
+# 1. Have git-crypt installed
+# 2. Have been added as a GPG user to the repository
+# 3. Run: git crypt unlock
+#
+# See SETUP_GIT_CRYPT.md for setup instructions.

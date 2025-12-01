@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGETHandler, createPOSTHandler } from "@/lib/api/route-handler";
+import { createGETHandler, createPOSTHandler, RouteContext } from "@/lib/api/route-handler";
 
 /**
  * Investor Outreach Tracking API
@@ -30,7 +30,7 @@ interface Investor {
 }
 
 export async function GET(request: NextRequest) {
-  return createGETHandler(request, async () => {
+  return createGETHandler(async () => {
     // TODO: Replace with real database queries
     const investors: Investor[] = [
       {
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
       committed: investors.filter((i) => i.status === "committed").length,
     };
 
-    return {
+    return NextResponse.json({
       investors,
       summary: {
         total: totalInvestors,
@@ -166,22 +166,40 @@ export async function GET(request: NextRequest) {
         byType,
         byStatus,
       },
-    };
-  });
+    });
+  })(request);
 }
 
 export async function POST(request: NextRequest) {
-  return createPOSTHandler(request, async (body) => {
+  return createPOSTHandler(async (context: RouteContext) => {
+    const body = await context.request.json() as Partial<Investor>;
     // TODO: Implement database insert
     const newInvestor: Investor = {
       id: `inv_${Date.now()}`,
-      ...body,
+      name: body.name || "",
+      firm: body.firm,
+      title: body.title || "",
+      email: body.email || "",
+      phone: body.phone,
+      linkedin: body.linkedin,
+      type: body.type || "vc",
+      tier: body.tier || "tier1",
+      checkSize: body.checkSize,
+      focus: body.focus,
+      portfolio: body.portfolio,
       status: body.status || "not_contacted",
+      source: body.source || "cold_outreach",
+      dateContacted: body.dateContacted,
+      dateMeeting: body.dateMeeting,
+      dateFollowUp: body.dateFollowUp,
+      notes: body.notes,
+      dealAmount: body.dealAmount,
+      dealStatus: body.dealStatus,
     };
 
-    return {
+    return NextResponse.json({
       success: true,
       investor: newInvestor,
-    };
-  });
+    });
+  })(request);
 }

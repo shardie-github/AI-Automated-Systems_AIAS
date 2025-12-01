@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGETHandler } from "@/lib/api/route-handler";
+import { createGETHandler, RouteContext } from "@/lib/api/route-handler";
 import { verifyAdminAuth } from "@/lib/auth/admin-auth";
 import { getAllNotifications } from "@/lib/notifications/seed-round-notifications";
 
@@ -8,9 +8,9 @@ import { getAllNotifications } from "@/lib/notifications/seed-round-notification
  * Returns notifications for health scores, LOI expirations, investor follow-ups, etc.
  */
 export async function GET(request: NextRequest) {
-  return createGETHandler(request, async () => {
+  return createGETHandler(async (context: RouteContext) => {
     // Verify admin authentication
-    const { user, error: authError } = await verifyAdminAuth(request);
+    const { user, error: authError } = await verifyAdminAuth(context.request);
     if (authError || !user) {
       return NextResponse.json({ error: authError || "Unauthorized" }, { status: 401 });
     }
@@ -45,5 +45,5 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-  });
+  })(request);
 }

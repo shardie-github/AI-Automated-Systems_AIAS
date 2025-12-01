@@ -91,7 +91,7 @@ export default function DemoPage() {
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground text-center">
-                Or email us at <a href="mailto:sales@aias-platform.com" className="text-primary hover:underline">sales@aias-platform.com</a>
+                Or email us at <a href="mailto:inquiries@aiautomatedsystems.ca" className="text-primary hover:underline">inquiries@aiautomatedsystems.ca</a>
               </p>
             </div>
           </CardContent>

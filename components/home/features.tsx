@@ -90,7 +90,7 @@ export function Features() {
       
       <StaggerList>
         <BentoGrid columns={3} className="relative z-10">
-          {features.map((feature, index) => {
+          {features.map((feature) => {
             const Icon = feature.icon;
             const isWide = feature.highlight;
             return (

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGETHandler, createPOSTHandler } from "@/lib/api/route-handler";
+import { createGETHandler, createPOSTHandler, RouteContext } from "@/lib/api/route-handler";
 
 /**
  * Case Study Management API
@@ -95,7 +95,7 @@ interface CaseStudy {
 }
 
 export async function GET(request: NextRequest) {
-  return createGETHandler(request, async () => {
+  return createGETHandler(async () => {
     // TODO: Replace with real database queries
     const caseStudies: CaseStudy[] = [
       {
@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
       return acc;
     }, {} as Record<string, number>);
 
-    return {
+    return NextResponse.json({
       caseStudies,
       summary: {
         total,
@@ -251,23 +251,76 @@ export async function GET(request: NextRequest) {
         byTier,
         byIndustry,
       },
-    };
-  });
+    });
+  })(request);
 }
 
 export async function POST(request: NextRequest) {
-  return createPOSTHandler(request, async (body) => {
+  return createPOSTHandler(async (context: RouteContext) => {
+    const body = await context.request.json() as Partial<CaseStudy>;
     // TODO: Implement database insert
     const newCaseStudy: CaseStudy = {
       id: `cs_${Date.now()}`,
-      ...body,
+      title: body.title || "",
+      customer: body.customer || "",
+      industry: body.industry || "",
+      companySize: body.companySize || "",
+      useCase: body.useCase || "",
+      tier: body.tier || "Starter",
       date: body.date || new Date().toISOString(),
       status: body.status || "draft",
+      challenge: body.challenge || {
+        background: "",
+        problems: [],
+        impact: { timeLost: "", cost: "", businessImpact: "" },
+        previousSolutions: [],
+      },
+      solution: body.solution || {
+        whyChosen: [],
+        implementation: {
+          timeline: "",
+          workflowsCreated: 0,
+          integrationsUsed: [],
+          teamInvolved: [],
+        },
+        keyWorkflows: [],
+      },
+      results: body.results || {
+        quantitative: {
+          timeSaved: { before: "", after: "", saved: "", value: "" },
+          costSavings: { before: "", after: "", netSavings: "" },
+          roi: { investment: "", savings: "", roi: "", paybackPeriod: "" },
+          businessMetrics: {},
+        },
+        qualitative: { quotes: [], benefits: [] },
+      },
+      testimonial: body.testimonial || {
+        quote: "",
+        author: "",
+        title: "",
+        company: "",
+      },
+      lessonsLearned: body.lessonsLearned || {
+        whatWorked: [],
+        bestPractices: [],
+        recommendations: [],
+      },
+      nextSteps: body.nextSteps || [],
+      metadata: body.metadata || {
+        permissionToUse: false,
+        anonymization: false,
+        logoUsage: false,
+        quoteAttribution: false,
+        useCases: [],
+        industries: [],
+        companySizes: [],
+        tags: [],
+      },
     };
 
-    return {
+    return NextResponse.json({
       success: true,
       caseStudy: newCaseStudy,
-    };
-  });
+    });
+  })(request);
 }

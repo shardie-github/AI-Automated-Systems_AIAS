@@ -17,7 +17,7 @@ export const About = () => {
         "Open Source Contributor"
       ],
       social: {
-        github: "https://github.com/aias-founder",
+        github: "https://github.com/shardie-github/aias",
         linkedin: "https://linkedin.com/in/aias-founder",
         email: "inquiries@aiautomatedsystems.ca"
       },
