@@ -16,6 +16,7 @@ import { EnhancedErrorBoundary } from "@/lib/error-handling/error-boundary-enhan
 import { TelemetryProvider } from "@/lib/monitoring/telemetry-provider";
 import { UTMTracker } from "@/components/analytics/utm-tracker";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { ReactQueryProvider } from "@/lib/data/react-query";
 import { env, getOptionalEnv } from "@/lib/env";
 
 const siteUrl = env.app.siteUrl || "https://aiautomatedsystems.ca";
@@ -173,9 +174,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="min-h-dvh antialiased">
         <EnhancedErrorBoundary>
-          <TelemetryProvider>
-            <ThemeProvider>
-              <SmoothScroll>
+          <ReactQueryProvider>
+            <TelemetryProvider>
+              <ThemeProvider>
+                <SmoothScroll>
                 {/* Accessibility: Skip to main content link */}
                 <a 
                   href="#main" 
@@ -205,6 +207,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </SmoothScroll>
             </ThemeProvider>
           </TelemetryProvider>
+          </ReactQueryProvider>
         </EnhancedErrorBoundary>
       </body>
     </html>

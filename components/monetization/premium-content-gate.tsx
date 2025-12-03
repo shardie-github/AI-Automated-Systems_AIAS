@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/lib/hooks/use-user";
 
 interface PremiumContentGateProps {
   title?: string;
