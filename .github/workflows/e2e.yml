@@ -1,0 +1,278 @@
+name: E2E & Visual Regression Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+    # Run on demand with label
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      run_visual:
+        description: 'Run visual regression tests'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '8.15.0'
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # E2E Tests - Critical Flows
+  e2e-critical:
+    name: E2E Tests (Critical Flows)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SKIP_ENV_VALIDATION: "true"
+
+      - name: Start server for E2E tests
+        run: |
+          pnpm run start &
+          echo $! > server.pid
+          sleep 15
+          # Verify server is running
+          curl -f http://localhost:3000/api/healthz || exit 1
+        env:
+          PORT: 3000
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SKIP_ENV_VALIDATION: "true"
+
+      - name: Run E2E tests (critical flows)
+        run: pnpm run test:e2e -- tests/e2e/critical-flows.spec.ts
+        env:
+          BASE_URL: http://localhost:3000
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-critical
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  # Visual Regression Tests
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Only run on PRs with visual label, main/develop pushes, or manual dispatch
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && 
+       (contains(github.event.pull_request.labels.*.name, 'visual-regression') ||
+        contains(github.event.pull_request.labels.*.name, 'visual')))
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SKIP_ENV_VALIDATION: "true"
+
+      - name: Start server for visual tests
+        run: |
+          pnpm run start &
+          echo $! > server.pid
+          sleep 15
+          curl -f http://localhost:3000/api/healthz || exit 1
+        env:
+          PORT: 3000
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SKIP_ENV_VALIDATION: "true"
+
+      - name: Run visual regression tests
+        run: pnpm run test:e2e --project=visual-regression
+        env:
+          BASE_URL: http://localhost:3000
+        continue-on-error: true
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      - name: Upload visual test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-regression-results
+          path: |
+            playwright-report/
+            test-results/
+            tests/e2e/**/*-actual.png
+            tests/e2e/**/*-diff.png
+          retention-days: 14
+
+      - name: Comment PR with visual results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `## 🎨 Visual Regression Test Results
+            
+            Visual regression tests detected differences. Please review the uploaded artifacts.
+            
+            **Next Steps:**
+            1. Review the diff images in the artifacts
+            2. If changes are intentional, update baselines: \`pnpm test:e2e --project=visual-regression --update-snapshots\`
+            3. If changes are unintentional, investigate and fix the visual regression
+            
+            *Note: Visual regression tests are optional for most PRs. Add the \`visual-regression\` label to require them.*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # E2E Tests - Cross Browser
+  e2e-cross-browser:
+    name: E2E Tests (Cross Browser)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Only run on main/develop pushes or manual dispatch
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Build application
+        run: pnpm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SKIP_ENV_VALIDATION: "true"
+
+      - name: Start server
+        run: |
+          pnpm run start &
+          echo $! > server.pid
+          sleep 15
+          curl -f http://localhost:3000/api/healthz || exit 1
+        env:
+          PORT: 3000
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://localhost:5432/test' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SKIP_ENV_VALIDATION: "true"
+
+      - name: Run E2E tests (${{ matrix.browser }})
+        run: pnpm run test:e2e --project=${{ matrix.browser }} tests/e2e/critical-flows.spec.ts
+        env:
+          BASE_URL: http://localhost:3000
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
