@@ -11,7 +11,7 @@ export function Footer() {
       aria-label="Site footer"
     >
       <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -22,7 +22,7 @@ export function Footer() {
               <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
               <h3 className="font-bold text-lg text-foreground">AI Automated Systems</h3>
             </div>
-            <p className="text-sm mb-4 leading-relaxed">
+            <p className="text-sm mb-6 leading-relaxed max-w-sm">
               Custom AI platforms, workflow automation systems, and intelligent agents. AI Automated Systems builds complete solutions 
               (like TokPulse and Hardonia Suite) while the AIAS Platform powers business automation for our SaaS customers.
             </p>
@@ -98,7 +98,7 @@ export function Footer() {
           transition={{ duration: 0.5 }}
           className="mt-12 pt-8 border-t border-border"
         >
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground mb-6">
+          <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground mb-8">
             {[
               { href: "/trust", label: "Trust Center" },
               { href: "/privacy", label: "Privacy" },
@@ -116,7 +116,7 @@ export function Footer() {
               </Link>
             ))}
           </div>
-          <div className="flex flex-wrap justify-center gap-3 mb-6">
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
             {[
               { icon: "🔒", text: "PIPEDA Compliant" },
               { icon: "🛡️", text: "SOC 2 (In Progress)" },

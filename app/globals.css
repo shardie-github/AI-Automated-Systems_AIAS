@@ -250,6 +250,39 @@ a, button, [role="button"], [role="link"] {
   justify-content: center;
 }
 
+/* Spacing utilities for consistent vertical rhythm */
+@layer utilities {
+  .space-section {
+    margin-top: 3rem; /* 48px */
+    margin-bottom: 3rem;
+  }
+  
+  .space-section-sm {
+    margin-top: 2rem; /* 32px */
+    margin-bottom: 2rem;
+  }
+  
+  .space-section-lg {
+    margin-top: 4rem; /* 64px */
+    margin-bottom: 4rem;
+  }
+  
+  .space-element {
+    margin-top: 1.5rem; /* 24px */
+    margin-bottom: 1.5rem;
+  }
+  
+  .space-element-sm {
+    margin-top: 1rem; /* 16px */
+    margin-bottom: 1rem;
+  }
+  
+  .space-element-lg {
+    margin-top: 2rem; /* 32px */
+    margin-bottom: 2rem;
+  }
+}
+
 /* Focus visible improvements */
 :focus-visible {
   outline: 2px solid hsl(var(--ring));
