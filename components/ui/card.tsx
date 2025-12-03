@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { motionTransitions, motionTranslate, prefersReducedMotion } from "@/lib/style/motion";
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { 
   hover?: boolean;
@@ -10,20 +11,27 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
 }>(
   ({ className, hover = true, gradient = false, ...props }, ref) => {
     const MotionDiv = motion.div;
+    const motionProps = prefersReducedMotion()
+      ? {}
+      : {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: motionTransitions.entrance,
+          whileHover: hover 
+            ? { y: motionTranslate.lift, transition: motionTransitions.standard } 
+            : undefined,
+        };
     
     return (
       <MotionDiv
         ref={ref}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        whileHover={hover ? { y: -4, transition: { duration: 0.2 } } : undefined}
         className={cn(
           "rounded-xl border border-border bg-card text-card-foreground shadow-sm transition-all duration-200",
           hover && "hover:shadow-lg hover:border-primary/20",
           gradient && "bg-gradient-to-br from-card to-card/50",
           className
         )}
+        {...motionProps}
         {...(props as any)}
       />
     );
@@ -69,7 +77,7 @@ CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+    <div ref={ref} className={cn("p-6 pt-4", className)} {...props} />
   )
 );
 CardContent.displayName = "CardContent";

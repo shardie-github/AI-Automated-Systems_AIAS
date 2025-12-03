@@ -3,11 +3,14 @@
 import * as React from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { motionVariants } from "@/lib/style/motion";
 
 interface LoadingStateProps {
   message?: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  "aria-label"?: string;
 }
 
 const sizeMap = {
@@ -20,18 +23,28 @@ export function LoadingState({
   message = "Loading...",
   className,
   size = "md",
+  "aria-label": ariaLabel,
 }: LoadingStateProps) {
   return (
-    <div
+    <motion.div
+      variants={motionVariants.fadeIn}
+      initial="hidden"
+      animate="visible"
       className={cn(
         "flex flex-col items-center justify-center py-12 px-4",
         className
       )}
+      role="status"
+      aria-live="polite"
+      aria-label={ariaLabel || message}
     >
-      <Loader2 className={cn("animate-spin text-muted-foreground", sizeMap[size])} />
+      <Loader2 
+        className={cn("animate-spin text-muted-foreground", sizeMap[size])} 
+        aria-hidden="true"
+      />
       {message && (
         <p className="mt-4 text-sm text-muted-foreground">{message}</p>
       )}
-    </div>
+    </motion.div>
   );
 }

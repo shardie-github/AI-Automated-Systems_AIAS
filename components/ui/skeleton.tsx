@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { motionTransitions, prefersReducedMotion } from "@/lib/style/motion";
 
 function Skeleton({
   className,
@@ -22,8 +23,9 @@ function Skeleton({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={prefersReducedMotion() ? { duration: 0.01 } : motionTransitions.standard}
       className={cn(baseClasses, variantClasses[variant], className)}
+      aria-hidden="true"
       {...(props as any)}
     />
   );

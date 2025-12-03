@@ -6,9 +6,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { motionTransitions, motionScale, prefersReducedMotion } from "@/lib/style/motion";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 min-h-[44px] min-w-[44px] relative overflow-hidden group",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-95 min-h-[44px] min-w-[44px] relative overflow-hidden group",
   {
     variants: {
       variant: {
@@ -72,14 +73,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       );
     }
     
+    const motionProps = prefersReducedMotion() 
+      ? {} 
+      : {
+          whileHover: { scale: isDisabled ? 1 : motionScale.hover },
+          whileTap: { scale: isDisabled ? 1 : motionScale.active },
+          transition: motionTransitions.standard,
+        };
+    
     return (
       <Comp
         ref={ref}
         className={cn(buttonVariants({ variant, size }), className)}
         disabled={isDisabled}
-        whileHover={{ scale: isDisabled ? 1 : 1.05 }}
-        whileTap={{ scale: isDisabled ? 1 : 0.95 }}
-        transition={{ duration: 0.2 }}
+        aria-busy={loading}
+        aria-disabled={isDisabled}
+        {...motionProps}
         {...(props as any)}
       >
         {buttonContent}
