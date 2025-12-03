@@ -64,12 +64,18 @@ FormControl.displayName = "FormControl"
 
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLParagraphElement> & {
+    id?: string
+  }
+>(({ className, id, ...props }, ref) => {
+  const root = React.useContext(FormFieldContext)
+  const descriptionId = id || (root?.name ? `${root.name}-description` : undefined)
+  
   return (
     <p
       ref={ref}
-      className={cn("text-sm text-muted-foreground", className)}
+      id={descriptionId}
+      className={cn("text-sm text-muted-foreground mt-1", className)}
       {...props}
     />
   )
@@ -94,10 +100,15 @@ const FormMessage = React.forwardRef<
     return null
   }
 
+  const fieldId = root?.name ? `${root.name}-error` : 'form-error'
+
   return (
     <p
       ref={ref}
-      className={cn("text-sm font-medium text-destructive", className)}
+      id={fieldId}
+      className={cn("text-sm font-medium text-destructive mt-2", className)}
+      role="alert"
+      aria-live="polite"
       {...props}
     >
       {fieldError?.message as React.ReactNode}

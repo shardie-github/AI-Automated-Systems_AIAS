@@ -104,12 +104,18 @@ a, button {
   .shimmer {
     background: linear-gradient(
       90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.8) 50%,
+      hsl(var(--muted)) 100%
     );
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer {
+      animation: none;
+    }
   }
   
   /* Enhanced Glass morphism */
