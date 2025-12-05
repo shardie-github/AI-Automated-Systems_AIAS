@@ -109,7 +109,7 @@
     "build:next": "next build",
     "postinstall": "patch-package --error-on-fail=false || true",
     "type-check": "tsc --noEmit",
-    "vercel-build": "cd apps/web && prisma generate && prisma migrate deploy --skip-seed && cd ../.. && next build",
+    "vercel-build": "cd apps/web && prisma generate && prisma migrate deploy && cd ../.. && next build",
     "build:analyze": "ANALYZE=true vite build",
     "preview": "next start",
     "start": "next start",
