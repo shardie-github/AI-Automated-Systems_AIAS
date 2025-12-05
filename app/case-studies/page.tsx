@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Rocket } from "lucide-react";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getUserPlanData } from "@/lib/trial/user-plan";
+import { GatedCaseStudy } from "@/components/case-studies/gated-case-study";
 
 export const metadata: Metadata = {
   title: "Case Studies — AIAS Consultancy | Custom Builds & Platform Success Stories",
@@ -115,7 +118,17 @@ const consultancyBuilds = [
   },
 ];
 
-export default function CaseStudiesPage() {
+export default async function CaseStudiesPage() {
+  // Get user plan from database
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let userPlan: "free" | "trial" | "starter" | "pro" = "free";
+  if (user) {
+    const userData = await getUserPlanData(user.id);
+    userPlan = userData.plan;
+  }
+
   return (
     <div className="container py-16">
       <div className="text-center mb-12">
@@ -146,7 +159,32 @@ export default function CaseStudiesPage() {
         </div>
 
         <div className="space-y-12 max-w-4xl mx-auto mb-16">
-          {consultancyBuilds.map((build) => (
+          {consultancyBuilds.map((build) => {
+            // Convert consultancy build to case study format for gating
+            const buildAsStudy = {
+              title: build.title,
+              company: build.company,
+              industry: build.industry,
+              location: build.location,
+              flag: build.flag,
+              challenge: build.challenge,
+              solution: build.solution,
+              results: build.results,
+              quote: build.quote,
+              author: build.author,
+              role: build.role,
+            };
+            
+            return (
+            <GatedCaseStudy
+              key={build.title}
+              study={buildAsStudy}
+              userPlan={userPlan}
+              showFull={true} // Consultancy builds always show full
+            />
+          )})}
+          {/* Original consultancy builds code kept for reference but replaced above */}
+          {false && consultancyBuilds.map((build) => (
             <Card key={build.title} className="overflow-hidden border-2 border-primary/20">
               <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
                 <div className="flex items-start justify-between">
@@ -225,53 +263,12 @@ export default function CaseStudiesPage() {
 
         <div className="space-y-12 max-w-4xl mx-auto">
           {caseStudies.map((study) => (
-            <Card key={study.title} className="overflow-hidden">
-              <CardHeader className="bg-muted/50">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-2xl mb-2">{study.title}</CardTitle>
-                    <CardDescription className="text-base flex items-center gap-2">
-                      {study.company} • {study.industry} • {study.location} {study.flag}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">The Challenge</h3>
-                      <span className="text-2xl">{study.flag}</span>
-                    </div>
-                    <p className="text-muted-foreground">{study.challenge}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">The Solution</h3>
-                    <p className="text-muted-foreground">{study.solution}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">The Results</h3>
-                    <ul className="space-y-2">
-                      {study.results.map((result, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">✓</span>
-                          <span className="text-muted-foreground">{result}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="border-t pt-6">
-                    <blockquote className="text-lg italic text-muted-foreground mb-4">
-                      &ldquo;{study.quote}&rdquo;
-                    </blockquote>
-                    <div>
-                      <p className="font-semibold">{study.author}</p>
-                      <p className="text-sm text-muted-foreground">{study.role}, {study.company}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <GatedCaseStudy
+              key={study.title}
+              study={study}
+              userPlan={userPlan}
+              showFull={userPlan === "starter" || userPlan === "pro"}
+            />
           ))}
         </div>
       </section>

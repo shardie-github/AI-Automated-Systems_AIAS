@@ -6,7 +6,7 @@ import { Check, Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Sign Up — Start Your Free Trial | AI Automated Systems",
-  description: "Start your 14-day free trial of AIAS Platform. No credit card required. Automate workflows, save 10+ hours/week. Canadian-built, PIPEDA compliant.",
+  description: "Start your 30-day free trial of AIAS Platform. No credit card required. Automate workflows, save 10+ hours/week. Canadian-built, PIPEDA compliant.",
 };
 
 export default function SignUpPage() {
@@ -21,7 +21,7 @@ export default function SignUpPage() {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground">
-            No credit card required • 14-day free trial • Cancel anytime
+            No credit card required • 30-day free trial • Cancel anytime
           </p>
         </div>
 

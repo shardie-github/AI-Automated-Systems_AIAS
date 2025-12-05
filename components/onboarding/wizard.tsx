@@ -149,6 +149,15 @@ export function OnboardingWizard() {
         timeToActivation: totalTimeSeconds,
         achievedTarget,
       });
+
+      // Mark workflow as created in database
+      try {
+        await fetch("/api/trial/mark-workflow-created", {
+          method: "POST",
+        });
+      } catch (error) {
+        console.error("Failed to mark workflow created:", error);
+      }
     }
   };
 

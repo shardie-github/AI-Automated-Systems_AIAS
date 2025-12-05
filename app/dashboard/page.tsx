@@ -6,6 +6,7 @@ import { TrendingUp, Users, Eye, Activity, MessageSquare, Zap } from "lucide-rea
 import { enrichWithExternalData, generateSampleMetrics, getIndustryBenchmarks } from "@/lib/data-enrichment";
 import { HealthMonitor } from "@/components/monitoring/health-monitor";
 import { RealtimeDashboard } from "@/components/dashboard/realtime-dashboard";
+import { DashboardUpgradeSection } from "@/components/dashboard/dashboard-upgrade-section";
 
 /**
  * Public Dashboard: "Loud & High" Social Proof Metrics
@@ -129,8 +130,15 @@ export default async function DashboardPage() {
     (kpiData as any).kpi2Met &&
     (kpiData as any).kpi3Met;
 
+  // TODO: Get user plan from session/database
+  const userPlan: "free" | "trial" | "starter" | "pro" = "trial"; // Placeholder
+  const isFirstVisit = false; // TODO: Check from database
+
   return (
     <div className="container mx-auto py-8 px-4">
+      {/* Upgrade prompts and welcome dashboard */}
+      <DashboardUpgradeSection userPlan={userPlan} isFirstVisit={isFirstVisit} />
+
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">Ecosystem Dashboard</h1>
         <p className="text-muted-foreground">

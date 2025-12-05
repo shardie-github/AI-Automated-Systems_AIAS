@@ -134,7 +134,7 @@ export function MobileNav() {
               <Link 
                 href="/signup" 
                 onClick={() => setOpen(false)}
-                aria-label="Start your 14-day free trial - no credit card required"
+                aria-label="Start your 30-day free trial - no credit card required"
               >
                 Start Free Trial
               </Link>
