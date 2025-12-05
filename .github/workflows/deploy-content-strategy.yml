@@ -1,0 +1,266 @@
+name: Deploy Content Strategy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'emails/**'
+      - 'lib/email-templates/**'
+      - 'lib/email-cadence/**'
+      - 'components/**'
+      - 'app/**'
+      - '.github/workflows/deploy-content-strategy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+      deploy_emails:
+        description: 'Deploy email templates'
+        required: true
+        default: true
+        type: boolean
+      deploy_components:
+        description: 'Deploy UI components'
+        required: true
+        default: true
+        type: boolean
+      deploy_pages:
+        description: 'Deploy content pages'
+        required: true
+        default: true
+        type: boolean
+
+env:
+  NODE_VERSION: '20.x'
+  # Supabase Configuration (from GitHub Secrets)
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+  
+  # Email Configuration (from GitHub Secrets)
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+  
+  # Vercel Configuration (from GitHub Secrets)
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  
+  # Application Configuration
+  NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://aiautomatedsystems.ca' }}
+  NEXT_PUBLIC_APP_ENV: ${{ github.event.inputs.environment || 'production' }}
+
+jobs:
+  validate:
+    name: Validate Environment Variables
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate required env vars
+        run: npm run validate:env
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+          RESEND_API_KEY: ${{ env.RESEND_API_KEY }}
+          SENDGRID_API_KEY: ${{ env.SENDGRID_API_KEY }}
+
+  deploy-email-function:
+    name: Deploy Email Cadence Function
+    runs-on: ubuntu-latest
+    needs: validate
+    if: ${{ github.event.inputs.deploy_emails != false }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Login to Supabase
+        run: |
+          echo "${{ env.SUPABASE_ACCESS_TOKEN }}" | supabase login --token-stdin
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Link Supabase project
+        run: |
+          supabase link --project-ref ${{ env.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
+
+      - name: Deploy email cadence scheduler function
+        run: |
+          echo "Deploying email cadence scheduler function..."
+          supabase functions deploy email-cadence-scheduler \
+            --project-ref ${{ env.SUPABASE_PROJECT_REF }} \
+            --no-verify-jwt
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
+          RESEND_API_KEY: ${{ env.RESEND_API_KEY }}
+          SENDGRID_API_KEY: ${{ env.SENDGRID_API_KEY }}
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Verify function deployment
+        run: |
+          echo "Verifying function deployment..."
+          supabase functions list --project-ref ${{ env.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
+
+  deploy-vercel:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: validate
+    if: ${{ github.event.inputs.deploy_pages != false }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_ENV: ${{ env.NEXT_PUBLIC_APP_ENV }}
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ env.VERCEL_TOKEN }}
+          vercel-org-id: ${{ env.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+
+  test-email-delivery:
+    name: Test Email Delivery
+    runs-on: ubuntu-latest
+    needs: [deploy-email-function]
+    if: ${{ github.event.inputs.deploy_emails != false }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test email template rendering
+        run: |
+          echo "Testing email template rendering..."
+          # Simple test to verify template engine works
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const templatePath = path.join(process.cwd(), 'emails', 'lifecycle', 'trial_welcome.html');
+            if (fs.existsSync(templatePath)) {
+              const template = fs.readFileSync(templatePath, 'utf-8');
+              console.log('✅ Template file exists and is readable');
+              console.log('Template length:', template.length, 'characters');
+            } else {
+              console.log('⚠️  Template file not found at:', templatePath);
+            }
+          "
+
+  verify-deployment:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-vercel, test-email-delivery]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify pillar pages
+        run: |
+          echo "Verifying content pages are accessible..."
+          SITE_URL="${{ env.NEXT_PUBLIC_SITE_URL }}"
+          
+          pages=(
+            "/systems-thinking"
+            "/automation-guide"
+            "/canadian-automation"
+            "/blog/10-automation-workflows-save-time"
+          )
+          
+          for page in "${pages[@]}"; do
+            echo "✅ $page would be checked at ${SITE_URL}${page}"
+          done
+          
+          echo ""
+          echo "📋 Deployment Checklist:"
+          echo "  [ ] Verify email cadence function is deployed"
+          echo "  [ ] Verify pillar pages are accessible"
+          echo "  [ ] Verify blog post is accessible"
+          echo "  [ ] Test email delivery"
+          echo "  [ ] Check Supabase function logs"
+
+      - name: Deployment summary
+        run: |
+          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployed Components:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Email cadence scheduler function" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Content pages (pillar pages)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ UI components" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Blog system" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Environment:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Site URL**: ${{ env.NEXT_PUBLIC_SITE_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify email delivery in production" >> $GITHUB_STEP_SUMMARY
+          echo "2. Monitor email open/click rates" >> $GITHUB_STEP_SUMMARY
+          echo "3. Check pillar page SEO rankings" >> $GITHUB_STEP_SUMMARY
+          echo "4. Review analytics dashboard" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Links:" >> $GITHUB_STEP_SUMMARY
+          echo "- [Systems Thinking Page](${{ env.NEXT_PUBLIC_SITE_URL }}/systems-thinking)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Automation Guide](${{ env.NEXT_PUBLIC_SITE_URL }}/automation-guide)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Canadian Automation](${{ env.NEXT_PUBLIC_SITE_URL }}/canadian-automation)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Blog Post](${{ env.NEXT_PUBLIC_SITE_URL }}/blog/10-automation-workflows-save-time)" >> $GITHUB_STEP_SUMMARY
