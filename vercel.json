@@ -5,12 +5,10 @@
       "PRISMA_CLIENT_ENGINE_TYPE": "library",
       "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
       "PUPPETEER_SKIP_DOWNLOAD": "true",
-      "SKIP_ENV_VALIDATION": "1",
-      "NEXT_PRIVATE_SKIP_TYPE_CHECK": "1",
-      "NEXT_PRIVATE_SKIP_LINT": "1"
+      "SKIP_ENV_VALIDATION": "1"
     }
   },
-  "buildCommand": "cd apps/web && prisma generate --schema=./prisma/schema.prisma --generator client && cd ../.. && next build",
+  "buildCommand": "pnpm vercel-build",
   "cleanUrls": true,
   "devCommand": "pnpm run dev",
   "env": {
@@ -24,16 +22,16 @@
   "framework": "nextjs",
   "git": {
     "deploymentEnabled": {
-      "main": false,
-      "preview": false
+      "main": true,
+      "preview": true
     }
   },
   "github": {
     "autoAlias": true,
     "autoJobCancelation": true,
     "deploymentEnabled": {
-      "main": false,
-      "preview": false
+      "main": true,
+      "preview": true
     },
     "silent": false
   },

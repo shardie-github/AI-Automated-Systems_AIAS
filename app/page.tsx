@@ -4,6 +4,7 @@ import { Features } from "@/components/home/features";
 import { StatsSection } from "@/components/home/stats-section";
 import { TrustBadges } from "@/components/home/trust-badges";
 import { ConversionCTA } from "@/components/home/conversion-cta";
+import { SettlerShowcase } from "@/components/home/settler-showcase";
 import { SoftwareApplicationSchema } from "@/components/seo/structured-data";
 import { FAQSchema } from "@/components/seo/structured-data";
 
@@ -45,6 +46,7 @@ export default function HomePage() {
       <StatsSection />
       <TrustBadges />
       <CaseStudyPreview />
+      <SettlerShowcase />
       <ROICalculator />
       <Features />
       <Testimonials />

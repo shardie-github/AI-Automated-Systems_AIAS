@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Code, Workflow, Zap, Shield, BarChart, Users } from "lucide-react";
+import { Code, Workflow, Zap, Shield, BarChart, Users, Building2 } from "lucide-react";
 import { ServiceSchema } from "@/components/seo/structured-data";
 
 export const metadata: Metadata = {
@@ -22,6 +23,20 @@ const services = [
       "Scalable infrastructure",
     ],
     timeline: "8-16 weeks",
+  },
+  {
+    icon: Building2,
+    title: "Settler — Payment & Settlement Platform",
+    description: "Enterprise-grade payment processing and settlement platform. Built for high-volume transactions, compliance, and seamless integrations. Perfect for marketplaces, SaaS, and fintech.",
+    deliverables: [
+      "Payment processing infrastructure",
+      "Settlement & escrow services",
+      "Multi-currency support",
+      "Compliance & security",
+    ],
+    timeline: "Custom",
+    link: "/settler",
+    badge: "Partner Product",
   },
   {
     icon: Zap,
@@ -127,8 +142,15 @@ export default function ServicesPage() {
           return (
             <Card key={service.title} className="h-full">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Icon className="h-6 w-6 text-primary" />
+                <div className="flex items-start justify-between mb-2">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  {"badge" in service && service.badge && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {service.badge}
+                    </Badge>
+                  )}
                 </div>
                 <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
                 <CardDescription className="text-base">{service.description}</CardDescription>

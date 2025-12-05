@@ -80,10 +80,10 @@ const nextConfig = {
   
   // TypeScript and ESLint (handled in CI)
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true, // Allow build to proceed, type checking done in CI
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // Linting done separately in CI
   },
 };
 
