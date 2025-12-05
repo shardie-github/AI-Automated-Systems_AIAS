@@ -92,7 +92,7 @@ export function OnboardingWizard() {
     },
   ];
 
-  const goToNext = () => {
+  const goToNext = async () => {
     const currentStepId = steps[currentStep].id;
     const stepStartTime = Date.now() - startTimeRef.current;
     
