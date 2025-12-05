@@ -73,7 +73,7 @@ export function Features() {
             delay={0.1}
             staggerDelay={0.03}
           >
-            Why Systems Thinking + AI = Success
+            Automate Your Workflows. Save Time. Grow Your Business.
           </TextReveal>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -82,8 +82,8 @@ export function Features() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
           >
-            Systems thinking is THE critical skill for the AI age. It's what makes you stand out in the job market, 
-            succeed in business, and achieve optimal outcomes. Combined with AI automation, it's unstoppable.
+            Connect your tools, automate repetitive tasks, and get insights that help you make better decisions. 
+            No coding required. Start in minutes.
           </motion.p>
         </div>
       </FadeIn>

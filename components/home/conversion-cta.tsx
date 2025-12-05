@@ -74,7 +74,7 @@ export function ConversionCTA() {
                 </h2>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
                   Join 2,000+ businesses worldwide automating with AI Automated Systems. 
-                  <span className="font-bold text-foreground"> No credit card required.</span> 14-day free trial. Cancel anytime.
+                  <span className="font-bold text-foreground"> No credit card required.</span> 30-day free trial. Cancel anytime.
                 </p>
               </div>
 
@@ -148,9 +148,9 @@ export function ConversionCTA() {
                   className="text-base md:text-lg px-8 md:px-12 h-12 md:h-14 font-bold shadow-xl hover:shadow-2xl transition-all hover:scale-105 group min-h-[48px] w-full sm:w-auto" 
                   asChild
                 >
-                  <Link href="/signup" aria-label="Start your 14-day free trial - no credit card required">
+                  <Link href="/signup" aria-label="Start your 30-day free trial - no credit card required">
                     <span className="flex items-center justify-center gap-2">
-                      Start Free Trial
+                      Start 30-Day Free Trial
                       <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                     </span>
                   </Link>
@@ -177,7 +177,7 @@ export function ConversionCTA() {
               >
                 <span>✨ No credit card required</span>
                 <span>•</span>
-                <span>🎁 14-day free trial</span>
+                <span>🎁 30-day free trial</span>
                 <span>•</span>
                 <span>🔄 Cancel anytime</span>
                 <span>•</span>

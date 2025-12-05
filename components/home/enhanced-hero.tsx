@@ -100,9 +100,7 @@ export function EnhancedHero() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-medium px-4"
         >
-          We don't sell software. We architect, build, and deploy{" "}
-          <span className="text-foreground font-bold">custom AI solutions</span> — 
-          from TikTok analytics platforms to e-commerce automation ecosystems.
+          Save 10+ hours per week with AI automation. Connect your tools, automate workflows, and focus on what matters.
         </motion.p>
         
         {/* Value propositions */}
@@ -146,9 +144,9 @@ export function EnhancedHero() {
             className="text-base md:text-lg px-6 md:px-10 h-12 md:h-14 font-bold shadow-xl hover:shadow-2xl transition-all hover:scale-105 group min-h-[48px] w-full sm:w-auto" 
             asChild
           >
-            <Link href="/demo" aria-label="Schedule a free strategy call - no credit card required">
+            <Link href="/signup" aria-label="Start your 30-day free trial - no credit card required">
               <span className="flex items-center justify-center gap-2">
-                Schedule Free Strategy Call
+                Start 30-Day Free Trial
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </span>
             </Link>
@@ -159,18 +157,8 @@ export function EnhancedHero() {
             className="text-base md:text-lg px-6 md:px-10 h-12 md:h-14 font-bold border-2 hover:bg-primary/5 hover:border-primary/50 transition-all hover:scale-105 min-h-[48px] w-full sm:w-auto" 
             asChild
           >
-            <Link href="/tasks" aria-label="View our portfolio and case studies">
-              See Our Builds
-            </Link>
-          </Button>
-          <Button 
-            size="lg" 
-            variant="ghost" 
-            className="text-base md:text-lg px-6 md:px-10 h-12 md:h-14 font-bold hover:bg-primary/10 transition-all hover:scale-105 min-h-[48px] w-full sm:w-auto" 
-            asChild
-          >
-            <Link href="/signup" aria-label="Start your 14-day free trial - no credit card required">
-              Try AI Automated Systems Free
+            <Link href="/demo" aria-label="Book a free demo call">
+              Book Free Demo
             </Link>
           </Button>
         </motion.div>
@@ -213,7 +201,7 @@ export function EnhancedHero() {
         >
           <div className="inline-flex flex-col sm:flex-row items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 rounded-xl bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-2 border-primary/30 shadow-lg backdrop-blur-sm">
             <span className="text-xs md:text-sm font-semibold text-foreground">
-              🎁 Limited Time: Free Strategy Call + 14-Day Trial
+              🎁 Limited Time: Free Strategy Call + 30-Day Trial
             </span>
             <Button size="sm" variant="default" className="h-8 md:h-9 text-xs md:text-sm font-bold" asChild>
               <Link href="/signup">Claim Offer</Link>

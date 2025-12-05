@@ -14,46 +14,46 @@ export const metadata: Metadata = {
 
 const featureCategories = [
   {
-    title: "Systems Thinking Framework",
-    description: "THE critical skill for the AI age. Analyze problems from multiple perspectives.",
+    title: "Smart Problem Solving",
+    description: "See problems from all angles. Find root causes, not symptoms. Design solutions that actually work.",
     features: [
       {
-        name: "6-Perspective Analysis",
-        description: "Every challenge analyzed through process, technology, people, data, systems, AND automation. Systems thinking reveals optimal solutions.",
+        name: "Multi-Perspective Analysis",
+        description: "Analyze challenges from multiple angles to find the best solutions.",
       },
       {
         name: "Root Cause Identification",
-        description: "Find underlying causes, not symptoms. Systems thinking identifies leverage points for sustainable change.",
+        description: "Find underlying causes, not just symptoms. Fix problems for good.",
       },
       {
-        name: "Holistic Solution Design",
-        description: "Design integrated solutions that work together. Systems thinking creates synergies that point solutions cannot.",
+        name: "Integrated Solutions",
+        description: "Design solutions that work together. Avoid point fixes that create new problems.",
       },
       {
-        name: "Multi-Dimensional Problem Solving",
-        description: "Understand system interconnections, feedback loops, and unintended consequences. Systems thinking prevents costly mistakes.",
+        name: "Better Decision Making",
+        description: "Understand how everything connects. Make decisions with confidence.",
       },
     ],
   },
   {
-    title: "AI + Systems Thinking",
-    description: "AI amplifies systems thinking — it doesn't replace it",
+    title: "AI-Powered Automation",
+    description: "Let AI handle the repetitive work. You focus on strategy and growth.",
     features: [
       {
-        name: "AI Handles Execution",
-        description: "AI automates tasks, processes data, and scales execution. Systems thinking directs AI effectively.",
+        name: "Automated Workflows",
+        description: "AI handles tasks, processes data, and scales execution automatically.",
       },
       {
-        name: "Systems Thinking Creates Strategy",
-        description: "Systems thinking defines problems, designs solutions, and creates strategy. AI amplifies systems thinking.",
+        name: "Smart Insights",
+        description: "Get recommendations and insights that help you make better decisions.",
       },
       {
-        name: "Unstoppable Combination",
-        description: "Together, AI and systems thinking create optimal outcomes. AI scales execution, systems thinking ensures optimal direction.",
+        name: "Time Savings",
+        description: "Save 10+ hours per week by automating repetitive tasks.",
       },
       {
-        name: "Job Market Advantage",
-        description: "Systems thinking is uniquely human, irreplaceable. Combined with AI, it's the competitive advantage in the AI age.",
+        name: "Scalable Growth",
+        description: "Automate as you grow. No limits on workflows or automations.",
       },
     ],
   },
@@ -179,14 +179,13 @@ export default function FeaturesPage() {
           delay={0.1}
           staggerDelay={0.03}
         >
-          Systems Thinking + AI: The Complete Solution
+          Powerful Features. Simple Setup.
         </TextReveal>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-          Systems thinking is THE critical skill for the AI age. It's what makes you stand out in the job market, 
-          succeed in business, and achieve optimal outcomes. Combined with AI automation, it's unstoppable.
+          Automate workflows, analyze campaigns, and get personalized insights. Everything you need to save time and grow your business.
         </p>
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          🧠 Systems Thinking • 🤖 AI-Powered • 🎯 Optimal Outcomes
+          ⚡ Quick Setup • 🔄 Unlimited Automations • 📊 Advanced Analytics
         </div>
       </div>
 
@@ -221,17 +220,16 @@ export default function FeaturesPage() {
       ))}
 
       <div className="text-center mt-12 space-y-4 bg-primary/5 rounded-lg p-8">
-        <h2 className="text-2xl font-bold mb-2">Systems Thinking: The Critical Skill for the AI Age</h2>
+        <h2 className="text-2xl font-bold mb-2">Ready to Automate Your Workflows?</h2>
         <p className="text-muted-foreground mb-4">
-          Systems thinking is THE skill needed more than ever. It's what makes you stand out in the job market, 
-          succeed in business, and achieve optimal outcomes. AI amplifies systems thinking — it doesn't replace it.
+          Start your 30-day free trial. No credit card required. Connect your tools and automate your first workflow in minutes.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" asChild>
-            <Link href="/systems-thinking">Learn About Systems Thinking</Link>
+            <Link href="/signup">Start 30-Day Free Trial</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/demo">Book Consultation</Link>
+            <Link href="/pricing">See Pricing</Link>
           </Button>
         </div>
       </div>

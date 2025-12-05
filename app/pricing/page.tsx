@@ -39,6 +39,9 @@ const plans = [
       "Unlimited automations—never worry about limits",
       "50+ pre-built templates for common workflows",
       "20+ Canadian integrations (Shopify, Wave, RBC, TD)",
+      "Personalized news feed based on your goals",
+      "Advanced email campaign analysis",
+      "30-minute onboarding strategy session",
       "Email support with 24-48h response time",
       "Analytics dashboard",
       "Multi-currency support (CAD/USD/EUR)",
@@ -61,6 +64,9 @@ const plans = [
       "Unlimited automations",
       "All workflow templates (100+)",
       "Advanced integrations (50+)",
+      "Personalized news feed & insights",
+      "Full email campaign diagnostics",
+      "60-minute onboarding strategy session",
       "Priority support (24h response)",
       "Advanced analytics & reporting",
       "Team collaboration features",
@@ -100,7 +106,7 @@ export default function PricingPage() {
           </span>
           <span className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
-            14-day free trial
+            30-day free trial
           </span>
           <span className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
@@ -223,7 +229,7 @@ export default function PricingPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Yes! Start with our free plan (3 agents, 100 automations/month) or get a 14-day free trial of any paid plan. 
+              Yes! Start with our free plan (3 agents, 100 automations/month) or get a 30-day free trial of any paid plan. 
               No credit card required.
             </p>
           </CardContent>

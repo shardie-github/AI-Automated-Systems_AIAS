@@ -80,7 +80,7 @@ export default function ReferralPage() {
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-sm">They start with 14-day free trial</span>
+                <span className="text-sm">They start with 30-day free trial</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
@@ -159,7 +159,7 @@ export default function ReferralPage() {
               <div>
                 <h4 className="font-semibold mb-1">They Sign Up</h4>
                 <p className="text-sm text-muted-foreground">
-                  Your referral starts with a 14-day free trial. No credit card required.
+                  Your referral starts with a 30-day free trial. No credit card required.
                 </p>
               </div>
             </div>

@@ -15,23 +15,23 @@ const faqs = [
     questions: [
       {
         question: "What's the difference between AIAS Consultancy and AIAS Platform?",
-        answer: "AIAS Consultancy builds custom AI platforms from scratch (like TokPulse and Hardonia Suite). We architect, develop, and deploy complete solutions tailored to your business. AIAS Platform is our SaaS product for businesses that want ready-made automation tools. Think of it as: Consultancy = custom builds, Platform = ready-to-use software.",
+        answer: "AIAS Platform is ready-to-use automation software. Our consultancy builds custom platforms from scratch.",
       },
       {
         question: "How long does it take to build a custom AI platform?",
-        answer: "Typical timelines range from 8-16 weeks depending on complexity. Discovery & Strategy (1-2 weeks), Architecture & Design (2-3 weeks), Development & Testing (4-12 weeks), Deployment & Launch (1-2 weeks). We provide weekly demos throughout development so you see progress every step of the way.",
+        answer: "Typically 8-16 weeks. We provide weekly demos so you see progress every step of the way.",
       },
       {
         question: "What technologies do you use?",
-        answer: "We use modern, scalable tech stacks: Next.js/React for frontends, Node.js/Python for backends, AI/ML frameworks (OpenAI, Anthropic, custom models), cloud infrastructure (AWS, GCP, Azure), and enterprise databases. We choose technologies based on your requirements, not a one-size-fits-all approach.",
+        answer: "Modern, scalable tech stacks tailored to your needs. We use Next.js, Node.js, Python, and leading AI frameworks.",
       },
       {
         question: "Do you provide ongoing support after launch?",
-        answer: "Yes. We offer ongoing support packages including 24/7 monitoring, performance optimization, feature enhancements, bug fixes, and strategic consulting. Many clients work with us long-term for continuous improvement and scaling.",
+        answer: "Yes. We offer ongoing support including monitoring, optimization, and feature enhancements.",
       },
       {
         question: "What's included in a custom AI platform build?",
-        answer: "Complete platform development including: architecture design, custom AI agent development, real-time analytics engines, scalable infrastructure, security & compliance implementation, team training, documentation, and post-launch support. We handle everything from strategy to deployment.",
+        answer: "Complete development from strategy to deployment: architecture, AI agents, analytics, infrastructure, security, training, and support.",
       },
     ],
   },
@@ -40,15 +40,15 @@ const faqs = [
     questions: [
       {
         question: "How much does a custom AI platform cost?",
-        answer: "Custom platform projects typically range from $50K-$500K+ depending on scope, complexity, and timeline. We provide detailed proposals after the discovery phase with transparent pricing, timelines, and deliverables. Schedule a strategy call for a custom quote.",
+        answer: "Custom projects range from $50K-$500K+ depending on scope. Schedule a strategy call for a custom quote.",
       },
       {
         question: "Can I try AIAS Platform before hiring consultancy services?",
-        answer: "Absolutely. AIAS Platform offers a free plan and 14-day free trial. Many clients start with the platform to understand our capabilities, then engage consultancy services for custom builds. The platform is CAD $49/month for the Starter plan.",
+        answer: "Absolutely. Start with our 30-day free trial. The platform is CAD $49/month for the Starter plan.",
       },
       {
         question: "Do you offer payment plans for consultancy projects?",
-        answer: "Yes. We structure payments across project phases: Discovery (20%), Development milestones (60%), Launch (15%), Support retainer (5%). This aligns payments with deliverables and reduces risk for both parties.",
+        answer: "Yes. We structure payments across project phases, aligning with deliverables.",
       },
     ],
   },
@@ -57,15 +57,15 @@ const faqs = [
     questions: [
       {
         question: "How do you ensure projects stay on time and budget?",
-        answer: "We use agile methodology with weekly demos, clear milestones, and transparent communication. Scope is locked after discovery phase. Any changes go through formal change requests. We've delivered 100% of projects on time and within budget.",
+        answer: "We use agile methodology with weekly demos and clear milestones. Scope is locked after discovery.",
       },
       {
         question: "What if I need changes during development?",
-        answer: "We accommodate changes through formal change requests. Minor adjustments are usually included. Significant scope changes are estimated separately and approved before implementation. This keeps projects on track while remaining flexible.",
+        answer: "We accommodate changes through formal change requests. Minor adjustments are usually included.",
       },
       {
         question: "Will my team be trained on the platform?",
-        answer: "Yes. Training is included in every project. We provide comprehensive documentation, hands-on training sessions, and ongoing support. Your team will be fully capable of using and maintaining the platform after launch.",
+        answer: "Yes. Training is included with comprehensive documentation and hands-on sessions.",
       },
     ],
   },

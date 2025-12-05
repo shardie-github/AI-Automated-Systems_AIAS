@@ -37,7 +37,7 @@ export function CTASection() {
                 </CardTitle>
                 <CardDescription className="text-lg md:text-xl max-w-2xl mx-auto">
                   Join 2,000+ businesses worldwide automating with AIAS Platform. 
-                  No credit card required. 14-day free trial. Cancel anytime.
+                  No credit card required. 30-day free trial. Cancel anytime.
                 </CardDescription>
               </CardHeader>
               
@@ -106,7 +106,7 @@ export function CTASection() {
                     asChild
                   >
                     <Link href="/signup">
-                      Start Free Trial
+                      Start 30-Day Free Trial
                       <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
                     </Link>
                   </Button>
@@ -127,7 +127,7 @@ export function CTASection() {
                   transition={{ duration: 0.5, delay: 0.8 }}
                   className="text-sm text-muted-foreground text-center font-medium"
                 >
-                  ✨ No credit card required • 🎁 14-day free trial • 🔄 Cancel anytime
+                  ✨ No credit card required • 🎁 30-day free trial • 🔄 Cancel anytime
                 </motion.p>
               </CardContent>
             </Card>
