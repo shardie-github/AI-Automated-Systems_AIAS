@@ -1,0 +1,39 @@
+{{> layout}}
+
+<!-- Content -->
+<div style="color: #1f2937; line-height: 1.6;">
+  <h1 style="color: #1e40af; font-size: 28px; margin: 0 0 20px 0;">You're doing great, {{user.first_name}}!</h1>
+  
+  <p style="margin: 0 0 20px 0; font-size: 16px;">
+    You've been using {{product.product_name}} for a week. Here's what you could unlock with a paid plan:
+  </p>
+  
+  <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="color: #1e40af; font-size: 20px; margin: 0 0 15px 0;">What You'll Unlock:</h2>
+    <ul style="margin: 0; padding-left: 20px; line-height: 2;">
+      <li>✓ Personalized news feed (50+ articles/day based on your goals)</li>
+      <li>✓ Unlimited email campaign analysis with full diagnostics</li>
+      <li>✓ Unlimited workflows and automations</li>
+      <li>✓ 30-minute onboarding strategy session</li>
+      <li>✓ Priority support</li>
+    </ul>
+  </div>
+  
+  {{#if user.workflow_count}}
+  <p style="margin: 20px 0; font-size: 16px;">
+    You've created <strong>{{user.workflow_count}} workflows</strong> so far. Imagine what you could do with unlimited workflows!
+  </p>
+  {{/if}}
+  
+  <p style="margin: 20px 0; font-size: 16px;">
+    Your trial includes the basics. <strong>Upgrade to unlock the full power.</strong>
+  </p>
+  
+  {{> button button_url="{{urls.upgrade_url}}" button_text="Upgrade to Unlock"}}
+  
+  <p style="margin: 30px 0 0 0; font-size: 14px; color: #6b7280;">
+    Your trial ends in {{user.trial_days_left}} days. Upgrade anytime to keep your setup.
+  </p>
+</div>
+
+{{/layout}}

@@ -1,0 +1,355 @@
+{
+  "description": "Dynamic field definitions for email templates. All templates support these fields automatically via the template engine.",
+  "version": "1.0.0",
+  "fields": {
+    "user": {
+      "first_name": {
+        "type": "string",
+        "description": "User's first name",
+        "example": "John",
+        "fallback": "there"
+      },
+      "last_name": {
+        "type": "string",
+        "description": "User's last name",
+        "example": "Doe",
+        "fallback": ""
+      },
+      "email": {
+        "type": "string",
+        "description": "User's email address",
+        "example": "john@example.com"
+      },
+      "plan_name": {
+        "type": "string",
+        "description": "Current plan name",
+        "example": "Starter",
+        "options": ["Free", "Trial", "Starter", "Pro", "Enterprise"]
+      },
+      "trial_days_left": {
+        "type": "number",
+        "description": "Days remaining in trial",
+        "example": 15,
+        "fallback": 0
+      },
+      "trial_end_date": {
+        "type": "date",
+        "description": "Trial end date",
+        "example": "2025-02-15",
+        "format": "YYYY-MM-DD"
+      },
+      "workflow_count": {
+        "type": "number",
+        "description": "Number of workflows created",
+        "example": 3,
+        "fallback": 0
+      },
+      "integration_count": {
+        "type": "number",
+        "description": "Number of integrations connected",
+        "example": 2,
+        "fallback": 0
+      },
+      "automation_count": {
+        "type": "number",
+        "description": "Number of automations executed this month",
+        "example": 150,
+        "fallback": 0
+      },
+      "time_saved_hours": {
+        "type": "number",
+        "description": "Estimated hours saved (calculated)",
+        "example": 12.5,
+        "fallback": 0
+      }
+    },
+    "product": {
+      "product_name": {
+        "type": "string",
+        "description": "Product name",
+        "example": "AIAS Platform",
+        "default": "AIAS Platform"
+      },
+      "site_url": {
+        "type": "url",
+        "description": "Base site URL",
+        "example": "https://aiautomatedsystems.ca",
+        "default": "https://aiautomatedsystems.ca"
+      },
+      "dashboard_url": {
+        "type": "url",
+        "description": "Dashboard URL",
+        "example": "https://aiautomatedsystems.ca/dashboard"
+      },
+      "pricing_url": {
+        "type": "url",
+        "description": "Pricing page URL",
+        "example": "https://aiautomatedsystems.ca/pricing"
+      },
+      "help_url": {
+        "type": "url",
+        "description": "Help center URL",
+        "example": "https://aiautomatedsystems.ca/help"
+      },
+      "signup_url": {
+        "type": "url",
+        "description": "Signup page URL",
+        "example": "https://aiautomatedsystems.ca/signup"
+      }
+    },
+    "trial": {
+      "trial_days_left": {
+        "type": "number",
+        "description": "Days remaining in trial",
+        "example": 15
+      },
+      "trial_start_date": {
+        "type": "date",
+        "description": "Trial start date",
+        "example": "2025-01-15"
+      },
+      "trial_end_date": {
+        "type": "date",
+        "description": "Trial end date",
+        "example": "2025-02-15"
+      },
+      "trial_usage_percentage": {
+        "type": "number",
+        "description": "Percentage of trial features used",
+        "example": 65,
+        "min": 0,
+        "max": 100
+      }
+    },
+    "workflow": {
+      "workflow_name": {
+        "type": "string",
+        "description": "Name of workflow",
+        "example": "Order Processing Automation"
+      },
+      "workflow_type": {
+        "type": "string",
+        "description": "Type/category of workflow",
+        "example": "E-commerce",
+        "options": ["E-commerce", "Lead Generation", "Customer Support", "Content", "Data Processing", "Other"]
+      },
+      "workflow_suggestion": {
+        "type": "string",
+        "description": "Recommended next workflow",
+        "example": "Customer Support Ticket Routing"
+      },
+      "next_recommendation": {
+        "type": "string",
+        "description": "Next recommended action",
+        "example": "Create a lead qualification workflow"
+      }
+    },
+    "settler": {
+      "score_change": {
+        "type": "number",
+        "description": "Change in Settler score (compliance/risk)",
+        "example": 5.2,
+        "can_be_negative": true
+      },
+      "reconciliation_progress": {
+        "type": "number",
+        "description": "Reconciliation completion percentage",
+        "example": 85,
+        "min": 0,
+        "max": 100
+      },
+      "upcoming_deadline": {
+        "type": "date",
+        "description": "Next important deadline",
+        "example": "2025-02-20"
+      },
+      "suggested_next_action": {
+        "type": "string",
+        "description": "Recommended next action for Settler",
+        "example": "Review pending transactions"
+      }
+    },
+    "aias": {
+      "automation_maturity": {
+        "type": "string",
+        "description": "User's automation maturity level",
+        "example": "Intermediate",
+        "options": ["Beginner", "Intermediate", "Advanced", "Expert"]
+      },
+      "workflow_adoption": {
+        "type": "number",
+        "description": "Percentage of available workflows being used",
+        "example": 40,
+        "min": 0,
+        "max": 100
+      },
+      "recommended_upgrade": {
+        "type": "string",
+        "description": "Recommended plan upgrade",
+        "example": "Pro",
+        "options": ["Starter", "Pro", "Enterprise"]
+      },
+      "cost_time_savings_summary": {
+        "type": "string",
+        "description": "Summary of cost/time savings",
+        "example": "Saved 15 hours/week, reduced errors by 90%"
+      }
+    },
+    "news": {
+      "news_topic": {
+        "type": "string",
+        "description": "News topic/category",
+        "example": "Automation Trends",
+        "options": ["Automation Trends", "Systems Thinking", "Industry News", "Case Studies", "Tutorials"]
+      },
+      "article_count": {
+        "type": "number",
+        "description": "Number of articles in news feed",
+        "example": 50
+      },
+      "top_article_title": {
+        "type": "string",
+        "description": "Title of top recommended article",
+        "example": "10 Ways AI Automation Transforms Small Business"
+      },
+      "top_article_url": {
+        "type": "url",
+        "description": "URL of top recommended article",
+        "example": "https://aiautomatedsystems.ca/blog/ai-automation-small-business"
+      }
+    },
+    "analysis": {
+      "analysis_summary": {
+        "type": "string",
+        "description": "Summary of analysis results",
+        "example": "Your email campaigns show 25% higher engagement on Tuesdays"
+      },
+      "report_period": {
+        "type": "string",
+        "description": "Reporting period",
+        "example": "January 2025",
+        "format": "Month YYYY"
+      },
+      "insight_count": {
+        "type": "number",
+        "description": "Number of insights generated",
+        "example": 5
+      }
+    },
+    "urls": {
+      "upgrade_url": {
+        "type": "url",
+        "description": "Upgrade page URL with tracking",
+        "example": "https://aiautomatedsystems.ca/pricing?utm_source=email&utm_campaign=trial_ending"
+      },
+      "dashboard_url": {
+        "type": "url",
+        "description": "Dashboard URL",
+        "example": "https://aiautomatedsystems.ca/dashboard"
+      },
+      "workflow_url": {
+        "type": "url",
+        "description": "Workflow creation/management URL",
+        "example": "https://aiautomatedsystems.ca/workflows"
+      },
+      "integration_url": {
+        "type": "url",
+        "description": "Integrations page URL",
+        "example": "https://aiautomatedsystems.ca/integrations"
+      },
+      "template_url": {
+        "type": "url",
+        "description": "Templates page URL",
+        "example": "https://aiautomatedsystems.ca/templates"
+      },
+      "help_url": {
+        "type": "url",
+        "description": "Help center URL",
+        "example": "https://aiautomatedsystems.ca/help"
+      },
+      "case_study_url": {
+        "type": "url",
+        "description": "Case study URL",
+        "example": "https://aiautomatedsystems.ca/case-studies/example"
+      },
+      "demo_url": {
+        "type": "url",
+        "description": "Demo booking URL",
+        "example": "https://aiautomatedsystems.ca/demo"
+      }
+    },
+    "personalization": {
+      "industry": {
+        "type": "string",
+        "description": "User's industry",
+        "example": "E-commerce",
+        "options": ["E-commerce", "SaaS", "Professional Services", "Healthcare", "Finance", "Education", "Other"]
+      },
+      "user_goals": {
+        "type": "array",
+        "description": "User's goals from pre-test",
+        "example": ["Save time", "Reduce errors", "Scale business"],
+        "items": {
+          "type": "string"
+        }
+      },
+      "interests": {
+        "type": "array",
+        "description": "User's interests",
+        "example": ["Automation", "Systems Thinking", "AI"],
+        "items": {
+          "type": "string"
+        }
+      },
+      "recommended_templates": {
+        "type": "array",
+        "description": "Recommended workflow templates",
+        "example": ["E-commerce Order Processing", "Lead Qualification"],
+        "items": {
+          "type": "string"
+        }
+      },
+      "recommended_workflow": {
+        "type": "string",
+        "description": "Recommended next workflow",
+        "example": "Customer Support Automation"
+      },
+      "benefit": {
+        "type": "string",
+        "description": "Primary benefit for user",
+        "example": "save 10+ hours per week"
+      }
+    },
+    "social_proof": {
+      "total_users": {
+        "type": "number",
+        "description": "Total platform users",
+        "example": 2000
+      },
+      "paid_users": {
+        "type": "number",
+        "description": "Total paid users",
+        "example": 1500
+      },
+      "average_time_saved": {
+        "type": "number",
+        "description": "Average hours saved per week",
+        "example": 10.5
+      },
+      "success_rate": {
+        "type": "number",
+        "description": "Success rate percentage",
+        "example": 95,
+        "min": 0,
+        "max": 100
+      }
+    }
+  },
+  "usage_notes": {
+    "template_syntax": "Use {{field.path}} syntax in templates. Example: {{user.first_name}}",
+    "fallbacks": "Fields with fallbacks will use the fallback value if the field is missing or null",
+    "conditional_rendering": "Use conditional logic for optional fields. Example: {{#if user.workflow_count}}{{user.workflow_count}} workflows{{else}}No workflows yet{{/if}}",
+    "date_formatting": "Dates should be formatted according to user's locale. Use format helpers in template engine.",
+    "url_tracking": "All URLs should include UTM parameters for email tracking. Use {{urls.upgrade_url}} which includes tracking."
+  }
+}

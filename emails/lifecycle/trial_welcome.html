@@ -1,0 +1,57 @@
+{{> layout}}
+
+<!-- Content -->
+<div style="color: #1f2937; line-height: 1.6;">
+  <h1 style="color: #1e40af; font-size: 28px; margin: 0 0 20px 0;">Welcome to {{product.product_name}}, {{user.first_name}}!</h1>
+  
+  <p style="margin: 0 0 20px 0; font-size: 16px;">
+    Thanks for starting your 30-day free trial. Here are <strong>3 quick wins</strong> you can achieve today:
+  </p>
+  
+  <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 4px;">
+    <ol style="margin: 0; padding-left: 20px; line-height: 2;">
+      <li><strong>Connect your email (2 min)</strong> → See campaign insights</li>
+      <li><strong>Take pre-test (3 min)</strong> → Get personalized news</li>
+      <li><strong>Create first workflow (5 min)</strong> → Automate a task</li>
+    </ol>
+  </div>
+  
+  <p style="margin: 20px 0; font-size: 16px;">
+    All of this is <strong>free during your trial</strong>. No credit card required.
+  </p>
+  
+  <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 30px 0;">
+    <h2 style="color: #1e40af; font-size: 20px; margin: 0 0 15px 0;">What Makes {{product.product_name}} Different?</h2>
+    <p style="margin: 0 0 15px 0;">
+      Most automation platforms focus on tasks. We focus on <strong>systems thinking</strong> — analyzing problems from multiple perspectives to find optimal solutions.
+    </p>
+    <ul style="margin: 0; padding-left: 20px; line-height: 2;">
+      <li><strong>6-Perspective Analysis:</strong> Every challenge analyzed through process, technology, people, data, systems, AND automation</li>
+      <li><strong>Root Cause Identification:</strong> Find underlying causes, not symptoms</li>
+      <li><strong>Holistic Solution Design:</strong> Design integrated solutions that work together</li>
+      <li><strong>AI-Powered Execution:</strong> AI handles execution, systems thinking creates strategy</li>
+    </ul>
+  </div>
+  
+  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 4px;">
+    <p style="margin: 0; font-weight: 600; color: #92400e;">
+      🇨🇦 Built in Canada, Serving the World
+    </p>
+    <p style="margin: 10px 0 0 0; color: #78350f;">
+      PIPEDA compliant • Multi-currency support • Global integrations • Privacy first
+    </p>
+  </div>
+  
+  {{> button button_url="{{urls.dashboard_url}}" button_text="Go to Dashboard"}}
+  
+  <p style="margin: 30px 0 0 0; font-size: 14px; color: #6b7280;">
+    Questions? Reply to this email or visit our <a href="{{urls.help_url}}" style="color: #3b82f6;">help center</a>.
+  </p>
+  
+  <p style="margin: 20px 0 0 0; font-size: 16px;">
+    Best regards,<br>
+    <strong>The {{product.product_name}} Team</strong>
+  </p>
+</div>
+
+{{/layout}}

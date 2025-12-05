@@ -138,6 +138,13 @@ export default async function DashboardPage() {
     <div className="container mx-auto py-8 px-4">
       {/* Upgrade prompts and welcome dashboard */}
       <DashboardUpgradeSection userPlan={userPlan} isFirstVisit={isFirstVisit} />
+      
+      {/* Show empty state for first-time users */}
+      {isFirstVisit && (
+        <div className="mb-8">
+          {/* Welcome dashboard will be shown by DashboardUpgradeSection if isFirstVisit is true */}
+        </div>
+      )}
 
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">Ecosystem Dashboard</h1>

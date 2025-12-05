@@ -1,0 +1,131 @@
+name: Setup Environment Variables
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to configure'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+
+jobs:
+  validate-secrets:
+    name: Validate Required Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required secrets
+        run: |
+          echo "## Required GitHub Secrets" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Core Secrets (Required):" >> $GITHUB_STEP_SUMMARY
+          echo "- \`SUPABASE_URL\` or \`NEXT_PUBLIC_SUPABASE_URL\` - Your Supabase project URL" >> $GITHUB_STEP_SUMMARY
+          echo "- \`SUPABASE_SERVICE_ROLE_KEY\` - Supabase service role key" >> $GITHUB_STEP_SUMMARY
+          echo "- \`SUPABASE_ANON_KEY\` or \`NEXT_PUBLIC_SUPABASE_ANON_KEY\` - Supabase anonymous key" >> $GITHUB_STEP_SUMMARY
+          echo "- \`SUPABASE_ACCESS_TOKEN\` - For deploying functions" >> $GITHUB_STEP_SUMMARY
+          echo "- \`SUPABASE_PROJECT_REF\` - Your Supabase project reference" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Email Secrets (Required for email cadence):" >> $GITHUB_STEP_SUMMARY
+          echo "- \`RESEND_API_KEY\` - Resend API key (recommended)" >> $GITHUB_STEP_SUMMARY
+          echo "- OR \`SENDGRID_API_KEY\` - SendGrid API key (alternative)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Secrets (Required for Vercel):" >> $GITHUB_STEP_SUMMARY
+          echo "- \`VERCEL_TOKEN\` - Vercel API token" >> $GITHUB_STEP_SUMMARY
+          echo "- \`VERCEL_ORG_ID\` - Vercel organization ID" >> $GITHUB_STEP_SUMMARY
+          echo "- \`VERCEL_PROJECT_ID\` - Vercel project ID" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Optional Secrets:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`NEXT_PUBLIC_SITE_URL\` - Your site URL (defaults to https://aiautomatedsystems.ca)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`STRIPE_SECRET_KEY\` - For payments" >> $GITHUB_STEP_SUMMARY
+          echo "- \`STRIPE_WEBHOOK_SECRET\` - For webhooks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Setup Instructions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to **Repository → Settings → Secrets and variables → Actions**" >> $GITHUB_STEP_SUMMARY
+          echo "2. Click **'New repository secret'**" >> $GITHUB_STEP_SUMMARY
+          echo "3. Add each secret listed above" >> $GITHUB_STEP_SUMMARY
+          echo "4. Run this workflow again to validate" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Environment: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Validate secrets are set
+        run: |
+          required_secrets=(
+            "SUPABASE_URL"
+            "SUPABASE_SERVICE_ROLE_KEY"
+            "SUPABASE_ANON_KEY"
+            "RESEND_API_KEY"
+            "VERCEL_TOKEN"
+          )
+          
+          echo "Checking if secrets are configured..."
+          missing=0
+          
+          for secret in "${required_secrets[@]}"; do
+            # Check both direct and NEXT_PUBLIC_ variants
+            if [ -z "${!secret}" ] && [ -z "${NEXT_PUBLIC_${secret}}" ]; then
+              echo "⚠️  Missing: $secret (or NEXT_PUBLIC_${secret})"
+              missing=$((missing + 1))
+            else
+              echo "✅ Found: $secret"
+            fi
+          done
+          
+          if [ $missing -gt 0 ]; then
+            echo "❌ $missing required secrets are missing"
+            echo "Please add them in Repository → Settings → Secrets and variables → Actions"
+            exit 1
+          else
+            echo "✅ All required secrets are configured"
+          fi
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  generate-env-template:
+    name: Generate Environment Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate .env file template
+        run: |
+          cat > .env.generated << EOF
+          # Generated environment file for ${{ github.event.inputs.environment }}
+          # Copy values from GitHub Secrets to your deployment platform
+          
+          # Supabase
+          NEXT_PUBLIC_SUPABASE_URL=\${SUPABASE_URL}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
+          SUPABASE_SERVICE_ROLE_KEY=\${SUPABASE_SERVICE_ROLE_KEY}
+          SUPABASE_ACCESS_TOKEN=\${SUPABASE_ACCESS_TOKEN}
+          SUPABASE_PROJECT_REF=\${SUPABASE_PROJECT_REF}
+          
+          # Email
+          RESEND_API_KEY=\${RESEND_API_KEY}
+          
+          # Deployment
+          VERCEL_TOKEN=\${VERCEL_TOKEN}
+          VERCEL_ORG_ID=\${VERCEL_ORG_ID}
+          VERCEL_PROJECT_ID=\${VERCEL_PROJECT_ID}
+          
+          # Application
+          NEXT_PUBLIC_SITE_URL=\${NEXT_PUBLIC_SITE_URL:-https://aiautomatedsystems.ca}
+          NEXT_PUBLIC_APP_ENV=${{ github.event.inputs.environment }}
+          EOF
+          
+          echo "Generated .env template for ${{ github.event.inputs.environment }}"
+          echo ""
+          echo "📋 Template saved to .env.generated"
+          echo "Copy these values to:"
+          echo "  - Vercel: Dashboard → Project → Settings → Environment Variables"
+          echo "  - Supabase: Dashboard → Edge Functions → Settings"
+          echo "  - Local: .env.local file"

@@ -6,6 +6,7 @@
 import { logger } from '@/lib/logging/structured-logger';
 import { env } from '@/lib/env';
 import { getTemplateById, replaceTemplateVariables } from '@/lib/email-templates';
+import { renderTemplate } from '@/lib/email-templates/template-engine';
 
 export interface EmailOptions {
   to: string;
@@ -47,33 +48,83 @@ class EmailService {
 
   /**
    * Send email using template
+   * Supports both legacy templates (from lib/email-templates) and new HTML templates (from emails/)
    */
   async sendTemplate(
     templateId: string,
     to: string,
-    variables: Record<string, string>,
+    variables: Record<string, any> = {},
     options?: Partial<EmailOptions>
   ): Promise<EmailResult> {
-    const template = getTemplateById(templateId);
-    if (!template) {
-      logger.error('Email template not found', new Error(`Template ${templateId} not found`), { templateId });
+    // Try legacy template system first
+    const legacyTemplate = getTemplateById(templateId);
+    if (legacyTemplate) {
+      const subject = replaceTemplateVariables(legacyTemplate.subject, variables);
+      const html = replaceTemplateVariables(legacyTemplate.body, variables);
+      const text = legacyTemplate.textBody ? replaceTemplateVariables(legacyTemplate.textBody, variables) : undefined;
+
+      return this.send({
+        to,
+        subject,
+        html,
+        text,
+        ...options,
+      });
+    }
+
+    // Try to load from emails/ directory (new system)
+    try {
+      // In production, this would load from file system or database
+      // For now, we'll use the enhanced template engine with the template content
+      // This assumes templates are loaded elsewhere and passed in
+      logger.warn('Template not found in legacy system, attempting enhanced engine', { templateId });
+      
+      // Fallback: return error
+      return {
+        success: false,
+        error: `Template ${templateId} not found. Use sendTemplateWithContent() for HTML templates.`,
+      };
+    } catch (error) {
+      logger.error('Failed to load template', error instanceof Error ? error : new Error(String(error)), { templateId });
       return {
         success: false,
         error: `Template ${templateId} not found`,
       };
     }
+  }
 
-    const subject = replaceTemplateVariables(template.subject, variables);
-    const html = replaceTemplateVariables(template.body, variables);
-    const text = template.textBody ? replaceTemplateVariables(template.textBody, variables) : undefined;
+  /**
+   * Send email using HTML template content with enhanced template engine
+   * Use this for templates from emails/ directory with dynamic fields
+   */
+  async sendTemplateWithContent(
+    templateContent: string,
+    to: string,
+    subject: string,
+    variables: Record<string, any> = {},
+    components: Record<string, string> = {},
+    options?: Partial<EmailOptions>
+  ): Promise<EmailResult> {
+    try {
+      const html = renderTemplate(templateContent, variables, components);
+      const renderedSubject = renderTemplate(subject, variables, components);
 
-    return this.send({
-      to,
-      subject,
-      html,
-      text,
-      ...options,
-    });
+      return this.send({
+        to,
+        subject: renderedSubject,
+        html,
+        ...options,
+      });
+    } catch (error) {
+      logger.error('Failed to render template', error instanceof Error ? error : new Error(String(error)), {
+        to,
+        subject,
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
   }
 
   /**

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Sparkles, Plus, Play, Settings } from "lucide-react";
+import { WorkflowsEmptyState } from "@/components/ui/empty-state-enhanced";
 
 export const metadata: Metadata = {
   title: "Workflows — AIAS Platform | Manage Your Automations",
@@ -32,6 +33,9 @@ export default function WorkflowsPage() {
             </Link>
           </Button>
         </div>
+
+        {/* Empty state for no workflows */}
+        <WorkflowsEmptyState />
 
         <Card>
           <CardHeader>

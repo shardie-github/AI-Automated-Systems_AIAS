@@ -146,6 +146,11 @@ export const env = {
     replyTo: getEnvVar('EMAIL_REPLY_TO', false, 'inquiries@aiautomatedsystems.ca'),
     supportEmail: getEnvVar('SUPPORT_EMAIL', false, 'support@aiautomatedsystems.ca'),
     inquiriesEmail: getEnvVar('INQUIRIES_EMAIL', false, 'inquiries@aiautomatedsystems.ca'),
+    cadenceEnabled: getEnvVar('EMAIL_CADENCE_ENABLED', false, 'true') === 'true',
+    cadenceScheduleHour: parseInt(getEnvVar('EMAIL_CADENCE_SCHEDULE_HOUR', false, '9')),
+    cadenceScheduleTimezone: getEnvVar('EMAIL_CADENCE_SCHEDULE_TIMEZONE', false, 'UTC'),
+    trackingEnabled: getEnvVar('EMAIL_TRACKING_ENABLED', false, 'true') === 'true',
+    analyticsEnabled: getEnvVar('EMAIL_ANALYTICS_ENABLED', false, 'true') === 'true',
   },
   
   // Resend Configuration
@@ -167,6 +172,20 @@ export const env = {
     secure: getEnvVar('SMTP_SECURE', false, 'false') === 'true',
   },
   
+  // Content Marketing Configuration
+  content: {
+    blogEnabled: getEnvVar('BLOG_ENABLED', false, 'true') === 'true',
+    blogPostsPerPage: parseInt(getEnvVar('BLOG_POSTS_PER_PAGE', false, '10')),
+  },
+
+  // Feature Flags
+  features: {
+    emailCadence: getEnvVar('NEXT_PUBLIC_FEATURE_EMAIL_CADENCE', false, 'true') === 'true',
+    contentMarketing: getEnvVar('NEXT_PUBLIC_FEATURE_CONTENT_MARKETING', false, 'true') === 'true',
+    socialMedia: getEnvVar('NEXT_PUBLIC_FEATURE_SOCIAL_MEDIA', false, 'true') === 'true',
+    analytics: getEnvVar('NEXT_PUBLIC_FEATURE_ANALYTICS', false, 'true') === 'true',
+  },
+
   // Runtime information
   runtime: {
     env: getRuntimeEnv(),
