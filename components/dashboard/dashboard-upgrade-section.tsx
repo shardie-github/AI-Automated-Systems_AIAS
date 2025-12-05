@@ -3,69 +3,98 @@
 import { UpgradePrompt } from "@/components/monetization/upgrade-prompt";
 import { WelcomeDashboard } from "@/components/dashboard/welcome-dashboard";
 import { useEffect, useState } from "react";
+import type { PlanTier } from "@/config/plans";
+
+interface UserPlanData {
+  plan: PlanTier;
+  trialDaysRemaining: number | null;
+  isFirstVisit: boolean;
+  hasCompletedPretest: boolean;
+  hasConnectedEmail: boolean;
+  hasCreatedWorkflow: boolean;
+}
 
 interface DashboardUpgradeSectionProps {
-  userPlan?: "free" | "trial" | "starter" | "pro";
+  userPlan?: PlanTier;
   isFirstVisit?: boolean;
 }
 
 export function DashboardUpgradeSection({
-  userPlan = "trial",
-  isFirstVisit = false,
+  userPlan: initialPlan,
+  isFirstVisit: initialFirstVisit,
 }: DashboardUpgradeSectionProps) {
-  const [trialDaysRemaining, setTrialDaysRemaining] = useState<number | undefined>();
-  const [hasCompletedPretest, setHasCompletedPretest] = useState(false);
-  const [hasConnectedEmail, setHasConnectedEmail] = useState(false);
-  const [hasCreatedWorkflow, setHasCreatedWorkflow] = useState(false);
+  const [userData, setUserData] = useState<UserPlanData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check localStorage for pretest completion
-    const pretestCompleted = localStorage.getItem("pretest_completed") === "true";
-    setHasCompletedPretest(pretestCompleted);
-
-    // Calculate trial days remaining (if trial)
-    if (userPlan === "trial") {
-      // In production, get from database
-      // For now, calculate from signup date if available
-      const signupDate = localStorage.getItem("signup_date");
-      if (signupDate) {
-        const daysSinceSignup = Math.floor(
-          (Date.now() - new Date(signupDate).getTime()) / (1000 * 60 * 60 * 24)
-        );
-        setTrialDaysRemaining(Math.max(0, 30 - daysSinceSignup));
-      } else {
-        setTrialDaysRemaining(30); // Default
+    async function fetchUserData() {
+      try {
+        const response = await fetch("/api/trial/user-data");
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            plan: data.plan || "free",
+            trialDaysRemaining: data.trialDaysRemaining,
+            isFirstVisit: data.isFirstVisit || false,
+            hasCompletedPretest: data.hasCompletedPretest || false,
+            hasConnectedEmail: data.hasConnectedEmail || false,
+            hasCreatedWorkflow: data.hasCreatedWorkflow || false,
+          });
+        } else {
+          // Fallback to localStorage if API fails
+          const pretestCompleted = localStorage.getItem("pretest_completed") === "true";
+          setUserData({
+            plan: initialPlan || "free",
+            trialDaysRemaining: null,
+            isFirstVisit: initialFirstVisit || false,
+            hasCompletedPretest: pretestCompleted,
+            hasConnectedEmail: false,
+            hasCreatedWorkflow: false,
+          });
+        }
+      } catch (error) {
+        // Fallback to localStorage
+        const pretestCompleted = localStorage.getItem("pretest_completed") === "true";
+        setUserData({
+          plan: initialPlan || "free",
+          trialDaysRemaining: null,
+          isFirstVisit: initialFirstVisit || false,
+          hasCompletedPretest: pretestCompleted,
+          hasConnectedEmail: false,
+          hasCreatedWorkflow: false,
+        });
+      } finally {
+        setLoading(false);
       }
     }
 
-    // Check for email connection and workflows (would come from API in production)
-    // For now, check localStorage
-    const emailConnected = localStorage.getItem("email_connected") === "true";
-    const workflowCreated = localStorage.getItem("workflow_created") === "true";
-    setHasConnectedEmail(emailConnected);
-    setHasCreatedWorkflow(workflowCreated);
-  }, [userPlan]);
+    fetchUserData();
+  }, [initialPlan, initialFirstVisit]);
+
+  if (loading || !userData) {
+    return null; // Or loading spinner
+  }
 
   // Show welcome dashboard on first visit
-  if (isFirstVisit && (userPlan === "trial" || userPlan === "free")) {
+  if (userData.isFirstVisit && (userData.plan === "trial" || userData.plan === "free")) {
     return (
       <WelcomeDashboard
-        userPlan={userPlan}
-        trialDaysRemaining={trialDaysRemaining}
-        hasCompletedPretest={hasCompletedPretest}
-        hasConnectedEmail={hasConnectedEmail}
-        hasCreatedWorkflow={hasCreatedWorkflow}
+        userPlan={userData.plan}
+        trialDaysRemaining={userData.trialDaysRemaining || undefined}
+        hasCompletedPretest={userData.hasCompletedPretest}
+        hasConnectedEmail={userData.hasConnectedEmail}
+        hasCreatedWorkflow={userData.hasCreatedWorkflow}
       />
     );
   }
 
   // Show upgrade prompt for trial/free users
-  if (userPlan === "trial" || userPlan === "free") {
+  if (userData.plan === "trial" || userData.plan === "free") {
     return (
       <div className="mb-8">
         <UpgradePrompt
-          currentPlan={userPlan}
-          trialDaysRemaining={trialDaysRemaining}
+          currentPlan={userData.plan}
+          trialDaysRemaining={userData.trialDaysRemaining || undefined}
           variant="banner"
         />
       </div>

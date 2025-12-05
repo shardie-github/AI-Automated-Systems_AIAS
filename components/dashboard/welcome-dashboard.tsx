@@ -34,11 +34,10 @@ export function WelcomeDashboard({
     setShowPretest(!completed);
   }, []);
 
-  const handlePretestComplete = (answers: PreTestAnswers) => {
+  const handlePretestComplete = async (answers: PreTestAnswers) => {
     setPretestCompleted(true);
     setShowPretest(false);
-    // In production, save to database
-    // await savePretestAnswers(userId, answers);
+    // Already saved via API in pre-test component
   };
 
   const handlePretestSkip = () => {
@@ -147,11 +146,24 @@ export function WelcomeDashboard({
                 )}
               </div>
             ) : (
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/integrations">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Connect Email
-                </Link>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={async () => {
+                  // Mark as connected in database
+                  try {
+                    await fetch("/api/trial/mark-email-connected", {
+                      method: "POST",
+                    });
+                    setHasConnectedEmail(true);
+                  } catch (error) {
+                    console.error("Failed to mark email connected:", error);
+                  }
+                  window.location.href = "/integrations";
+                }}
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Connect Email
               </Button>
             )}
           </CardContent>

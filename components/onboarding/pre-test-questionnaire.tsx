@@ -114,7 +114,7 @@ export function PreTestQuestionnaire({ onComplete, onSkip, canDismiss = false }:
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     const userId = localStorage.getItem("user_id") || "anonymous";
     
     track(userId, {
@@ -127,9 +127,27 @@ export function PreTestQuestionnaire({ onComplete, onSkip, canDismiss = false }:
       app: "web",
     });
 
-    // Save to localStorage for personalization
-    localStorage.setItem("pretest_answers", JSON.stringify(answers));
-    localStorage.setItem("pretest_completed", "true");
+    // Save to database
+    try {
+      const response = await fetch("/api/trial/pretest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ answers }),
+      });
+
+      if (response.ok) {
+        // Also save to localStorage as fallback
+        localStorage.setItem("pretest_answers", JSON.stringify(answers));
+        localStorage.setItem("pretest_completed", "true");
+      }
+    } catch (error) {
+      console.error("Failed to save pretest answers:", error);
+      // Still save to localStorage as fallback
+      localStorage.setItem("pretest_answers", JSON.stringify(answers));
+      localStorage.setItem("pretest_completed", "true");
+    }
 
     onComplete(answers as PreTestAnswers);
   };
