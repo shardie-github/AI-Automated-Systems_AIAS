@@ -282,9 +282,12 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
     <div className="space-y-6">
       <div className="text-center">
         <Sparkles className="h-16 w-16 text-primary mx-auto mb-4" />
-        <h3 className="text-2xl font-bold mb-2">Welcome to AI Automated Systems!</h3>
-        <p className="text-muted-foreground">
-          Get your first automation running in under 5 minutes. No credit card required.
+        <h3 className="text-2xl font-bold mb-2">Welcome! Let's get your first automation running in 5 minutes</h3>
+        <p className="text-muted-foreground text-base mb-2">
+          Save 10+ hours per week with AI-powered workflows. Built in Canada, trusted by 2,000+ businesses.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Get started in 5 minutes. Choose a template, connect an integration (or skip), and watch your first automation run. No coding required.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -372,9 +375,17 @@ function ChooseIntegrationStep({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-muted-foreground">
-        Choose a tool you use daily, or skip this step and use a demo template.
+      <p className="text-muted-foreground mb-4">
+        Connect a tool you use daily to unlock powerful automations. Or skip this step and use a demo template to see how workflows work.
       </p>
+      <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg mb-4">
+        <p className="text-sm font-medium mb-2">Popular integrations:</p>
+        <ul className="text-sm space-y-1 text-muted-foreground">
+          <li>• <strong>Shopify</strong> → Automate order processing, inventory sync</li>
+          <li>• <strong>Wave Accounting</strong> → Auto-categorize expenses, generate reports</li>
+          <li>• <strong>Stripe</strong> → Process payments, send receipts automatically</li>
+        </ul>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {integrations.map((integration) => (
           <button
@@ -496,8 +507,17 @@ function CreateWorkflowStep({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-muted-foreground">
-        Choose a template to get started instantly. You can customize it later.
+      <p className="text-muted-foreground mb-4">
+        Templates save hours of setup time. Each template includes pre-configured triggers and actions with best practices built-in.
+      </p>
+      <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg mb-4">
+        <p className="text-sm font-medium mb-2">💡 Recommended for beginners:</p>
+        <p className="text-sm text-muted-foreground">
+          <strong>Demo Workflow</strong> — See how it works with zero setup. Perfect for your first automation.
+        </p>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        After creating your workflow, you can customize triggers, add conditions, and connect more integrations.
       </p>
       <div className="space-y-3">
         {templates.map((template) => (
