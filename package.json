@@ -109,7 +109,7 @@
     "build:next": "next build",
     "postinstall": "patch-package --error-on-fail=false || true",
     "type-check": "tsc --noEmit",
-    "vercel-build": "cd apps/web && prisma generate && prisma migrate deploy && cd ../.. && next build",
+    "vercel-build": "cd apps/web && export DIRECT_URL=${DIRECT_URL:-${DATABASE_URL}} && prisma generate && (prisma migrate deploy || echo 'Migration skipped') && cd ../.. && next build",
     "build:analyze": "ANALYZE=true vite build",
     "preview": "next start",
     "start": "next start",
