@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Building2, Zap, Shield, Globe, CheckCircle2, ArrowRight, Code, Database, Lock, TrendingUp } from "lucide-react";
 import { ServiceSchema } from "@/components/seo/structured-data";
 import { Badge } from "@/components/ui/badge";
-import { DashboardPreview } from "@/components/dashboard/dashboard-preview";
+import { DashboardPreviewWrapper } from "@/components/dashboard/dashboard-preview-wrapper";
 
 export const metadata: Metadata = {
   title: "Settler — Enterprise Settlement & Payment Platform | AIAS Partner",
@@ -138,14 +138,11 @@ export default function SettlerPage() {
                 Get comprehensive visibility into your payment operations with our advanced dashboard.
               </p>
             </div>
-            <DashboardPreview
+            <DashboardPreviewWrapper
               title="Settler Analytics Dashboard"
               description="Transaction monitoring, settlement tracking, and performance metrics"
               variant="settler"
-              onRequestPreview={() => {
-                // Scroll to demo CTA or open contact form
-                document.getElementById("demo-cta")?.scrollIntoView({ behavior: "smooth" });
-              }}
+              scrollTargetId="demo-cta"
             />
           </div>
         </section>
