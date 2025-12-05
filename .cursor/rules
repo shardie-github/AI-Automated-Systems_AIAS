@@ -233,7 +233,7 @@ export async function createUser(formData: FormData): Promise<{ success: boolean
 ### package.json
 - Add `"postinstall": "prisma generate || true"`
 - Add `"type-check": "tsc --noEmit"`
-- Add `"vercel-build": "prisma generate && prisma migrate deploy --skip-seed && next build"`
+- Add `"vercel-build": "prisma generate && prisma migrate deploy && next build"`
 
 ### prisma/schema.prisma
 - Add `binaryTargets: ["native", "rhel-openssl-3.0.x", "rhel-openssl-1.0.x"]`
