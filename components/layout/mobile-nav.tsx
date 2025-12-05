@@ -42,6 +42,14 @@ export function MobileNav() {
             Services
           </Link>
           <Link 
+            href="/edge-ai" 
+            onClick={() => setOpen(false)} 
+            className="text-lg font-medium hover:underline min-h-[44px] flex items-center"
+            aria-label="Navigate to Edge AI Accelerator Studio"
+          >
+            Edge AI
+          </Link>
+          <Link 
             href="/portfolio" 
             onClick={() => setOpen(false)} 
             className="text-lg font-medium hover:underline min-h-[44px] flex items-center"

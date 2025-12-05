@@ -24,6 +24,19 @@ const services = [
     timeline: "8-16 weeks",
   },
   {
+    icon: Zap,
+    title: "Edge AI Accelerator Studio",
+    description: "Optimize and deploy AI models for edge devices, NPUs, and local inference. Model quantization, benchmarking, and deployment tools for Jetson, Android, AI PCs, and more.",
+    deliverables: [
+      "Model optimization & quantization",
+      "Device profiling & benchmarking",
+      "Edge deployment packages",
+      "SDK scaffolds & integration support",
+    ],
+    timeline: "2-8 weeks",
+    link: "/edge-ai",
+  },
+  {
     icon: Workflow,
     title: "Workflow Automation Architecture",
     description: "Design and implement intelligent automation systems that understand your business logic and make decisions autonomously.",
@@ -134,9 +147,14 @@ export default function ServicesPage() {
                     </ul>
                   </div>
                   <div className="pt-4 border-t">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground mb-3">
                       <strong>Typical Timeline:</strong> {service.timeline}
                     </p>
+                    {"link" in service && service.link && (
+                      <Button size="sm" variant="outline" className="w-full" asChild>
+                        <Link href={service.link}>Learn More</Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>

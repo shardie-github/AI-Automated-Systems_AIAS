@@ -36,6 +36,7 @@ export function Header() {
         <nav aria-label="Primary" className="hidden md:flex items-center gap-1">
           {[
             { href: "/services", label: "Services" },
+            { href: "/edge-ai", label: "Edge AI" },
             { href: "/portfolio", label: "Portfolio" },
             { href: "/tasks", label: "Our Builds" },
             { href: "/case-studies", label: "Case Studies" },
