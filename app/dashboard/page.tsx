@@ -7,6 +7,10 @@ import { enrichWithExternalData, generateSampleMetrics, getIndustryBenchmarks } 
 import { HealthMonitor } from "@/components/monitoring/health-monitor";
 import { RealtimeDashboard } from "@/components/dashboard/realtime-dashboard";
 import { DashboardUpgradeSection } from "@/components/dashboard/dashboard-upgrade-section";
+import { WhatsNextChecklist } from "@/components/onboarding/whats-next-checklist";
+import { UsageProgressBanner } from "@/components/monetization/usage-progress-banner";
+import { TrialCountdownBanner } from "@/components/monetization/trial-countdown-banner";
+import { DashboardClient } from "./dashboard-client";
 
 /**
  * Public Dashboard: "Loud & High" Social Proof Metrics
@@ -154,6 +158,9 @@ export default async function DashboardPage() {
           Manage Workflows
         </a>
       </div>
+      
+      {/* Client-side components for upgrade nudges and checklist */}
+      <DashboardClient />
       
       {/* Show empty state for first-time users */}
       {isFirstVisit && (

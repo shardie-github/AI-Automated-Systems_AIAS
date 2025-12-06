@@ -7,6 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, ArrowLeft, Sparkles, Zap, Target, Clock } from "lucide-react";
 import { conversionTracker } from "@/lib/analytics/conversion-tracking";
 import { track } from "@/lib/telemetry/track";
+import { trackWorkflowCreate, trackActivation } from "@/lib/analytics/funnel-tracking";
+import { SuccessCelebration } from "@/components/onboarding/success-celebration";
 import Link from "next/link";
 
 interface Step {
@@ -52,6 +54,13 @@ export function OnboardingWizard() {
       userId,
       timestamp: Date.now(),
       targetTimeToAha: 300, // 5 minutes
+    });
+    
+    // Track funnel stage
+    import("@/lib/analytics/funnel-tracking").then(({ trackOnboardingStart }) => {
+      trackOnboardingStart(userId, {
+        timestamp: new Date().toISOString(),
+      });
     });
   }, []);
 
@@ -155,6 +164,20 @@ export function OnboardingWizard() {
         await fetch("/api/trial/mark-workflow-created", {
           method: "POST",
         });
+        
+        // Track workflow creation in funnel
+        const userId = localStorage.getItem("user_id") || "anonymous";
+        trackWorkflowCreate(userId, "workflow-id", {
+          timeToCreate: totalTimeSeconds,
+        });
+        
+        // Check if user is activated (has completed all steps)
+        if (completedSteps.includes("create-workflow") && completedSteps.includes("test-workflow")) {
+          trackActivation(userId, {
+            timeToActivation: totalTimeSeconds,
+            stepsCompleted: completedSteps.length,
+          });
+        }
       } catch (error) {
         console.error("Failed to mark workflow created:", error);
       }
@@ -254,11 +277,9 @@ export function OnboardingWizard() {
         <CardContent>
           {steps[currentStep].component}
           {/* Show success celebration after workflow creation step */}
-          {steps[currentStep].id === "create-workflow" && completedSteps.includes("create-workflow") && (
+          {steps[currentStep].id === "test-workflow" && completedSteps.includes("create-workflow") && (
             <div className="mt-4">
-              {React.createElement(
-                require("@/components/onboarding/success-celebration").SuccessCelebration
-              )}
+              <SuccessCelebration />
             </div>
           )}
         </CardContent>

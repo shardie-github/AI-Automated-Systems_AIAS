@@ -149,6 +149,13 @@ export async function POST(request: NextRequest) {
         app: "web",
       });
 
+      // Track funnel stage
+      const { trackWorkflowCreate } = await import("@/lib/analytics/funnel-tracking");
+      trackWorkflowCreate(user.id, workflow.id, {
+        templateId: validatedData.template_id,
+        timestamp: new Date().toISOString(),
+      });
+
       // Check if user has activated (has integration + workflow)
       // This is a simplified check - in production, you'd query the database
       const { data: integrations } = await supabase

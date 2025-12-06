@@ -89,9 +89,35 @@ function getTrialDaysRemaining(user: UserData): number {
 }
 
 /**
- * Send trial welcome email (Day 0)
+ * Send welcome email (Day 0) - Enhanced with new template
  */
 export async function sendTrialWelcomeEmail(user: UserData): Promise<boolean> {
+  try {
+    // Use new welcome email function from Supabase
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (supabaseServiceKey && supabaseUrl) {
+      const response = await fetch(`${supabaseUrl}/functions/v1/welcome-email`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseServiceKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+          firstName: user.firstName,
+        }),
+      });
+      
+      if (response.ok) {
+        logger.info('Welcome email sent via function', { userId: user.id });
+        return true;
+      }
+    }
+    
+    // Fallback to original implementation
   try {
     const template = loadEmailTemplate('lifecycle/trial_welcome.html');
     const components = loadEmailComponents();

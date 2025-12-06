@@ -87,6 +87,13 @@ export const POST = createPOSTHandler(
         app: "web",
       });
 
+      // Track funnel stage
+      const { trackIntegrationConnect } = await import("@/lib/analytics/funnel-tracking");
+      trackIntegrationConnect(user.id, "shopify", {
+        shop: validatedData.shop,
+        timestamp: new Date().toISOString(),
+      });
+
       // Check if user has activated (has integration + workflow)
       const { data: workflows } = await supabase
         .from("workflows")

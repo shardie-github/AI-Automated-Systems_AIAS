@@ -117,6 +117,20 @@ export async function createWorkflow(
     throw new Error(error.message || "Failed to create workflow");
   }
 
+  // Track workflow creation in funnel (if user_id available)
+  if (workflow.user_id) {
+    try {
+      const { trackWorkflowCreate } = await import("@/lib/analytics/funnel-tracking");
+      trackWorkflowCreate(workflow.user_id, data.id, {
+        templateId: workflow.template_id,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (trackingError) {
+      // Non-critical, continue
+      console.warn("Failed to track workflow creation", trackingError);
+    }
+  }
+
   return data as Workflow;
 }
 

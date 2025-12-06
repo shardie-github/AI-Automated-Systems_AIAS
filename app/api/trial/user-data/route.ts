@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getUserPlanData } from "@/lib/trial/user-plan";
-import { logger } from "@/lib/logging/structured-logger";
+import { handleApiError } from "@/lib/api/route-handler";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 /**
  * GET /api/trial/user-data
- * Get user plan and trial data
+ * Get current user's trial and plan data
  */
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
     
-    // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
@@ -23,15 +22,17 @@ export async function GET(request: NextRequest) {
 
     const userData = await getUserPlanData(user.id);
 
-    return NextResponse.json(userData);
+    return NextResponse.json({
+      plan: userData.plan,
+      trialStartDate: userData.trialStartDate?.toISOString(),
+      trialEndDate: userData.trialEndDate?.toISOString(),
+      trialDaysRemaining: userData.trialDaysRemaining,
+      isFirstVisit: userData.isFirstVisit,
+      hasCompletedPretest: userData.hasCompletedPretest,
+      hasConnectedEmail: userData.hasConnectedEmail,
+      hasCreatedWorkflow: userData.hasCreatedWorkflow,
+    });
   } catch (error) {
-    logger.error(
-      "Error getting user plan data",
-      error instanceof Error ? error : new Error(String(error))
-    );
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to get user data");
   }
 }

@@ -1,0 +1,20 @@
+name: Rescue Email Cron
+
+on:
+  schedule:
+    - cron: '0 10 * * *' # Daily at 10 AM UTC
+  workflow_dispatch:
+
+jobs:
+  rescue-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Rescue Email
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            "$SUPABASE_URL/functions/v1/rescue-email"
