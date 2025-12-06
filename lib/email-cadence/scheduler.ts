@@ -118,7 +118,6 @@ export async function sendTrialWelcomeEmail(user: UserData): Promise<boolean> {
     }
     
     // Fallback to original implementation
-  try {
     const template = loadEmailTemplate('lifecycle/trial_welcome.html');
     const components = loadEmailComponents();
     
