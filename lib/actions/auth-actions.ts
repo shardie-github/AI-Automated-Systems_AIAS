@@ -91,6 +91,10 @@ export async function signUpUser(
       };
     }
 
+    // Step 2.5: If user is being created as admin, generate Content Studio token
+    // This will be handled by the database trigger, but we can also do it here explicitly
+    // The trigger will handle it automatically when admin role is assigned
+
     // Step 3: Log sign-up activity
     const { error: activityError } = await supabase
       .from("activity_log")

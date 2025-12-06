@@ -66,11 +66,37 @@ export default function ContentStudioPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiasContent, settlerContent, hasChanges, autoSaveEnabled, authenticated, saving]);
 
+  // Try to get token from admin session on mount
+  useEffect(() => {
+    const tryAdminAuth = async () => {
+      try {
+        const response = await fetch("/api/content/auth");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.token) {
+            sessionStorage.setItem("content_studio_auth", "true");
+            sessionStorage.setItem("content_studio_token", data.token);
+            setAuthenticated(true);
+            await loadContent();
+            return;
+          }
+        }
+      } catch (error) {
+        // Silent fail - user can still use manual token
+        console.log("Admin session auth not available");
+      }
+    };
+    
+    if (authenticated === false) {
+      tryAdminAuth();
+    }
+  }, [authenticated]);
+
   const handleLogin = async () => {
     if (!password) {
       toast({
         title: "Password required",
-        description: "Please enter the access token",
+        description: "Please enter the access token or sign in as admin",
         variant: "destructive",
       });
       return;
@@ -78,8 +104,29 @@ export default function ContentStudioPage() {
 
     setLoading(true);
     try {
-      // Test authentication by trying to save (which will fail if wrong, but won't actually save without proper token)
-      // Or we can create a dedicated auth endpoint
+      // First try to verify as admin token
+      const verifyResponse = await fetch("/api/content/auth/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: password }),
+      });
+
+      if (verifyResponse.ok) {
+        // Valid admin token
+        sessionStorage.setItem("content_studio_auth", "true");
+        sessionStorage.setItem("content_studio_token", password);
+        setAuthenticated(true);
+        await loadContent();
+        toast({
+          title: "Authenticated",
+          description: "You can now edit content",
+        });
+        return;
+      }
+
+      // Fallback: Test with legacy token method
       const response = await fetch("/api/content/aias", {
         method: "POST",
         headers: {
@@ -94,7 +141,7 @@ export default function ContentStudioPage() {
         throw new Error("Invalid token");
       }
 
-      // Otherwise, assume it's valid (even if it fails for other reasons)
+      // Otherwise, assume it's valid
       sessionStorage.setItem("content_studio_auth", "true");
       sessionStorage.setItem("content_studio_token", password);
       setAuthenticated(true);
@@ -106,7 +153,7 @@ export default function ContentStudioPage() {
     } catch (error: any) {
       toast({
         title: "Authentication failed",
-        description: error.message || "Invalid token. Please try again.",
+        description: error.message || "Invalid token. If you're an admin, try signing in first.",
         variant: "destructive",
       });
     } finally {
@@ -246,8 +293,45 @@ export default function ContentStudioPage() {
               )}
             </Button>
             <p className="text-sm text-muted-foreground text-center">
-              Set CONTENT_STUDIO_TOKEN in your environment variables
+              If you're an admin, sign in to your account first, or enter your Content Studio token.
             </p>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                // Try to get token from admin session
+                try {
+                  const response = await fetch("/api/content/auth");
+                  if (response.ok) {
+                    const data = await response.json();
+                    if (data.token) {
+                      setPassword(data.token);
+                      await handleLogin();
+                    } else {
+                      toast({
+                        title: "Not an admin",
+                        description: "You need admin privileges to access Content Studio.",
+                        variant: "destructive",
+                      });
+                    }
+                  } else {
+                    toast({
+                      title: "Not signed in",
+                      description: "Please sign in to your admin account first.",
+                      variant: "destructive",
+                    });
+                  }
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: "Could not verify admin status. Please sign in first.",
+                    variant: "destructive",
+                  });
+                }
+              }}
+              className="w-full"
+            >
+              Sign In as Admin
+            </Button>
           </CardContent>
         </Card>
       </div>

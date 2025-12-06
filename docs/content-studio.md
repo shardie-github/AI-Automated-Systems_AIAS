@@ -13,8 +13,17 @@ Content Studio is a simple, non-developer-friendly content management system tha
 
 ### Authentication
 
-Content Studio is protected by a password/token system. To access:
+Content Studio supports two authentication methods:
 
+#### Method 1: Admin Account (Recommended)
+1. Sign in to your admin account on the AIAS website
+2. Navigate to `/admin/content-studio`
+3. Click "Sign In as Admin" button
+4. Your Content Studio token is automatically retrieved from your admin account
+
+**Note**: Admin accounts automatically receive a Content Studio token when the admin role is assigned. No manual configuration needed!
+
+#### Method 2: Manual Token (Legacy)
 1. Set the `CONTENT_STUDIO_TOKEN` environment variable in your deployment (Vercel, local `.env.local`, etc.)
 2. Navigate to `/admin/content-studio`
 3. Enter the token when prompted
@@ -188,7 +197,9 @@ Create or update a section editor component in `/components/content-studio/`:
 ## Troubleshooting
 
 ### "Content Studio not configured"
-- Set `CONTENT_STUDIO_TOKEN` in your environment variables
+- If using admin accounts: Ensure you're signed in and have admin role assigned
+- If using legacy token: Set `CONTENT_STUDIO_TOKEN` in your environment variables
+- Check that the database migration has been run (see `/docs/content-studio-admin-integration.md`)
 
 ### "Failed to save content"
 - Check that the token is correct
@@ -204,6 +215,38 @@ Create or update a section editor component in `/components/content-studio/`:
 - The file is created automatically with defaults on first load
 - If it's missing, check file permissions and ensure the `/content/` directory is writable
 
+## Configuration
+
+### Environment Variables
+
+```bash
+# OpenAI API key (for AI features)
+OPENAI_API_KEY=sk-your-openai-key-here
+
+# Supabase (for image uploads and admin auth)
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Optional: Legacy Content Studio token (for non-admin access)
+# If not set, only admin accounts can access
+CONTENT_STUDIO_TOKEN=your-secure-token-here
+```
+
+### Admin Account Setup
+
+Admin accounts automatically receive Content Studio access:
+
+1. Create a user account
+2. Assign the `admin` role:
+   ```sql
+   INSERT INTO user_roles (user_id, role)
+   VALUES ('user-uuid-here', 'admin');
+   ```
+3. Token is automatically generated
+4. Admin can access Content Studio by signing in
+
+See `/docs/content-studio-admin-integration.md` for detailed information.
+
 ## Architecture
 
 - **Storage**: File-based JSON configs (simple, version-controlled, no DB needed)
@@ -211,13 +254,16 @@ Create or update a section editor component in `/components/content-studio/`:
 - **Defaults**: Robust defaults ensure pages always render, even if config is missing
 - **API Routes**: `/api/content/aias` and `/api/content/settler` handle read/write
 - **UI**: React components in `/components/content-studio/` provide the editing interface
+- **Authentication**: Integrated with admin account system - tokens auto-generated
 
 ## Security
 
-- Content Studio routes are protected by token authentication
-- Tokens should be strong, random strings (use a password generator)
-- Never commit tokens to git
-- Consider adding IP whitelisting for production if needed
+- Content Studio routes are protected by admin authentication
+- Admin accounts automatically receive secure, unique tokens
+- Tokens are stored in the database and tied to admin user accounts
+- Admin status is verified on every API call
+- If admin role is removed, Content Studio access is automatically revoked
+- Legacy token support maintained for backward compatibility
 - The `/admin/content-studio` route should not be indexed by search engines (already handled by Next.js)
 
 ## Future Enhancements

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadAIASContent, saveAIASContent } from "@/lib/content/loader";
+import { env } from "@/lib/env";
 import type { AIASContent } from "@/lib/content/schemas";
 
 /**
@@ -21,22 +22,63 @@ export async function GET() {
 
 /**
  * POST /api/content/aias
- * Updates AIAS content (requires authentication)
+ * Updates AIAS content (requires admin authentication)
  */
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication token
+    // Check authentication - support both admin token and legacy env token
     const authHeader = request.headers.get("authorization");
-    const token = process.env.CONTENT_STUDIO_TOKEN;
+    const providedToken = authHeader?.replace("Bearer ", "");
     
-    if (!token) {
+    if (!providedToken) {
       return NextResponse.json(
-        { error: "Content Studio not configured" },
-        { status: 500 }
+        { error: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    if (!authHeader || authHeader !== `Bearer ${token}`) {
+    // First, try to verify as admin token
+    let isAuthorized = false;
+    
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabaseAdmin = createClient(
+        env.supabase.url,
+        env.supabase.serviceRoleKey
+      );
+
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("content_studio_token", providedToken)
+        .single();
+
+      if (profile) {
+        // Verify user is still admin
+        const { data: roleData } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", profile.id)
+          .eq("role", "admin")
+          .single();
+
+        if (roleData) {
+          isAuthorized = true;
+        }
+      }
+    } catch {
+      // If verification fails, fall back to legacy env token
+    }
+
+    // Fallback to legacy env token if admin verification failed
+    if (!isAuthorized) {
+      const legacyToken = process.env.CONTENT_STUDIO_TOKEN;
+      if (legacyToken && providedToken === legacyToken) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

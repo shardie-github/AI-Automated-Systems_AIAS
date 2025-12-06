@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { createClient } from "@supabase/supabase-js";
+import { env } from "@/lib/env";
 
 /**
  * POST /api/content/ai/seo
@@ -7,18 +9,55 @@ import OpenAI from "openai";
  */
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
+    // Check authentication - support both admin token and legacy env token
     const authHeader = request.headers.get("authorization");
-    const token = process.env.CONTENT_STUDIO_TOKEN;
+    const providedToken = authHeader?.replace("Bearer ", "");
     
-    if (!token) {
+    if (!providedToken) {
       return NextResponse.json(
-        { error: "Content Studio not configured" },
-        { status: 500 }
+        { error: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    if (!authHeader || authHeader !== `Bearer ${token}`) {
+    let isAuthorized = false;
+    
+    try {
+      const supabaseAdmin = createClient(
+        env.supabase.url,
+        env.supabase.serviceRoleKey
+      );
+
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("content_studio_token", providedToken)
+        .single();
+
+      if (profile) {
+        const { data: roleData } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", profile.id)
+          .eq("role", "admin")
+          .single();
+
+        if (roleData) {
+          isAuthorized = true;
+        }
+      }
+    } catch {
+      // Fall back to legacy token
+    }
+
+    if (!isAuthorized) {
+      const legacyToken = process.env.CONTENT_STUDIO_TOKEN;
+      if (legacyToken && providedToken === legacyToken) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
