@@ -1,0 +1,87 @@
+name: Migration Guardian
+
+on:
+  # Run on push to main/master branches
+  push:
+    branches:
+      - main
+      - master
+  # Run on pull requests (for verification)
+  pull_request:
+    branches:
+      - main
+      - master
+  # Run on schedule (daily at 2 AM UTC)
+  schedule:
+    - cron: '0 2 * * *'
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    name: Apply Prisma Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Migration Guardian
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          UPSTASH_REDIS_URL: ${{ secrets.UPSTASH_REDIS_URL }}
+        run: pnpm run migrate:guardian
+
+      - name: Upload Migration Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-log
+          path: MIGRATION_LOG.md
+          retention-days: 90
+
+      - name: Comment PR with Migration Status
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let logContent = '';
+            try {
+              logContent = fs.readFileSync('MIGRATION_LOG.md', 'utf-8');
+              // Extract the latest run summary
+              const latestRun = logContent.split('---').pop();
+              const outcomeMatch = latestRun.match(/\*\*STATE:\*\* (.+)/);
+              const outcome = outcomeMatch ? outcomeMatch[1] : 'UNKNOWN';
+              
+              const emoji = outcome.includes('VERIFIED') ? '✅' : outcome.includes('FAILED') ? '❌' : '⚠️';
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ${emoji} Migration Guardian Status\n\n**State:** ${outcome}\n\n<details>\n<summary>View Migration Log</summary>\n\n\`\`\`\n${latestRun}\n\`\`\`\n\n</details>`
+              });
+            } catch (error) {
+              console.log('Could not read migration log:', error.message);
+            }
