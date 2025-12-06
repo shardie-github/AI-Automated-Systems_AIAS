@@ -116,6 +116,18 @@ importers:
       '@vercel/analytics':
         specifier: ^1.6.1
         version: 1.6.1(next@15.5.7)(react@19.2.0)
+      '@vercel/blob':
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@vercel/edge-config':
+        specifier: ^1.4.3
+        version: 1.4.3(@opentelemetry/api@1.9.0)(next@15.5.7)
+      '@vercel/kv':
+        specifier: ^3.0.0
+        version: 3.0.0
+      '@vercel/speed-insights':
+        specifier: ^1.3.1
+        version: 1.3.1(next@15.5.7)(react@19.2.0)
       canvas-confetti:
         specifier: ^1.9.4
         version: 1.9.4
@@ -3533,7 +3545,6 @@ packages:
   /@fastify/busboy@2.1.1:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
-    dev: true
 
   /@floating-ui/core@1.7.3:
     resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
@@ -9243,6 +9254,12 @@ packages:
     dev: true
     optional: true
 
+  /@upstash/redis@1.35.7:
+    resolution: {integrity: sha512-bdCdKhke+kYUjcLLuGWSeQw7OLuWIx3eyKksyToLBAlGIMX9qiII0ptp8E0y7VFE1yuBxBd/3kSzJ8774Q4g+A==}
+    dependencies:
+      uncrypto: 0.1.3
+    dev: false
+
   /@vercel/analytics@1.6.1(next@15.5.7)(react@19.2.0):
     resolution: {integrity: sha512-oH9He/bEM+6oKlv3chWuOOcp8Y6fo6/PSro8hEkgCW3pu9/OiCXiUpRUogDh3Fs3LH2sosDrx8CxeOLBEE+afg==}
     peerDependencies:
@@ -9300,6 +9317,17 @@ packages:
       undici: 5.28.4
     dev: true
 
+  /@vercel/blob@2.0.0:
+    resolution: {integrity: sha512-oAj7Pdy83YKSwIaMFoM7zFeLYWRc+qUpW3PiDSblxQMnGFb43qs4bmfq7dr/+JIfwhs6PTwe1o2YBwKhyjWxXw==}
+    engines: {node: '>=20.0.0'}
+    dependencies:
+      async-retry: 1.3.3
+      is-buffer: 2.0.5
+      is-node-process: 1.2.0
+      throttleit: 2.1.0
+      undici: 5.28.4
+    dev: false
+
   /@vercel/build-utils@13.2.3:
     resolution: {integrity: sha512-SmXSNXfRh7E3wKR50IV3bGHw9iE5bw6D08LYvJdkQv1SjUgYVuIf2P5ceUPjzA2dqrKol0dxMvYb28dNHxmj5w==}
     dev: true
@@ -9321,6 +9349,27 @@ packages:
     resolution: {integrity: sha512-AIPgNkmtFcDgPCl+xvTT1ga90OL7OTX2RKM4zu0PMpwBthPfN2DpdHy10n3bh8K+CA22GDU0/ncjzprZsrk0sw==}
     engines: {node: '>=14'}
     dev: true
+
+  /@vercel/edge-config-fs@0.1.0:
+    resolution: {integrity: sha512-NRIBwfcS0bUoUbRWlNGetqjvLSwgYH/BqKqDN7vK1g32p7dN96k0712COgaz6VFizAm9b0g6IG6hR6+hc0KCPg==}
+    dev: false
+
+  /@vercel/edge-config@1.4.3(@opentelemetry/api@1.9.0)(next@15.5.7):
+    resolution: {integrity: sha512-8vTDATodRrH49wMzKEjZ8/5H2qs1aPkD0uRK585f/Fx4YN2wfHfY/3td9OFrh+gdnCq07z8A5f0hoY6xhBcPkg==}
+    engines: {node: '>=14.6'}
+    peerDependencies:
+      '@opentelemetry/api': ^1.7.0
+      next: '>=1'
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+      next:
+        optional: true
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      '@vercel/edge-config-fs': 0.1.0
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@19.2.0)(react@19.2.0)
+    dev: false
 
   /@vercel/elysia@0.1.13(rollup@2.79.2):
     resolution: {integrity: sha512-rNmS4Pfg1ku38GNx9vW9lItL1Zkzoyd0aN2wjy1iXqbM2ElKzOWAa2nwqqWpXMwU5552paWdvl+JQ94M5Wyibw==}
@@ -9466,6 +9515,13 @@ packages:
       zod: 3.22.4
     dev: true
 
+  /@vercel/kv@3.0.0:
+    resolution: {integrity: sha512-pKT8fRnfyYk2MgvyB6fn6ipJPCdfZwiKDdw7vB+HL50rjboEBHDVBEcnwfkEpVSp2AjNtoaOUH7zG+bVC/rvSg==}
+    engines: {node: '>=14.6'}
+    dependencies:
+      '@upstash/redis': 1.35.7
+    dev: false
+
   /@vercel/nestjs@0.2.17(rollup@2.79.2):
     resolution: {integrity: sha512-ZeR1Ins4Jhttc5Jehj4+Hna4Znb+JmdhTB6yn9ROwuKzgcqw+qu0jk7nbA1HysHHgrgFNJSV54rDmmOEZ8Ix7g==}
     dependencies:
@@ -9588,6 +9644,33 @@ packages:
       '@iarna/toml': 2.2.5
       execa: 5.1.1
     dev: true
+
+  /@vercel/speed-insights@1.3.1(next@15.5.7)(react@19.2.0):
+    resolution: {integrity: sha512-PbEr7FrMkUrGYvlcLHGkXdCkxnylCWePx7lPxxq36DNdfo9mcUjLOmqOyPDHAOgnfqgGGdmE3XI9L/4+5fr+vQ==}
+    peerDependencies:
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+    dependencies:
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@19.2.0)(react@19.2.0)
+      react: 19.2.0
+    dev: false
 
   /@vercel/static-build@2.8.14:
     resolution: {integrity: sha512-hCV74EgUJjNBl5UIQ93RhpQjP+QMNltT86hC2OgGHCZZms6fVQfaO4aaidWmBVr1LqVuSbY/V2MnS/zflpsVcQ==}
@@ -10299,7 +10382,6 @@ packages:
     resolution: {integrity: sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==}
     dependencies:
       retry: 0.13.1
-    dev: true
 
   /async-sema@3.1.1:
     resolution: {integrity: sha512-tLRNUXati5MFePdAk8dw7Qt7DpxPB60ofAgn8WRhW6a2rcimZnYBP9oxHiv0OHy+Wz7kPMG+t4LGdt31+4EmGg==}
@@ -14935,7 +15017,6 @@ packages:
   /is-buffer@2.0.5:
     resolution: {integrity: sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==}
     engines: {node: '>=4'}
-    dev: true
 
   /is-bun-module@2.0.0:
     resolution: {integrity: sha512-gNCGbnnnnFAUGKeZ9PdbyeGYJqewpmc2aKHUEMO5nQPWU9lOmv7jcmQIv+qHD8fXW6W7qfuCwX4rY9LNRjXrkQ==}
@@ -15080,7 +15161,6 @@ packages:
 
   /is-node-process@1.2.0:
     resolution: {integrity: sha512-Vg4o6/fqPxIjtxgUH5QLJhwZ7gW5diGCVlXpuUfELC62CuxM1iHcRe51f2W1FDy04Ai4KJkagKjx3XaqyfRKXw==}
-    dev: true
 
   /is-npm@4.0.0:
     resolution: {integrity: sha512-96ECIfh9xtDDlPylNPXhzjsykHsMJZ18ASpaWzQyBr4YRTcVjUvzaHayDAES2oU/3KpljhHUjtSRNiDwi0F0ig==}
@@ -19592,7 +19672,6 @@ packages:
   /retry@0.13.1:
     resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
     engines: {node: '>= 4'}
-    dev: true
 
   /reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
@@ -21078,7 +21157,6 @@ packages:
   /throttleit@2.1.0:
     resolution: {integrity: sha512-nt6AMGKW1p/70DF/hGBdJB57B8Tspmbp5gfJ8ilhLnt7kkr2ye7hzD6NVG8GGErk2HWF34igrL2CXmNIkzKqKw==}
     engines: {node: '>=18'}
-    dev: true
 
   /through@2.3.8:
     resolution: {integrity: sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==}
@@ -21624,6 +21702,10 @@ packages:
       through: 2.3.8
     dev: false
 
+  /uncrypto@0.1.3:
+    resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
+    dev: false
+
   /underscore@1.12.1:
     resolution: {integrity: sha512-hEQt0+ZLDVUMhebKxL4x1BTtDY7bavVofhZ9KZ4aI26X9SRaE+Y3m83XUL1UP2jn8ynjndwCCpEHdUG+9pP1Tw==}
     dev: true
@@ -21640,7 +21722,6 @@ packages:
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.1.1
-    dev: true
 
   /undici@6.22.0:
     resolution: {integrity: sha512-hU/10obOIu62MGYjdskASR3CUAiYaFTtC9Pa6vHyf//mAipSvSQg6od2CnJswq7fvzNS3zJhxoRkgNVaHurWKw==}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { logger } from "@/lib/logging/structured-logger";
+import { getEdgeConfigValue, isEdgeConfigAvailable } from "@/lib/config/edge-config";
 
 export const runtime = 'nodejs'; // Requires Node.js runtime for fs operations
 export const dynamic = "force-dynamic";
@@ -12,7 +13,22 @@ export const dynamic = "force-dynamic";
  */
 export async function GET() {
   try {
-    // Try to read from feature flags file
+    // Try Edge Config first (production/preferred)
+    if (isEdgeConfigAvailable()) {
+      const trustFlags = {
+        trust_audit_enabled: await getEdgeConfigValue<boolean>("feature:trust_audit_enabled") ?? true,
+        trust_ledger_enabled: await getEdgeConfigValue<boolean>("feature:trust_ledger_enabled") ?? true,
+        trust_scoring_enabled: await getEdgeConfigValue<boolean>("feature:trust_scoring_enabled") ?? false,
+        trust_badges_enabled: await getEdgeConfigValue<boolean>("feature:trust_badges_enabled") ?? true,
+        trust_verification_enabled: await getEdgeConfigValue<boolean>("feature:trust_verification_enabled") ?? false,
+        timestamp: new Date().toISOString(),
+        source: "edge-config",
+      };
+
+      return NextResponse.json(trustFlags);
+    }
+
+    // Fallback to file-based flags (development/local)
     const flagsPath = join(process.cwd(), "featureflags", "flags.json");
     
     if (existsSync(flagsPath)) {
@@ -26,6 +42,7 @@ export async function GET() {
         trust_badges_enabled: flags.trust_badges_enabled ?? true,
         trust_verification_enabled: flags.trust_verification_enabled ?? false,
         timestamp: new Date().toISOString(),
+        source: "file",
       };
 
       return NextResponse.json(trustFlags);
@@ -39,6 +56,7 @@ export async function GET() {
       trust_badges_enabled: true,
       trust_verification_enabled: false,
       timestamp: new Date().toISOString(),
+      source: "default",
     });
   } catch (error) {
     logger.error("Error in GET /api/flags/trust", error instanceof Error ? error : undefined);

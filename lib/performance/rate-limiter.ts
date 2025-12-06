@@ -10,6 +10,7 @@
  */
 
 import Redis from 'ioredis';
+import { kv } from '@vercel/kv';
 import { logger } from '@/lib/logging/structured-logger';
 
 interface RateLimitConfig {
@@ -128,16 +129,13 @@ class RateLimiter {
   }
 
   /**
-   * Check rate limit using Vercel KV
+   * Check rate limit using Vercel KV SDK
    */
   private async checkRateLimitVercelKV(
     key: string,
     config: RateLimitConfig
   ): Promise<RateLimitResult> {
-    const kvUrl = process.env.KV_REST_API_URL;
-    const kvToken = process.env.KV_REST_API_TOKEN;
-
-    if (!kvUrl || !kvToken) {
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
       throw new Error('Vercel KV not configured');
     }
 
@@ -145,36 +143,17 @@ class RateLimiter {
     const windowSeconds = Math.ceil(config.windowMs / 1000);
 
     try {
-      // Get current count
-      const getResponse = await fetch(`${kvUrl}/get/${encodeURIComponent(key)}`, {
-        headers: {
-          Authorization: `Bearer ${kvToken}`,
-        },
-      });
-
+      // Get current count using Vercel KV SDK
+      const entry = await kv.get<{ count: number; resetTime: number }>(key);
+      
       let count = 1;
-      if (getResponse.ok) {
-        const data = await getResponse.json();
-        const entry = data.result ? JSON.parse(data.result) : null;
-        
-        if (entry && entry.resetTime > now) {
-          count = entry.count + 1;
-        }
+      if (entry && entry.resetTime > now) {
+        count = entry.count + 1;
       }
 
-      // Set count with TTL
+      // Set count with TTL using Vercel KV SDK
       const resetTime = now + config.windowMs;
-      await fetch(`${kvUrl}/set/${encodeURIComponent(key)}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${kvToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          value: JSON.stringify({ count, resetTime }),
-          expiration: windowSeconds,
-        }),
-      });
+      await kv.set(key, { count, resetTime }, { ex: windowSeconds });
 
       if (count > config.maxRequests) {
         return {
