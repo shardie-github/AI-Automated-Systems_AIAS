@@ -30,11 +30,28 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get workflow counts
-    const { data: workflows, error: workflowsError } = await supabase
-      .from("workflows")
-      .select("id, enabled, status")
-      .eq("user_id", user.id);
+    // Batch queries to avoid N+1 problem
+    const [workflowsResult, executionsResult] = await Promise.all([
+      // Get workflow counts
+      supabase
+        .from("workflows")
+        .select("id, enabled, status")
+        .eq("user_id", user.id),
+      
+      // Get execution stats (last 30 days) - batch query
+      (async () => {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return supabase
+          .from("workflow_executions")
+          .select("status")
+          .eq("user_id", user.id)
+          .gte("started_at", thirtyDaysAgo.toISOString());
+      })(),
+    ]);
+
+    const { data: workflows, error: workflowsError } = workflowsResult;
+    const { data: executions, error: executionsError } = executionsResult;
 
     if (workflowsError) {
       logger.error("Failed to get workflows", workflowsError instanceof Error ? workflowsError : new Error(String(workflowsError)), {
@@ -42,18 +59,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    if (executionsError) {
+      logger.error("Failed to get executions", executionsError instanceof Error ? executionsError : new Error(String(executionsError)), {
+        userId: user.id,
+      });
+    }
+
     const total = workflows?.length || 0;
     const active = workflows?.filter((w) => w.enabled && w.status === "active").length || 0;
-
-    // Get execution stats (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const { data: executions, error: executionsError } = await supabase
-      .from("workflow_executions")
-      .select("status")
-      .eq("user_id", user.id)
-      .gte("started_at", thirtyDaysAgo.toISOString());
 
     if (executionsError) {
       logger.error("Failed to get executions", executionsError instanceof Error ? executionsError : new Error(String(executionsError)), {
