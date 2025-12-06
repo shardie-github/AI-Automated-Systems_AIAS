@@ -17,7 +17,7 @@ const executeSchema = z.object({
   }).optional(),
 });
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 /**
  * POST /api/workflows/execute

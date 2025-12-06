@@ -20,6 +20,12 @@ const nextConfig = {
       '@/app': path.resolve(rootDir, 'app'),
     };
     
+    // Exclude Node.js-only modules from client bundle
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push('pg', 'pg-native', '@prisma/client', 'ioredis');
+    }
+    
     // Ignore server-only modules on client
     if (!isServer) {
       config.resolve.alias['@/lib/database/migrations'] = false;

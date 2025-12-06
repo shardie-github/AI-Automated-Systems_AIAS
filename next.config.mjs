@@ -96,6 +96,8 @@ const nextConfig = {
     config.externals = config.externals || [];
     if (isServer) {
       config.externals.push('pg', 'pg-native', '@prisma/client');
+      // Exclude ioredis from client bundle (Node.js only)
+      config.externals.push('ioredis');
     }
     
     // Ignore migrations module during build analysis

@@ -7,7 +7,7 @@ import { executeWorkflow } from "@/lib/workflows/executor";
 
 const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 /**
  * POST /api/workflows/[id]/execute

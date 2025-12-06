@@ -67,7 +67,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@stripe/stripe-js": "^8.3.0",
-    "@studio-freight/lenis": "^1.0.42",
+    "lenis": "^1.1.19",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
     "@tailwindcss/typography": "^0.5.10",
