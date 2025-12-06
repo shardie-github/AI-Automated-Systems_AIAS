@@ -14,12 +14,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 
 // DevTools is optional - only import if available
+// Use dynamic import to avoid build-time resolution issues
 let ReactQueryDevtools: React.ComponentType<{ initialIsOpen?: boolean }> | null = null;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  ReactQueryDevtools = require("@tanstack/react-query-devtools").ReactQueryDevtools;
-} catch {
-  // DevTools not installed - that's okay
+if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    ReactQueryDevtools = require("@tanstack/react-query-devtools").ReactQueryDevtools;
+  } catch {
+    // DevTools not installed - that's okay
+  }
 }
 
 /**

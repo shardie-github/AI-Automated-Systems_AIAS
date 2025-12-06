@@ -7,7 +7,19 @@ import { z } from "zod";
 // CTA (Call-to-Action) schema
 export const ctaSchema = z.object({
   label: z.string().min(1),
-  href: z.string().url().or(z.string().startsWith("/")),
+  href: z.string().refine(
+    (val) => {
+      // Allow absolute URLs, paths starting with /, or hash links starting with #
+      if (val.startsWith("/") || val.startsWith("#")) return true;
+      try {
+        new URL(val);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: "Invalid url" }
+  ),
   variant: z.enum(["default", "outline", "secondary", "ghost"]).optional(),
   visible: z.boolean().default(true),
 });

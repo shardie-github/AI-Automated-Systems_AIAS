@@ -30,11 +30,16 @@ export default function ContentStudioPage() {
   const [hasChanges, setHasChanges] = useState(false);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const token = sessionStorage.getItem("content_studio_token") || password;
+  const [token, setToken] = useState<string>("");
 
   // Check if already authenticated (stored in sessionStorage)
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const auth = sessionStorage.getItem("content_studio_auth");
+    const storedToken = sessionStorage.getItem("content_studio_token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
     if (auth === "true") {
       setAuthenticated(true);
       loadContent();
@@ -73,8 +78,11 @@ export default function ContentStudioPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.token) {
-            sessionStorage.setItem("content_studio_auth", "true");
-            sessionStorage.setItem("content_studio_token", data.token);
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem("content_studio_auth", "true");
+              sessionStorage.setItem("content_studio_token", data.token);
+            }
+            setToken(data.token);
             setAuthenticated(true);
             await loadContent();
             return;
@@ -114,8 +122,11 @@ export default function ContentStudioPage() {
 
       if (verifyResponse.ok) {
         // Valid admin token
-        sessionStorage.setItem("content_studio_auth", "true");
-        sessionStorage.setItem("content_studio_token", password);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("content_studio_auth", "true");
+          sessionStorage.setItem("content_studio_token", password);
+        }
+        setToken(password);
         setAuthenticated(true);
         await loadContent();
         toast({
@@ -141,8 +152,11 @@ export default function ContentStudioPage() {
       }
 
       // Otherwise, assume it's valid
-      sessionStorage.setItem("content_studio_auth", "true");
-      sessionStorage.setItem("content_studio_token", password);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("content_studio_auth", "true");
+        sessionStorage.setItem("content_studio_token", password);
+      }
+      setToken(password);
       setAuthenticated(true);
       await loadContent();
       toast({
@@ -199,7 +213,9 @@ export default function ContentStudioPage() {
 
     setSaving(true);
     try {
-      const currentToken = sessionStorage.getItem("content_studio_token") || password;
+      const currentToken = typeof window !== "undefined" 
+        ? sessionStorage.getItem("content_studio_token") || token || password
+        : token || password;
       if (!currentToken) {
         throw new Error("Not authenticated");
       }
@@ -304,6 +320,7 @@ export default function ContentStudioPage() {
                     const data = await response.json();
                     if (data.token) {
                       setPassword(data.token);
+                      setToken(data.token);
                       await handleLogin();
                     } else {
                       toast({
