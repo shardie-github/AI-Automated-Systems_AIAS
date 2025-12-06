@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { PricingAnalytics } from "@/components/pricing/PricingAnalytics";
+import { FeatureComparison } from "@/components/pricing/feature-comparison";
+import { ROICalculator } from "@/components/pricing/roi-calculator";
 
 export const metadata: Metadata = {
   title: "Pricing — AIAS Platform | Starting at $49/month | Multi-Currency Support",
@@ -18,7 +20,7 @@ const plans = [
     tagline: "Perfect for trying AIAS Platform",
     description: "Get started with AI automation at no cost. Perfect for testing workflows, learning the platform, and automating small tasks.",
     features: [
-      "3 AI agents to automate your workflows",
+      "3 automation workflows",
       "100 automations per month",
       "Basic templates to get started",
       "Community support and resources",
@@ -27,22 +29,23 @@ const plans = [
     cta: "Start Free",
     popular: false,
     annualPrice: null,
+    isBeta: false,
   },
   {
     name: "Starter",
     price: "$49",
     period: "month",
     tagline: "For solo operators and small businesses",
-    description: "Everything you need to automate your business operations. Save 10+ hours per week with unlimited automations and Canadian-first integrations.",
+    description: "Everything you need to automate your business operations. Save 10+ hours per week with AI-powered workflows and Canadian-first integrations.",
     features: [
-      "10 AI agents for comprehensive automation",
-      "Unlimited automations—never worry about limits",
-      "50+ pre-built templates for common workflows",
-      "20+ Canadian integrations (Shopify, Wave, RBC, TD)",
+      "5 automation workflows",
+      "10,000 automations per month",
+      "10+ pre-built templates for common workflows",
+      "5+ Canadian integrations available (Shopify, Wave, more coming soon)",
       "Personalized news feed based on your goals",
-      "Advanced email campaign analysis",
-      "30-minute onboarding strategy session",
-      "Email support with 24-48h response time",
+      "Email campaign analysis",
+      "Optional setup call ($99 one-time)",
+      "Email support",
       "Analytics dashboard",
       "Multi-currency support (CAD/USD/EUR)",
       "Cancel anytime",
@@ -52,32 +55,34 @@ const plans = [
     annualPrice: "$490",
     annualSavings: "$98",
     annualDiscount: "20%",
+    isBeta: true,
   },
   {
     name: "Pro",
     price: "$149",
     period: "month",
     tagline: "For small teams (2-10 employees)",
-    description: "Advanced features for growing teams. Collaborate, scale, and automate everything with priority support and advanced analytics.",
+    description: "Advanced features for growing teams. Scale and automate with priority support and enhanced analytics.",
     features: [
-      "50 AI agents for team-wide automation",
-      "Unlimited automations",
-      "All workflow templates (100+)",
-      "Advanced integrations (50+)",
+      "20 automation workflows",
+      "50,000 automations per month",
+      "25+ workflow templates",
+      "15+ integrations available (more coming soon)",
       "Personalized news feed & insights",
       "Full email campaign diagnostics",
-      "60-minute onboarding strategy session",
+      "Optional setup call ($99 one-time)",
       "Priority support (24h response)",
-      "Advanced analytics & reporting",
-      "Team collaboration features",
+      "Analytics & reporting",
       "API access",
-      "White-label options available",
+      "Team collaboration (coming soon)",
+      "Advanced analytics (coming soon)",
     ],
     cta: "Start Free Trial",
     popular: false,
     annualPrice: "$1,490",
     annualSavings: "$298",
     annualDiscount: "20%",
+    isBeta: true,
   },
 ];
 
@@ -92,6 +97,12 @@ export default function PricingPage() {
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
           Multi-currency support: CAD, USD, EUR, GBP, and more. Prices shown in your local currency. Transparent pricing. Cancel anytime.
         </p>
+        <div className="mt-4 mb-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg max-w-3xl mx-auto">
+          <p className="text-sm text-amber-900 dark:text-amber-100">
+            <strong>Note:</strong> Starter and Pro plans are currently in Beta. Some features are in active development. 
+            See our <Link href="/help" className="underline">help center</Link> for current feature availability.
+          </p>
+        </div>
         <div className="mt-4 inline-flex flex-wrap items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-primary/10 text-primary text-sm md:text-base font-semibold border border-primary/20">
           <span>🇨🇦 Built in Canada</span>
           <span>•</span>
@@ -129,6 +140,13 @@ export default function PricingPage() {
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
                   Most Popular
+                </span>
+              </div>
+            )}
+            {plan.isBeta && (
+              <div className="absolute -top-4 right-4">
+                <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                  Beta
                 </span>
               </div>
             )}
@@ -241,12 +259,64 @@ export default function PricingPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              We support 20+ Canadian integrations including Shopify, Wave Accounting, Stripe CAD, RBC, TD, Interac, 
-              and more. See our <Link href="/integrations" className="text-primary hover:underline">integrations page</Link> for the full list.
+              We currently have Shopify and Wave Accounting integrations available. More integrations (RBC, TD, Interac, etc.) 
+              are coming soon. See our <Link href="/integrations" className="text-primary hover:underline">integrations page</Link> for the full list and availability status.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>What does "Beta" mean?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Beta means we're actively building and improving features. Some features may be in development, and we're 
+              continuously adding new capabilities based on user feedback. You'll have access to all current features, 
+              and we'll notify you as new features become available.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>What's the difference between workflows and agents?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Workflows are AI-powered automation sequences that connect your tools and automate repetitive tasks. 
+              Each workflow can handle multiple steps and conditions. Think of them as your automation assistants that 
+              work 24/7 to save you time.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Can I get help setting up?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Yes! We offer optional setup calls ($99 one-time) to help you get started quickly. Our team will help 
+              you connect your integrations, set up your first workflows, and answer any questions. 
+              <Link href="/demo" className="text-primary hover:underline ml-1">Book a setup call</Link>.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>What happens if I exceed automation limits?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              If you approach your monthly automation limit, we'll notify you. You can upgrade to a higher plan or 
+              purchase additional automation credits. We'll never cut off your automations mid-month—you'll have options 
+              to continue seamlessly.
             </p>
           </CardContent>
         </Card>
       </div>
+
+      <FeatureComparison />
+
+      <ROICalculator />
 
       <div className="text-center mt-12">
         <p className="text-muted-foreground mb-4">

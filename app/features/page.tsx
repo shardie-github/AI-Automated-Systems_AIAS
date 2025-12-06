@@ -53,7 +53,7 @@ const featureCategories = [
       },
       {
         name: "Scalable Growth",
-        description: "Automate as you grow. No limits on workflows or automations.",
+        description: "Automate as you grow. High-volume automation limits scale with your plan.",
       },
     ],
   },
@@ -85,19 +85,19 @@ const featureCategories = [
     features: [
       {
         name: "E-Commerce Platforms",
-        description: "Shopify, WooCommerce, BigCommerce. Automate order processing, inventory, customer support.",
+        description: "Shopify (available), WooCommerce (coming soon), BigCommerce (coming soon). Automate order processing, inventory, customer support.",
       },
       {
         name: "Accounting & Finance",
-        description: "Wave Accounting, QuickBooks, Stripe CAD. Automate invoicing, payments, bookkeeping.",
+        description: "Wave Accounting (available), QuickBooks (coming soon), Stripe CAD (coming soon). Automate invoicing, payments, bookkeeping.",
       },
       {
         name: "Banking & Payments",
-        description: "RBC, TD, Interac, PayPal CAD. Automate payments, transfers, reconciliation.",
+        description: "RBC (coming soon), TD (coming soon), Interac (coming soon), PayPal CAD (coming soon). Automate payments, transfers, reconciliation.",
       },
       {
         name: "CRM & Sales",
-        description: "HubSpot, Salesforce, Pipedrive. Automate lead qualification, follow-ups, pipeline management.",
+        description: "HubSpot (coming soon), Salesforce (coming soon), Pipedrive (coming soon). Automate lead qualification, follow-ups, pipeline management.",
       },
     ],
   },
@@ -159,7 +159,7 @@ const featureCategories = [
       },
       {
         name: "Enterprise Security",
-        description: "SOC 2 Type II (planned Q2 2024). AES-256 encryption. Regular security audits.",
+        description: "SOC 2 Type II (in progress). AES-256 encryption. Regular security audits. PIPEDA compliant.",
       },
       {
         name: "Access Controls",
@@ -185,7 +185,7 @@ export default function FeaturesPage() {
           Automate workflows, analyze campaigns, and get personalized insights. Everything you need to save time and grow your business.
         </p>
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          ⚡ Quick Setup • 🔄 Unlimited Automations • 📊 Advanced Analytics
+          ⚡ Quick Setup • 🔄 High-Volume Automations • 📊 Analytics Dashboard
         </div>
       </div>
 
