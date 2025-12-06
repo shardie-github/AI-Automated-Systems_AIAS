@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +15,6 @@ import { ContentStudioTestimonials } from "@/components/content-studio/ContentSt
 import { ContentStudioFAQ } from "@/components/content-studio/ContentStudioFAQ";
 import { ContentTemplates } from "@/components/content-studio/ContentTemplates";
 import type { AIASContent, SettlerContent } from "@/lib/content/schemas";
-import { useEffect, useRef } from "react";
 
 export default function ContentStudioPage() {
   const { toast } = useToast();
