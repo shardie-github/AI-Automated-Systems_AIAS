@@ -11,7 +11,7 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import'],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import', 'unused-imports'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -23,7 +23,17 @@ module.exports = {
   rules: {
     // TypeScript
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': 'off', // Turn off base rule
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'error',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
+    ],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-floating-promises': 'error',
@@ -61,5 +71,25 @@ module.exports = {
   env: {
     node: true,
     es2022: true,
+    browser: true,
   },
+  overrides: [
+    {
+      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
+      env: {
+        jest: true,
+        vitest: true,
+      },
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'warn',
+      },
+    },
+    {
+      files: ['*.config.{js,ts}', '*.config.*.{js,ts}'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        'import/no-unresolved': 'off',
+      },
+    },
+  ],
 };

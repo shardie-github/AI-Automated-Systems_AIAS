@@ -51,6 +51,8 @@ const envSchema = z.object({
   ENCRYPTION_KEY: z.string().min(32).optional(),
   JWT_SECRET: z.string().min(32).optional(),
   CSP_REPORT_URI: z.string().url().optional(),
+  CRON_SECRET: z.string().optional(),
+  CONTENT_STUDIO_TOKEN: z.string().optional(),
 
   // Feature Flags
   ENABLE_LEMON_SQUEEZY: z.string().transform(val => val === 'true').default('false'),
@@ -155,6 +157,8 @@ export const config = {
     encryptionKey: env.ENCRYPTION_KEY,
     jwtSecret: env.JWT_SECRET,
     cspReportUri: env.CSP_REPORT_URI,
+    cronSecret: env.CRON_SECRET,
+    contentStudioToken: env.CONTENT_STUDIO_TOKEN,
   },
   features: {
     lemonSqueezy: env.ENABLE_LEMON_SQUEEZY || false,

@@ -90,7 +90,7 @@ export default function ContentStudioPage() {
         }
       } catch (error) {
         // Silent fail - user can still use manual token
-        console.log("Admin session auth not available");
+        // Admin session auth not available - using fallback token method
       }
     };
     

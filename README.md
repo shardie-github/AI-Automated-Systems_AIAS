@@ -28,7 +28,7 @@ pnpm install
 
 # 3. Set up environment variables
 cp .env.example .env.local
-# Edit .env.local with your configuration
+# Edit .env.local with your configuration (see .env.example for required variables)
 
 # 4. Run the development server
 pnpm dev
@@ -36,6 +36,8 @@ pnpm dev
 # 5. Access the platform
 open http://localhost:3000
 ```
+
+For detailed setup instructions, see [Local Development Setup](./docs/SETUP_LOCAL.md).
 
 ## 🏗️ Architecture
 
@@ -50,7 +52,13 @@ AI Automated Systems is built with:
 
 ## 📚 Documentation & Support
 
-- **Official Documentation:** [docs.aias-platform.com](https://docs.aias-platform.com)
+- **Documentation:** See [docs/README.md](./docs/README.md) for comprehensive documentation
+  - [Quick Start Guide](./docs/QUICK_START.md)
+  - [Local Development Setup](./docs/SETUP_LOCAL.md)
+  - [Architecture Overview](./docs/ARCHITECTURE.md)
+  - [API Documentation](./docs/API.md)
+  - [Content Studio](./docs/content-studio.md)
+  - [Deployment Guide](./docs/DEPLOYMENT.md)
 - **Website:** [aiautomatedsystems.ca](https://aiautomatedsystems.ca)
 - **GitHub Issues:** [Report a bug or request a feature](https://github.com/shardie-github/aias/issues)
 - **Discussions:** [Community discussions](https://github.com/shardie-github/aias/discussions)
@@ -64,9 +72,20 @@ AI Automated Systems is built with:
 
 ## 🛠️ Development
 
+### Prerequisites
+
+- **Node.js**: >=22 (see [.nvmrc](./.nvmrc))
+- **pnpm**: >=8.0.0 (see [package.json](./package.json))
+- **Git**: Latest version
+
+### Development Commands
+
 ```bash
 # Install dependencies
 pnpm install
+
+# Run development server
+pnpm dev
 
 # Run type checking
 pnpm typecheck
@@ -74,12 +93,35 @@ pnpm typecheck
 # Run linting
 pnpm lint
 
+# Fix linting issues
+pnpm lint:fix
+
+# Check code formatting
+pnpm format:check
+
+# Format code
+pnpm format
+
 # Run tests
 pnpm test
+
+# Run E2E tests
+pnpm test:e2e
 
 # Build for production
 pnpm build
 ```
+
+### Required Checks Before Committing
+
+All code must pass these checks:
+
+1. **Linting**: `pnpm lint` (no errors)
+2. **Type Checking**: `pnpm typecheck` (no errors)
+3. **Formatting**: `pnpm format:check` (must pass)
+4. **Tests**: `pnpm test` (must pass, if tests exist)
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed contribution guidelines.
 
 ## 📦 Project Structure
 

@@ -9,8 +9,7 @@ export async function POST(request: Request) {
 
     // Track embed view
     // TODO: Create embed_views table if it doesn't exist
-    // For now, just log it
-    console.log("Embed view tracked:", { embedId, workflowId, timestamp: new Date().toISOString() });
+    // For now, silently succeed (tracking will be implemented later)
 
     return NextResponse.json({ success: true });
   } catch (error) {
