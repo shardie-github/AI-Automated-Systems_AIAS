@@ -120,18 +120,49 @@ export default function ServicesPage() {
       <div className="container py-16">
       <div className="text-center mb-16 max-w-3xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">
-          Consultancy Services
+          AIAS Consultancy — Custom Development Services
         </h1>
         <p className="text-xl text-muted-foreground mb-6">
-          We don't sell software. We build custom AI platforms, automation systems, 
-          and intelligent agents tailored to your business.
+          Need something custom? We build complete AI platforms, automation systems, 
+          and intelligent agents tailored to your business. See our work: TokPulse, Hardonia Suite.
         </p>
+        <div className="p-6 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-6">
+          <h2 className="text-lg font-semibold mb-2">SaaS vs. Consulting — Which Do You Need?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+            <div>
+              <h3 className="font-semibold mb-2">AIAS Platform (SaaS)</h3>
+              <p className="text-sm text-muted-foreground mb-2">Choose if you want:</p>
+              <ul className="text-sm space-y-1 text-muted-foreground">
+                <li>• Self-serve automation ($49-149/month)</li>
+                <li>• Pre-built templates and integrations</li>
+                <li>• Quick setup (30 minutes)</li>
+                <li>• Standard workflows</li>
+              </ul>
+              <Button size="sm" variant="outline" className="mt-3 w-full" asChild>
+                <Link href="/pricing">View SaaS Plans</Link>
+              </Button>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">AIAS Consultancy (Custom)</h3>
+              <p className="text-sm text-muted-foreground mb-2">Choose if you need:</p>
+              <ul className="text-sm space-y-1 text-muted-foreground">
+                <li>• Custom platform development</li>
+                <li>• Unique business requirements</li>
+                <li>• Full-stack development (8-16 weeks)</li>
+                <li>• Ongoing support and optimization</li>
+              </ul>
+              <Button size="sm" variant="outline" className="mt-3 w-full" asChild>
+                <Link href="/demo">Schedule Consultation</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" asChild>
             <Link href="/demo">Schedule Strategy Call</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/tasks">See Our Builds</Link>
+            <Link href="/case-studies">See Our Builds</Link>
           </Button>
         </div>
       </div>
