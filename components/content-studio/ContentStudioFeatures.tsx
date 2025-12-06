@@ -6,16 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { DraggableList } from "./DraggableList";
+import { RichTextEditor } from "./RichTextEditor";
+import { AIAssistant } from "./AIAssistant";
 import type { FeatureSection } from "@/lib/content/schemas";
 
 interface ContentStudioFeaturesProps {
   content: FeatureSection;
   onChange: (features: FeatureSection) => void;
+  token: string;
 }
 
 export function ContentStudioFeatures({
   content,
   onChange,
+  token,
 }: ContentStudioFeaturesProps) {
   const updateField = <K extends keyof FeatureSection>(
     key: K,
@@ -79,44 +84,47 @@ export function ContentStudioFeatures({
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label>Feature Items</Label>
+            <Label>Feature Items (drag to reorder)</Label>
             <Button type="button" size="sm" onClick={addItem}>
               <Plus className="mr-2 h-4 w-4" />
               Add Feature
             </Button>
           </div>
 
-          {content.items.map((item, index) => (
-            <Card key={index} className="p-4">
+          <DraggableList
+            items={content.items}
+            onReorder={(items) => updateField("items", items)}
+            onRemove={removeItem}
+            renderItem={(item, index) => (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Feature {index + 1}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeItem(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
                 <div className="space-y-2">
                   <Label>Title</Label>
                   <Input
                     value={item.title}
                     onChange={(e) => updateItem(index, "title", e.target.value)}
                   />
+                  <AIAssistant
+                    type="hero-title"
+                    currentContent={item.title}
+                    context="Feature title"
+                    onGenerate={(generated) => updateItem(index, "title", generated)}
+                    token={token}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Description</Label>
-                  <Textarea
+                  <RichTextEditor
                     value={item.description}
-                    onChange={(e) =>
-                      updateItem(index, "description", e.target.value)
-                    }
+                    onChange={(value) => updateItem(index, "description", value)}
                     rows={3}
+                  />
+                  <AIAssistant
+                    type="feature-description"
+                    currentContent={item.description}
+                    context="Feature description"
+                    onGenerate={(generated) => updateItem(index, "description", generated)}
+                    token={token}
                   />
                 </div>
 
@@ -148,8 +156,8 @@ export function ContentStudioFeatures({
                   </div>
                 </div>
               </div>
-            </Card>
-          ))}
+            )}
+          />
         </div>
       </CardContent>
     </Card>

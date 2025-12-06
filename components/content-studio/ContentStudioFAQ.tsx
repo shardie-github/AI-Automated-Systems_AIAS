@@ -6,16 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { RichTextEditor } from "./RichTextEditor";
+import { AIAssistant } from "./AIAssistant";
 import type { FAQSection } from "@/lib/content/schemas";
 
 interface ContentStudioFAQProps {
   content: FAQSection;
   onChange: (faq: FAQSection) => void;
+  token: string;
 }
 
 export function ContentStudioFAQ({
   content,
   onChange,
+  token,
 }: ContentStudioFAQProps) {
   const updateField = <K extends keyof FAQSection>(
     key: K,
@@ -191,18 +195,32 @@ export function ContentStudioFAQ({
                             )
                           }
                         />
-                        <Textarea
-                          placeholder="Answer"
+                        <RichTextEditor
                           value={faq.answer}
-                          onChange={(e) =>
+                          onChange={(value) =>
                             updateQuestion(
                               categoryIndex,
                               questionIndex,
                               "answer",
-                              e.target.value
+                              value
                             )
                           }
-                          rows={2}
+                          placeholder="Answer"
+                          rows={3}
+                        />
+                        <AIAssistant
+                          type="faq-answer"
+                          currentContent={faq.answer}
+                          context={`FAQ question: ${faq.question}`}
+                          onGenerate={(generated) =>
+                            updateQuestion(
+                              categoryIndex,
+                              questionIndex,
+                              "answer",
+                              generated
+                            )
+                          }
+                          token={token}
                         />
                       </div>
                     </Card>

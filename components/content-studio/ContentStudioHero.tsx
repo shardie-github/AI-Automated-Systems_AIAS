@@ -5,17 +5,23 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { ImageUpload } from "./ImageUpload";
+import { RichTextEditor } from "./RichTextEditor";
+import { AIAssistant } from "./AIAssistant";
+import { DraggableList } from "./DraggableList";
 import type { Hero } from "@/lib/content/schemas";
 
 interface ContentStudioHeroProps {
   content: Hero;
   onChange: (hero: Hero) => void;
+  token: string;
 }
 
 export function ContentStudioHero({
   content,
   onChange,
+  token,
 }: ContentStudioHeroProps) {
   const updateField = <K extends keyof Hero>(key: K, value: Hero[K]) => {
     onChange({ ...content, [key]: value });
@@ -34,6 +40,13 @@ export function ContentStudioHero({
             value={content.title}
             onChange={(e) => updateField("title", e.target.value)}
           />
+          <AIAssistant
+            type="hero-title"
+            currentContent={content.title}
+            context="AIAS platform hero section"
+            onGenerate={(generated) => updateField("title", generated)}
+            token={token}
+          />
         </div>
 
         <div className="space-y-2">
@@ -49,13 +62,18 @@ export function ContentStudioHero({
 
         <div className="space-y-2">
           <Label htmlFor="hero-description">Description (optional)</Label>
-          <Textarea
-            id="hero-description"
+          <RichTextEditor
             value={content.description || ""}
-            onChange={(e) =>
-              updateField("description", e.target.value || undefined)
-            }
+            onChange={(value) => updateField("description", value || undefined)}
+            placeholder="Enter hero description..."
             rows={3}
+          />
+          <AIAssistant
+            type="hero-description"
+            currentContent={content.description}
+            context="AIAS platform hero section"
+            onGenerate={(generated) => updateField("description", generated)}
+            token={token}
           />
         </div>
 
@@ -70,18 +88,12 @@ export function ContentStudioHero({
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="hero-image">Image URL (optional)</Label>
-          <Input
-            id="hero-image"
-            type="url"
-            value={content.imageUrl || ""}
-            onChange={(e) =>
-              updateField("imageUrl", e.target.value || undefined)
-            }
-            placeholder="https://example.com/image.jpg"
-          />
-        </div>
+        <ImageUpload
+          value={content.imageUrl}
+          onChange={(url) => updateField("imageUrl", url || undefined)}
+          label="Hero Image (optional)"
+          token={token}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -144,6 +156,56 @@ export function ContentStudioHero({
             </div>
           </div>
         </div>
+
+        {content.socialProof && content.socialProof.length > 0 && (
+          <div className="space-y-4">
+            <Label>Social Proof Items</Label>
+            <DraggableList
+              items={content.socialProof}
+              onReorder={(items) => updateField("socialProof", items)}
+              onRemove={(index) => {
+                const newItems = content.socialProof!.filter((_, i) => i !== index);
+                updateField("socialProof", newItems.length > 0 ? newItems : undefined);
+              }}
+              renderItem={(item, index) => (
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Icon (emoji)"
+                    value={item.icon || ""}
+                    onChange={(e) => {
+                      const newItems = [...content.socialProof!];
+                      newItems[index] = { ...item, icon: e.target.value || undefined };
+                      updateField("socialProof", newItems);
+                    }}
+                  />
+                  <Input
+                    placeholder="Text"
+                    value={item.text}
+                    onChange={(e) => {
+                      const newItems = [...content.socialProof!];
+                      newItems[index] = { ...item, text: e.target.value };
+                      updateField("socialProof", newItems);
+                    }}
+                  />
+                </div>
+              )}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                updateField("socialProof", [
+                  ...(content.socialProof || []),
+                  { text: "New item" },
+                ]);
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Social Proof Item
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

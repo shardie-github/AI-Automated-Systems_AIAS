@@ -6,16 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { DraggableList } from "./DraggableList";
+import { RichTextEditor } from "./RichTextEditor";
+import { AIAssistant } from "./AIAssistant";
 import type { TestimonialSection } from "@/lib/content/schemas";
 
 interface ContentStudioTestimonialsProps {
   content: TestimonialSection;
   onChange: (testimonials: TestimonialSection) => void;
+  token: string;
 }
 
 export function ContentStudioTestimonials({
   content,
   onChange,
+  token,
 }: ContentStudioTestimonialsProps) {
   const updateField = <K extends keyof TestimonialSection>(
     key: K,
@@ -82,36 +87,32 @@ export function ContentStudioTestimonials({
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label>Testimonials</Label>
+            <Label>Testimonials (drag to reorder)</Label>
             <Button type="button" size="sm" onClick={addItem}>
               <Plus className="mr-2 h-4 w-4" />
               Add Testimonial
             </Button>
           </div>
 
-          {content.items.map((item, index) => (
-            <Card key={index} className="p-4">
+          <DraggableList
+            items={content.items}
+            onReorder={(items) => updateField("items", items)}
+            onRemove={removeItem}
+            renderItem={(item, index) => (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    Testimonial {index + 1}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeItem(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
                 <div className="space-y-2">
                   <Label>Quote</Label>
-                  <Textarea
+                  <RichTextEditor
                     value={item.quote}
-                    onChange={(e) => updateItem(index, "quote", e.target.value)}
+                    onChange={(value) => updateItem(index, "quote", value)}
                     rows={4}
+                  />
+                  <AIAssistant
+                    type="testimonial"
+                    currentContent={item.quote}
+                    context="Customer testimonial"
+                    onGenerate={(generated) => updateItem(index, "quote", generated)}
+                    token={token}
                   />
                 </div>
 
@@ -162,8 +163,8 @@ export function ContentStudioTestimonials({
                   </div>
                 </div>
               </div>
-            </Card>
-          ))}
+            )}
+          />
         </div>
       </CardContent>
     </Card>

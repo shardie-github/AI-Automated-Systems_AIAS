@@ -1,6 +1,9 @@
 import dynamic from "next/dynamic";
 import { EnhancedHero } from "@/components/home/enhanced-hero";
 import { ContentDrivenHero } from "@/components/content/ContentDrivenHero";
+import { ContentDrivenFeatures } from "@/components/content/ContentDrivenFeatures";
+import { ContentDrivenTestimonials } from "@/components/content/ContentDrivenTestimonials";
+import { ContentDrivenFAQ } from "@/components/content/ContentDrivenFAQ";
 import { Features } from "@/components/home/features";
 import { StatsSection } from "@/components/home/stats-section";
 import { TrustBadges } from "@/components/home/trust-badges";
@@ -54,9 +57,21 @@ export default async function HomePage() {
       <CaseStudyPreview />
       <SettlerShowcase />
       <ROICalculator />
-      <Features />
-      <Testimonials />
-      <FAQ />
+      {content ? (
+        <ContentDrivenFeatures content={content.features} />
+      ) : (
+        <Features />
+      )}
+      {content ? (
+        <ContentDrivenTestimonials content={content.testimonials} />
+      ) : (
+        <Testimonials />
+      )}
+      {content ? (
+        <ContentDrivenFAQ content={content.faq} />
+      ) : (
+        <FAQ />
+      )}
       <ConversionCTA />
     </>
   );

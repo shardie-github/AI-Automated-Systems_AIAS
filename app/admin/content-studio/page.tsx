@@ -13,7 +13,9 @@ import { ContentStudioHero } from "@/components/content-studio/ContentStudioHero
 import { ContentStudioFeatures } from "@/components/content-studio/ContentStudioFeatures";
 import { ContentStudioTestimonials } from "@/components/content-studio/ContentStudioTestimonials";
 import { ContentStudioFAQ } from "@/components/content-studio/ContentStudioFAQ";
+import { ContentTemplates } from "@/components/content-studio/ContentTemplates";
 import type { AIASContent, SettlerContent } from "@/lib/content/schemas";
+import { useEffect, useRef } from "react";
 
 export default function ContentStudioPage() {
   const { toast } = useToast();
@@ -27,6 +29,9 @@ export default function ContentStudioPage() {
   );
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const token = sessionStorage.getItem("content_studio_token") || password;
 
   // Check if already authenticated (stored in sessionStorage)
   useEffect(() => {
@@ -36,6 +41,30 @@ export default function ContentStudioPage() {
       loadContent();
     }
   }, []);
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (!autoSaveEnabled || !hasChanges || !authenticated || saving) return;
+
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Set new timeout for auto-save (5 seconds after last change)
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      if (hasChanges && !saving) {
+        handleSave(true); // Silent save for auto-save
+      }
+    }, 5000);
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aiasContent, settlerContent, hasChanges, autoSaveEnabled, authenticated, saving]);
 
   const handleLogin = async () => {
     if (!password) {
@@ -113,8 +142,8 @@ export default function ContentStudioPage() {
     }
   };
 
-  const handleSave = async () => {
-    if (!hasChanges) {
+  const handleSave = async (silent = false) => {
+    if (!hasChanges && !silent) {
       toast({
         title: "No changes",
         description: "No changes to save",
@@ -124,19 +153,23 @@ export default function ContentStudioPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem("content_studio_token") || password;
-      if (!token) {
+      const currentToken = sessionStorage.getItem("content_studio_token") || password;
+      if (!currentToken) {
         throw new Error("Not authenticated");
       }
 
       const content = activeSite === "aias" ? aiasContent : settlerContent;
+      if (!content) {
+        throw new Error("No content to save");
+      }
+
       const endpoint = activeSite === "aias" ? "/api/content/aias" : "/api/content/settler";
 
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${currentToken}`,
         },
         body: JSON.stringify(content),
       });
@@ -147,16 +180,20 @@ export default function ContentStudioPage() {
       }
 
       setHasChanges(false);
-      toast({
-        title: "Saved successfully",
-        description: "Your changes have been saved.",
-      });
+      if (!silent) {
+        toast({
+          title: "Saved successfully",
+          description: "Your changes have been saved.",
+        });
+      }
     } catch (error: any) {
-      toast({
-        title: "Error saving",
-        description: error.message || "Failed to save content",
-        variant: "destructive",
-      });
+      if (!silent) {
+        toast({
+          title: "Error saving",
+          description: error.message || "Failed to save content",
+          variant: "destructive",
+        });
+      }
     } finally {
       setSaving(false);
     }
@@ -244,6 +281,14 @@ export default function ContentStudioPage() {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setAutoSaveEnabled(!autoSaveEnabled)}
+                title={autoSaveEnabled ? "Disable auto-save" : "Enable auto-save"}
+              >
+                {autoSaveEnabled ? "Auto-save: ON" : "Auto-save: OFF"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleReset}
                 disabled={!hasChanges || saving}
               >
@@ -252,7 +297,7 @@ export default function ContentStudioPage() {
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={!hasChanges || saving}
+                disabled={(!hasChanges && !saving) || saving}
                 size="sm"
               >
                 {saving ? (
@@ -263,7 +308,7 @@ export default function ContentStudioPage() {
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Save Changes
+                    {hasChanges ? "Save Changes" : "Saved"}
                   </>
                 )}
               </Button>
@@ -288,12 +333,20 @@ export default function ContentStudioPage() {
               <TabsContent value="aias" className="space-y-6">
                 {aiasContent && (
                   <>
+                    <ContentTemplates
+                      content={aiasContent}
+                      onChange={(content) => {
+                        setAiasContent(content as AIASContent);
+                        setHasChanges(true);
+                      }}
+                    />
                     <ContentStudioHero
                       content={aiasContent.hero}
                       onChange={(hero) => {
                         setAiasContent({ ...aiasContent, hero });
                         setHasChanges(true);
                       }}
+                      token={token}
                     />
                     <ContentStudioFeatures
                       content={aiasContent.features}
@@ -301,6 +354,7 @@ export default function ContentStudioPage() {
                         setAiasContent({ ...aiasContent, features });
                         setHasChanges(true);
                       }}
+                      token={token}
                     />
                     <ContentStudioTestimonials
                       content={aiasContent.testimonials}
@@ -308,6 +362,7 @@ export default function ContentStudioPage() {
                         setAiasContent({ ...aiasContent, testimonials });
                         setHasChanges(true);
                       }}
+                      token={token}
                     />
                     <ContentStudioFAQ
                       content={aiasContent.faq}
@@ -315,6 +370,7 @@ export default function ContentStudioPage() {
                         setAiasContent({ ...aiasContent, faq });
                         setHasChanges(true);
                       }}
+                      token={token}
                     />
                   </>
                 )}
@@ -323,12 +379,20 @@ export default function ContentStudioPage() {
               <TabsContent value="settler" className="space-y-6">
                 {settlerContent && (
                   <>
+                    <ContentTemplates
+                      content={settlerContent}
+                      onChange={(content) => {
+                        setSettlerContent(content as SettlerContent);
+                        setHasChanges(true);
+                      }}
+                    />
                     <ContentStudioHero
                       content={settlerContent.hero}
                       onChange={(hero) => {
                         setSettlerContent({ ...settlerContent, hero });
                         setHasChanges(true);
                       }}
+                      token={token}
                     />
                     <ContentStudioFeatures
                       content={settlerContent.features}
@@ -336,6 +400,7 @@ export default function ContentStudioPage() {
                         setSettlerContent({ ...settlerContent, features });
                         setHasChanges(true);
                       }}
+                      token={token}
                     />
                     {/* Add more Settler-specific editors as needed */}
                   </>
