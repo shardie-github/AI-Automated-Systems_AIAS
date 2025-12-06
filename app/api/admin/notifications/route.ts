@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGETHandler, RouteContext } from "@/lib/api/route-handler";
-import { verifyAdminAuth } from "@/lib/auth/admin-auth";
+import { requireAdmin } from "@/lib/auth/admin-auth";
 import { getAllNotifications } from "@/lib/notifications/seed-round-notifications";
 
 /**
@@ -10,9 +10,9 @@ import { getAllNotifications } from "@/lib/notifications/seed-round-notification
 export async function GET(request: NextRequest) {
   return createGETHandler(async (context: RouteContext) => {
     // Verify admin authentication
-    const { user, error: authError } = await verifyAdminAuth(context.request);
-    if (authError || !user) {
-      return NextResponse.json({ error: authError || "Unauthorized" }, { status: 401 });
+    const { authorized, user, response } = await requireAdmin(context.request);
+    if (!authorized || !user) {
+      return response || NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     try {

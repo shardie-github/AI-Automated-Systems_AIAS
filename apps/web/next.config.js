@@ -48,14 +48,38 @@ const nextConfig = {
         jsdom: false,
         'isomorphic-dompurify': false,
       };
-      // Use IgnorePlugin to completely ignore these modules
+      // Use IgnorePlugin to completely ignore these modules and their dependencies
       const webpack = require('webpack');
       config.plugins = config.plugins || [];
       config.plugins.push(
         new webpack.IgnorePlugin({
-          resourceRegExp: /^(canvas|jsdom)$/,
+          resourceRegExp: /^(canvas|jsdom|isomorphic-dompurify|agent-base|https-proxy-agent|http-proxy-agent)$/,
+        }),
+        new webpack.IgnorePlugin({
+          checkResource(resource, context) {
+            // Ignore net, tls, and other Node.js built-in modules
+            if (['net', 'tls', 'dns', 'fs', 'path', 'os', 'crypto'].includes(resource)) {
+              return true;
+            }
+            // Ignore jsdom and related packages
+            if (resource.includes('jsdom') || resource.includes('canvas') || resource.includes('isomorphic-dompurify')) {
+              return true;
+            }
+            return false;
+          },
         })
       );
+      // Add fallbacks for Node.js built-ins
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        net: false,
+        tls: false,
+        dns: false,
+        fs: false,
+        path: false,
+        os: false,
+        crypto: false,
+      };
     }
     
     // Optimize bundle splitting

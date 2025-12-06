@@ -16,7 +16,8 @@ let isServer = typeof window === 'undefined';
 let dompurifyInitialized = false;
 
 // Initialize client-side DOMPurify synchronously (only runs in browser)
-if (!isServer) {
+// This code only executes in the browser, so webpack won't try to bundle server modules
+if (typeof window !== 'undefined' && !isServer) {
   try {
     // Client-side: use regular DOMPurify (synchronous require is OK here since we're in browser)
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -35,9 +36,12 @@ async function initializeDOMPurify() {
 
   try {
     // Server-side: use server-only module with dynamic import
-    // This prevents webpack from bundling jsdom/canvas for client
-    const { createServerDOMPurify } = await import('./dompurify-server');
-    DOMPurify = createServerDOMPurify();
+    // Use a string-based import to prevent webpack from statically analyzing it
+    const dompurifyServerModule = await import(
+      /* webpackIgnore: true */
+      './dompurify-server'
+    );
+    DOMPurify = dompurifyServerModule.createServerDOMPurify();
     dompurifyInitialized = true;
   } catch (e) {
     // Server DOMPurify not available, will use fallback
