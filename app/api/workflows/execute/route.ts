@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
-import { createPOSTHandler } from "@/lib/api/route-handler";
+import { createPOSTHandler, handleApiError } from "@/lib/api/route-handler";
 import { executeWorkflow } from "@/lib/workflows/executor-enhanced";
 import { trackWorkflowExecute } from "@/lib/analytics/funnel-tracking";
 
@@ -72,18 +72,13 @@ export const POST = createPOSTHandler(
         message: "Workflow executed successfully",
       });
     } catch (error) {
-      const errorObj: Error = (error as any) instanceof Error ? (error as Error) : new Error(String(error));
+      const errorObj = error instanceof Error ? error : new Error(String(error));
       logger.error("Workflow execution failed", errorObj, {
         workflowId: validatedData.workflowId,
         userId: user.id,
       });
 
-      return NextResponse.json(
-        {
-          error: error instanceof Error ? error.message : "Workflow execution failed",
-        },
-        { status: 500 }
-      );
+      return handleApiError(error, "Workflow execution failed");
     }
   },
   {

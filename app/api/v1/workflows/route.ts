@@ -5,6 +5,7 @@ import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
 import { handleApiError } from "@/lib/api/route-handler";
 import { track } from "@/lib/telemetry/track";
+import { extractPaginationParams } from "@/lib/performance/pagination";
 
 const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
 
@@ -57,24 +58,41 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get("x-tenant-id") || 
                      new URL(request.url).searchParams.get("tenant_id");
 
-    // Query workflows
+    // Extract pagination params
+    const searchParams = new URL(request.url).searchParams;
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
+    const offset = parseInt(searchParams.get("offset") || "0", 10);
+
+    // Query workflows with pagination
     let query = supabase
       .from("workflows")
-      .select("*")
-      .eq("user_id", user.id);
+      .select("*", { count: "exact" })
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (tenantId) {
       query = query.eq("tenant_id", tenantId);
     }
 
-    const { data: workflows, error } = await query.order("created_at", { ascending: false });
+    const { data: workflows, error, count } = await query;
 
     if (error) {
       logger.error("Failed to get workflows", error instanceof Error ? error : new Error(String(error)), { userId: user.id });
       return handleApiError(error, "Failed to retrieve workflows");
     }
 
-    return NextResponse.json({ workflows: (workflows || []) });
+    const hasMore = count ? offset + limit < count : false;
+
+    return NextResponse.json({
+      workflows: workflows || [],
+      pagination: {
+        limit,
+        offset,
+        total: count || 0,
+        hasMore,
+      },
+    });
   } catch (error) {
     logger.error("Error in GET /api/v1/workflows", error instanceof Error ? error : undefined);
     return handleApiError(error, "Failed to retrieve workflows");

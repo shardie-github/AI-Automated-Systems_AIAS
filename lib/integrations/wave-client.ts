@@ -4,6 +4,7 @@
  */
 
 import { logger } from "@/lib/logging/structured-logger";
+import { retryWithBackoff } from "@/lib/utils/retry-enhanced";
 
 export interface WaveConfig {
   businessId: string;
@@ -50,7 +51,7 @@ export class WaveClient {
   }
 
   /**
-   * Make authenticated request to Wave API
+   * Make authenticated request to Wave API with retry logic
    */
   private async request<T>(
     endpoint: string,
@@ -63,46 +64,58 @@ export class WaveClient {
       ...options.headers,
     };
 
-    try {
-      // Add timeout to fetch request
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+    return retryWithBackoff(
+      async () => {
+        // Add timeout to fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Wave API error: ${response.status} ${response.statusText}`;
-        
         try {
-          const errorData = JSON.parse(errorText);
-          if (errorData.message) {
-            errorMessage = `Wave API error: ${errorData.message}`;
+          const response = await fetch(url, {
+            ...options,
+            headers,
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = `Wave API error: ${response.status} ${response.statusText}`;
+            
+            try {
+              const errorData = JSON.parse(errorText);
+              if (errorData.message) {
+                errorMessage = `Wave API error: ${errorData.message}`;
+              }
+            } catch {
+              // Use default error message
+            }
+
+            throw new Error(errorMessage);
           }
-        } catch {
-          // Use default error message
+
+          return await response.json();
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error instanceof Error) {
+            logger.error("Wave API request failed", error, {
+              endpoint,
+              businessId: this.businessId,
+            });
+            throw error;
+          }
+          throw new Error(`Wave API request failed: ${String(error)}`);
         }
-
-        throw new Error(errorMessage);
+      },
+      {
+        maxAttempts: 3,
+        initialDelayMs: 1000,
+        onRetry: (attempt, error) => {
+          logger.warn("Retrying Wave API request", { attempt, endpoint, error: error.message });
+        },
       }
-
-      return await response.json();
-    } catch (error) {
-      if (error instanceof Error) {
-        logger.error("Wave API request failed", error, {
-          endpoint,
-          businessId: this.businessId,
-        });
-        throw error;
-      }
-      throw new Error(`Wave API request failed: ${String(error)}`);
-    }
+    );
   }
 
   /**

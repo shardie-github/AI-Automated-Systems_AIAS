@@ -5,6 +5,7 @@ import { SystemError, ValidationError, formatError } from "@/lib/errors";
 import { recordError } from "@/lib/utils/error-detection";
 import { retry } from "@/lib/utils/retry";
 import { z } from "zod";
+import { logger } from "@/lib/logging/structured-logger";
 
 export const runtime = "edge";
 
@@ -146,7 +147,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<TelemetryResp
         maxAttempts: 3,
         initialDelayMs: 500,
         onRetry: (attempt, err) => {
-          console.warn(`Retrying telemetry insert (attempt ${attempt})`, { error: err.message });
+          logger.warn(`Retrying telemetry insert (attempt ${attempt})`, { error: err.message });
         },
       }
     );
@@ -159,7 +160,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<TelemetryResp
         { source, platform }
       );
       recordError(systemError, { endpoint: '/api/telemetry', source, platform });
-      console.error("Error storing telemetry:", systemError);
+      logger.error("Error storing telemetry", systemError);
       // Don't fail the request - telemetry is best effort
       return NextResponse.json(
         { success: false, error: systemError.message },
@@ -177,7 +178,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<TelemetryResp
       error instanceof Error ? error : new Error(String(error))
     );
     recordError(systemError, { endpoint: '/api/telemetry' });
-    console.error("Telemetry ingestion error:", systemError);
+    logger.error("Telemetry ingestion error", systemError);
     // Always return success to avoid breaking client-side code
     return NextResponse.json(
       {

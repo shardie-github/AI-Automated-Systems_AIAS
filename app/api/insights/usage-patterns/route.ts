@@ -27,16 +27,32 @@ export async function GET(request: NextRequest) {
     const days = parseInt(searchParams.get("days") || "30", 10);
     const includeIncomplete = searchParams.get("incomplete") === "true";
     const includeFriction = searchParams.get("friction") === "true";
+    const limit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 100);
+    const offset = parseInt(searchParams.get("offset") || "0", 10);
 
     // Analyze usage patterns
-    const usagePatterns = await analyzeUsagePatterns(days);
+    const allPatterns = await analyzeUsagePatterns(days);
+    const paginatedPatterns = allPatterns.slice(offset, offset + limit);
+    const hasMore = offset + limit < allPatterns.length;
 
     const response: {
-      usagePatterns: typeof usagePatterns;
+      usagePatterns: typeof paginatedPatterns;
       incompleteWorkflows?: Array<unknown>;
       frictionPoints?: Array<unknown>;
+      pagination: {
+        limit: number;
+        offset: number;
+        total: number;
+        hasMore: boolean;
+      };
     } = {
-      usagePatterns,
+      usagePatterns: paginatedPatterns,
+      pagination: {
+        limit,
+        offset,
+        total: allPatterns.length,
+        hasMore,
+      },
     };
 
     if (includeIncomplete) {

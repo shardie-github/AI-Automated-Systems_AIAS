@@ -37,53 +37,52 @@ export async function GET(request: NextRequest) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Get signups
-    const { data: signups, error: signupsError } = await supabase
-      .from("app_events")
-      .select("user_id", { count: "exact", head: true })
-      .eq("event_type", "funnel_stage")
-      .eq("meta->>stage", "signup")
-      .gte("created_at", thirtyDaysAgo.toISOString());
-
-    // Get onboarding starts
-    const { data: onboardingStarts, error: onboardingError } = await supabase
-      .from("app_events")
-      .select("user_id", { count: "exact", head: true })
-      .eq("event_type", "funnel_stage")
-      .eq("meta->>stage", "onboarding_start")
-      .gte("created_at", thirtyDaysAgo.toISOString());
-
-    // Get integration connections
-    const { data: integrations, error: integrationsError } = await supabase
-      .from("app_events")
-      .select("user_id", { count: "exact", head: true })
-      .eq("event_type", "funnel_stage")
-      .eq("meta->>stage", "integration_connect")
-      .gte("created_at", thirtyDaysAgo.toISOString());
-
-    // Get workflow creations
-    const { data: workflows, error: workflowsError } = await supabase
-      .from("app_events")
-      .select("user_id", { count: "exact", head: true })
-      .eq("event_type", "funnel_stage")
-      .eq("meta->>stage", "workflow_create")
-      .gte("created_at", thirtyDaysAgo.toISOString());
-
-    // Get workflow executions
-    const { data: executions, error: executionsError } = await supabase
-      .from("app_events")
-      .select("user_id", { count: "exact", head: true })
-      .eq("event_type", "funnel_stage")
-      .eq("meta->>stage", "workflow_execute")
-      .gte("created_at", thirtyDaysAgo.toISOString());
-
-    // Get activations
-    const { data: activations, error: activationsError } = await supabase
-      .from("app_events")
-      .select("user_id", { count: "exact", head: true })
-      .eq("event_type", "funnel_stage")
-      .eq("meta->>stage", "activated")
-      .gte("created_at", thirtyDaysAgo.toISOString());
+    // Batch all queries to avoid N+1 problem
+    const [
+      { count: signupCount, error: signupsError },
+      { count: onboardingCount, error: onboardingError },
+      { count: integrationCount, error: integrationsError },
+      { count: workflowCount, error: workflowsError },
+      { count: executionCount, error: executionsError },
+      { count: activationCount, error: activationsError },
+    ] = await Promise.all([
+      supabase
+        .from("app_events")
+        .select("user_id", { count: "exact", head: true })
+        .eq("event_type", "funnel_stage")
+        .eq("meta->>stage", "signup")
+        .gte("created_at", thirtyDaysAgo.toISOString()),
+      supabase
+        .from("app_events")
+        .select("user_id", { count: "exact", head: true })
+        .eq("event_type", "funnel_stage")
+        .eq("meta->>stage", "onboarding_start")
+        .gte("created_at", thirtyDaysAgo.toISOString()),
+      supabase
+        .from("app_events")
+        .select("user_id", { count: "exact", head: true })
+        .eq("event_type", "funnel_stage")
+        .eq("meta->>stage", "integration_connect")
+        .gte("created_at", thirtyDaysAgo.toISOString()),
+      supabase
+        .from("app_events")
+        .select("user_id", { count: "exact", head: true })
+        .eq("event_type", "funnel_stage")
+        .eq("meta->>stage", "workflow_create")
+        .gte("created_at", thirtyDaysAgo.toISOString()),
+      supabase
+        .from("app_events")
+        .select("user_id", { count: "exact", head: true })
+        .eq("event_type", "funnel_stage")
+        .eq("meta->>stage", "workflow_execute")
+        .gte("created_at", thirtyDaysAgo.toISOString()),
+      supabase
+        .from("app_events")
+        .select("user_id", { count: "exact", head: true })
+        .eq("event_type", "funnel_stage")
+        .eq("meta->>stage", "activated")
+        .gte("created_at", thirtyDaysAgo.toISOString()),
+    ]);
 
     if (signupsError || onboardingError || integrationsError || workflowsError || executionsError || activationsError) {
       logger.error("Failed to get funnel data", new Error("Database query failed"), {
@@ -97,13 +96,6 @@ export async function GET(request: NextRequest) {
         },
       });
     }
-
-    const signupCount = signups || 0;
-    const onboardingCount = onboardingStarts || 0;
-    const integrationCount = integrations || 0;
-    const workflowCount = workflows || 0;
-    const executionCount = executions || 0;
-    const activationCount = activations || 0;
 
     // Calculate conversion rates
     const conversionRates = {

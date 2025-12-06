@@ -4,6 +4,7 @@
  */
 
 import { logger } from "@/lib/logging/structured-logger";
+import { retryWithBackoff } from "@/lib/utils/retry-enhanced";
 
 export interface ShopifyConfig {
   shop: string;
@@ -40,7 +41,7 @@ export class ShopifyClient {
   }
 
   /**
-   * Make authenticated request to Shopify API
+   * Make authenticated request to Shopify API with retry logic
    */
   private async request<T>(
     endpoint: string,
@@ -53,46 +54,58 @@ export class ShopifyClient {
       ...options.headers,
     };
 
-    try {
-      // Add timeout to fetch request
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+    return retryWithBackoff(
+      async () => {
+        // Add timeout to fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Shopify API error: ${response.status} ${response.statusText}`;
-        
         try {
-          const errorData = JSON.parse(errorText);
-          if (errorData.errors) {
-            errorMessage = `Shopify API error: ${JSON.stringify(errorData.errors)}`;
+          const response = await fetch(url, {
+            ...options,
+            headers,
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = `Shopify API error: ${response.status} ${response.statusText}`;
+            
+            try {
+              const errorData = JSON.parse(errorText);
+              if (errorData.errors) {
+                errorMessage = `Shopify API error: ${JSON.stringify(errorData.errors)}`;
+              }
+            } catch {
+              // Use default error message
+            }
+
+            throw new Error(errorMessage);
           }
-        } catch {
-          // Use default error message
+
+          return await response.json();
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error instanceof Error) {
+            logger.error("Shopify API request failed", error, {
+              endpoint,
+              shop: this.shop,
+            });
+            throw error;
+          }
+          throw new Error(`Shopify API request failed: ${String(error)}`);
         }
-
-        throw new Error(errorMessage);
+      },
+      {
+        maxAttempts: 3,
+        initialDelayMs: 1000,
+        onRetry: (attempt, error) => {
+          logger.warn("Retrying Shopify API request", { attempt, endpoint, error: error.message });
+        },
       }
-
-      return await response.json();
-    } catch (error) {
-      if (error instanceof Error) {
-        logger.error("Shopify API request failed", error, {
-          endpoint,
-          shop: this.shop,
-        });
-        throw error;
-      }
-      throw new Error(`Shopify API request failed: ${String(error)}`);
-    }
+    );
   }
 
   /**

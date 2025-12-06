@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Send welcome email (async, don't wait)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = env.supabase.url;
+    const supabaseServiceKey = env.supabase.serviceRoleKey;
     if (supabaseServiceKey && supabaseUrl) {
       fetch(`${supabaseUrl}/functions/v1/welcome-email`, {
         method: "POST",
