@@ -237,6 +237,8 @@
     "migrate:apply": "tsx scripts/apply-migrations-direct.ts",
     "migrate:apply-all": "tsx scripts/apply-all-pending-changes.ts",
     "migrate:run": "tsx scripts/run-migrations.ts",
+    "migrate:guardian": "tsx scripts/migration-guardian.ts",
+    "migrate:all": "tsx scripts/run-all-migrations.ts",
     "validate:build": "tsx scripts/validate-build.ts",
     "verify:deployment": "tsx scripts/verify-deployment.ts",
     "validate:env": "tsx scripts/validate-env.ts",
