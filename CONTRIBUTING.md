@@ -14,11 +14,33 @@ Thank you for your interest in contributing to AI Automated Systems! We welcome 
 
 ## Code Standards
 
+### Required Checks Before Merging
+
+All pull requests must pass the following checks:
+
+1. **Linting**: `pnpm lint` must pass with no errors
+2. **Type Checking**: `pnpm typecheck` must pass with no errors
+3. **Formatting**: `pnpm format:check` must pass (code must be formatted)
+4. **Tests**: `pnpm test` must pass (if tests exist for your changes)
+
+### Code Quality
+
 - Follow TypeScript best practices
 - Use ESLint and Prettier (configured in the project)
-- Write meaningful commit messages
+- Write meaningful commit messages following [Conventional Commits](https://www.conventionalcommits.org/)
 - Add tests for new features
 - Update documentation as needed
+- No `any` types unless absolutely necessary (use `unknown` and type guards)
+- Remove unused imports and variables
+
+### Pull Request Guidelines
+
+- **Small, focused PRs**: Keep changes focused on a single feature or fix
+- **Descriptive titles**: Use clear, descriptive PR titles
+- **Detailed descriptions**: Explain what changed and why
+- **Link issues**: Reference related issues in the PR description
+- **Screenshots**: Include screenshots for UI changes
+- **Breaking changes**: Clearly mark and document any breaking changes
 
 ## Reporting Issues
 

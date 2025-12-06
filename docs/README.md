@@ -1,172 +1,118 @@
-# Conversion Optimization Documentation
+# AIAS Platform Documentation
 
-This directory contains comprehensive documentation for the marketing site and app conversion optimization project.
+Welcome to the AIAS Platform documentation. This directory contains comprehensive documentation for developers, operators, and stakeholders.
 
-## Overview
+## 📚 Documentation Index
 
-The project focused on:
-- Simplifying content and reducing jargon
-- Standardizing the free trial to 30 days
-- Designing a clear free → paid funnel
-- Implementing content gating
-- Creating a 30-day trial conversion cadence
+### Getting Started
 
-## Documentation Index
+- **[Quick Start Guide](./QUICK_START.md)** - Get up and running in minutes
+- **[Local Development Setup](./SETUP_LOCAL.md)** - Complete local development environment setup
+- **[Environment Variables](./ENVIRONMENT.md)** - Environment configuration guide
 
-### 1. Content Audit
-**File:** [`content_audit.md`](./content_audit.md)
+### Architecture & Design
 
-Comprehensive audit of all pages, identifying:
-- Jargon and verbosity issues
-- Unclear messaging
-- Pages needing rewrite
-- Clarity and benefit mapping
+- **[Architecture Overview](./ARCHITECTURE.md)** - System architecture and design decisions
+- **[API Documentation](./API.md)** - Complete API reference
+- **[API Contracts](./api-contracts.md)** - API contract specifications
+- **[Data Architecture](./data-architecture.md)** - Database and data layer design
+- **[Domain Models](./domain-models.md)** - Core domain models and entities
 
-**Key Findings:**
-- "Systems thinking" repeated 50+ times (jargon-heavy)
-- Long paragraphs need shortening
-- Trial length inconsistent (14-day vs 30-day)
-- No content gating implemented
+### Development
 
----
+- **[Content Studio](./content-studio.md)** - Content Studio / non-dev editor documentation
+- **[Content Architecture](./content-architecture.md)** - Content management system design
+- **[Migration Guide](./MIGRATION_POLICY.md)** - Database migration procedures
+- **[Migration Naming Convention](./MIGRATION_NAMING_CONVENTION.md)** - Migration file naming standards
+- **[Strict Build Rules](./STRICT_BUILD_RULES.md)** - Build and deployment rules
 
-### 2. Funnel Strategy
-**File:** [`funnel_strategy.md`](./funnel_strategy.md)
+### Deployment & Operations
 
-Funnel mapping and content boundaries:
-- Page-to-funnel-stage mapping
-- Free vs. paid content boundaries
-- Content gating recommendations
-- Primary CTA positioning
+- **[Deployment Guide](./DEPLOYMENT.md)** - Production deployment procedures
+- **[Vercel Deployment](./VERCEL_DEPLOYMENT_GUIDE.md)** - Vercel-specific deployment guide
+- **[Database Backup Procedures](./database-backup-procedures.md)** - Backup and restore procedures
+- **[Migration Rollback Procedures](./migration-rollback-procedures.md)** - How to rollback migrations
 
-**Key Decisions:**
-- Free tier: Basic news feed, 1 email analysis/month, 3 workflows
-- Paid tier: Personalized feed, unlimited analysis, consulting time
-- Gate: Systems thinking page, case studies, frameworks
+### Security
 
----
+- **[Security Audit](./security-audit.md)** - Security assessment and recommendations
+- **[Risks and Guardrails](./RISKS_AND_GUARDRAILS.md)** - Risk management and safety measures
+- **[Environment and Secrets](./env-and-secrets.md)** - Secrets management guide
 
-### 3. Trial Cadence
-**File:** [`trial_to_paid_cadence.md`](./trial_to_paid_cadence.md)
+### Features & Integrations
 
-30-day free trial conversion strategy:
-- Day-by-day email and in-app cadence
-- Pre-test questionnaire design
-- Consulting time positioning
-- Conversion metrics to track
+- **[Content Studio Admin Integration](./content-studio-admin-integration.md)** - Admin integration for Content Studio
+- **[Lead Generation System](./LEAD_GENERATION_SYSTEM.md)** - Lead gen system documentation
+- **[Integrations](./INTEGRATIONS.md)** - Third-party integrations guide
+- **[GTM Engine](./GTM_ENGINE.md)** - Go-to-market engine documentation
 
-**Key Touchpoints:**
-- Day 0: Welcome + quick start
-- Day 7: Introduce gated features
-- Day 21: Free vs. paid comparison
-- Days 25-27: Urgency prompts
+### Analytics & Metrics
 
----
+- **[Metrics Instrumentation](./METRICS_INSTRUMENTATION.md)** - Metrics and observability setup
+- **[Metrics and Forecasts](./METRICS_AND_FORECASTS.md)** - Metrics analysis and forecasting
+- **[Product Analytics Dashboards](./product-analytics-dashboards.md)** - Analytics dashboard documentation
 
-### 4. Implementation Notes
-**File:** [`implementation_notes.md`](./implementation_notes.md)
+### Business & Strategy
 
-Technical implementation details:
-- Files changed
-- New components and configs
-- Feature flags added
-- Next steps for full implementation
+- **[Product Requirements Document (PRD)](./PRD.md)** - Product requirements and specifications
+- **[Founder Manual](./FOUNDER_MANUAL.md)** - Executive guide to the platform
+- **[Marketing Strategy](./marketing_strategy.md)** - Marketing and positioning strategy
+- **[GTM Engine](./GTM_ENGINE.md)** - Go-to-market strategy
 
-**Key Components:**
-- `config/plans.ts` - Plan configuration
-- `<PlanFeatureGate />` - Content gating component
+### Performance & Quality
 
----
+- **[Performance, Accessibility, Mobile, SEO](./PERFORMANCE_ACCESSIBILITY_MOBILE_SEO.md)** - Performance optimization guide
+- **[Accessibility Report](./accessibility-report.md)** - Accessibility audit results
 
-### 5. Executive Summary
-**File:** [`summary_for_founder.md`](./summary_for_founder.md)
+### Archived Documentation
 
-High-level summary for founder:
-- What changed
-- New funnel structure
-- Free vs. paid boundaries
-- What to do next
-- Success criteria
+Historical and archived documentation is organized in the [`archive/`](./archive/) directory:
 
-**Best starting point** for understanding the project at a glance.
+- **Business Documents**: Archived business planning, strategy, and pitch materials
+- **Implementation Reports**: Historical implementation summaries and completion reports
+- **Sprint Documentation**: Past sprint reviews, planning, and retrospectives
 
----
+### Specialized Documentation
 
-## Quick Reference
+- **[Seed Round Documentation](./seed-round/)** - Investor relations and seed round materials
+- **[Edge AI Documentation](./edge-ai/)** - Edge AI accelerator documentation
+- **[Trust Documentation](./trust/)** - Trust and compliance documentation
 
-### Trial Length
-- **Before:** 14-day free trial (inconsistent)
-- **After:** 30-day free trial (standardized)
+## 🔍 Finding Documentation
 
-### Primary CTA
-- **Before:** Multiple competing CTAs
-- **After:** "Start 30-Day Free Trial" (single focus)
+### By Topic
 
-### Content Simplification
-- **Before:** Jargon-heavy, verbose, academic tone
-- **After:** Benefit-focused, concise, Grade 7-9 reading level
+- **Setup & Configuration**: Start with [Quick Start](./QUICK_START.md) and [Local Development Setup](./SETUP_LOCAL.md)
+- **API Development**: See [API Documentation](./API.md) and [API Contracts](./api-contracts.md)
+- **Content Management**: See [Content Studio](./content-studio.md) and [Content Architecture](./content-architecture.md)
+- **Deployment**: See [Deployment Guide](./DEPLOYMENT.md) and [Vercel Deployment](./VERCEL_DEPLOYMENT_GUIDE.md)
+- **Security**: See [Security Audit](./security-audit.md) and [Risks and Guardrails](./RISKS_AND_GUARDRAILS.md)
 
-### Content Gating
-- **Before:** All content freely available
-- **After:** Infrastructure ready, gating recommendations defined
+### By Role
 
----
+- **Developers**: Start with [Quick Start](./QUICK_START.md), then [Architecture](./ARCHITECTURE.md) and [API Documentation](./API.md)
+- **DevOps/Platform Engineers**: See [Deployment Guide](./DEPLOYMENT.md), [Environment Variables](./ENVIRONMENT.md), and [Database Backup Procedures](./database-backup-procedures.md)
+- **Product Managers**: See [PRD](./PRD.md), [Founder Manual](./FOUNDER_MANUAL.md), and [GTM Engine](./GTM_ENGINE.md)
+- **Security Engineers**: See [Security Audit](./security-audit.md), [Risks and Guardrails](./RISKS_AND_GUARDRAILS.md), and [Environment and Secrets](./env-and-secrets.md)
 
-## Implementation Status
+## 📝 Contributing to Documentation
 
-### ✅ Completed
-- Content audit
-- Funnel strategy design
-- Trial cadence design
-- Trial length standardization
-- Key content simplification
-- CTA optimization
-- Plan configuration system
-- Feature gating component
+When adding or updating documentation:
 
-### ⏳ In Progress
-- Content gating implementation
-- Pre-test questionnaire
-- Welcome dashboard
-- Email cadence system
+1. **Place files logically**: Use the directory structure above as a guide
+2. **Update this index**: Add new documents to the appropriate section
+3. **Link related docs**: Cross-reference related documentation
+4. **Keep it current**: Remove or archive outdated documentation
+5. **Use clear titles**: Make file names descriptive and searchable
 
-### 📋 Planned
-- Systems thinking page gating
-- Case study gating
-- In-app upgrade prompts
-- Consulting time booking
+## 🔗 External Resources
+
+- **GitHub Repository**: [shardie-github/aias](https://github.com/shardie-github/aias)
+- **Website**: [aiautomatedsystems.ca](https://aiautomatedsystems.ca)
+- **Support**: support@aiautomatedsystems.ca
+- **Contributing Guidelines**: See [CONTRIBUTING.md](../CONTRIBUTING.md) in the root directory
 
 ---
 
-## Related Files
-
-### Configuration
-- `config/plans.ts` - Plan tiers and feature flags
-
-### Components
-- `components/monetization/plan-feature-gate.tsx` - Content gating component
-
-### Pages Modified
-- `app/pricing/page.tsx`
-- `app/signup/page.tsx`
-- `app/features/page.tsx`
-- `components/home/enhanced-hero.tsx`
-- `components/home/features.tsx`
-- `components/home/conversion-cta.tsx`
-- `components/home/faq.tsx`
-
----
-
-## Next Steps
-
-1. **Review** the executive summary (`summary_for_founder.md`)
-2. **Test** the trial signup flow
-3. **Prioritize** content gating implementation
-4. **Build** pre-test questionnaire
-5. **Set up** email cadence system
-
----
-
-## Questions?
-
-Refer to the detailed documentation files above, or check `summary_for_founder.md` for a high-level overview.
+**Last Updated**: 2025-01-31  
+**Maintained By**: AI Automated Systems Development Team
