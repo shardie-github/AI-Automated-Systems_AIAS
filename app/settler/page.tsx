@@ -30,7 +30,9 @@ export default async function SettlerPage() {
   try {
     content = await loadSettlerContent();
   } catch (error) {
-    console.error("Error loading Settler content, using defaults:", error);
+    // Use server logger for server-side rendering
+    const { serverLogger } = await import("@/lib/utils/logger");
+    serverLogger.error("Error loading Settler content, using defaults", error as Error);
     content = null;
   }
 

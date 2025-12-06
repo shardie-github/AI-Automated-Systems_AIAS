@@ -3,6 +3,7 @@
 
 // import { readFile } from "fs/promises"; // Will be used for reading privacy policy file
 import { useEffect, useState } from "react";
+import { sanitize } from "@/lib/utils/sanitize-html";
 
 export default function Privacy() {
   const [content, setContent] = useState<string>("");
@@ -23,7 +24,8 @@ export default function Privacy() {
           .replace(/^\*(.*?)\*/gim, "<em>$1</em>")
           .replace(/^- (.*$)/gim, "<li>$1</li>")
           .replace(/\n/gim, "<br/>");
-        setContent(html);
+        // Sanitize HTML to prevent XSS attacks
+        setContent(sanitize(html));
       })
       .catch(() => {
         setContent(

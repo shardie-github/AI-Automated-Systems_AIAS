@@ -1,0 +1,8 @@
+# AIAS-Specific Financial Data
+# 
+# This directory contains financial reports and data specific to AI Automated Systems.
+# All files in this directory are encrypted with git-crypt.
+#
+# Access: Financial Admin role required
+# Encryption: git-crypt
+# Location: /admin/financial/aias (protected route)

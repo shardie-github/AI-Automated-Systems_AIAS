@@ -1,0 +1,13 @@
+# YC Application Materials
+# 
+# This directory contains YC application and fundraising materials encrypted with git-crypt.
+# 
+# Contents:
+# - YC application responses
+# - Financial projections
+# - Fundraising plans
+# - Market validation data
+#
+# Access: Financial Admin or Super Admin role required
+# Encryption: git-crypt
+# Location: /admin/financial/yc (protected route)

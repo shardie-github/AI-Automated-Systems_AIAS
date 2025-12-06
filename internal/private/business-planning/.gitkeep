@@ -1,0 +1,14 @@
+# Business Planning Documents
+# 
+# This directory contains sensitive business planning documents encrypted with git-crypt.
+# 
+# Contents:
+# - Financial projections
+# - Investor materials
+# - Revenue models
+# - Business strategy documents
+# - Fundraising plans
+#
+# Access: Financial Admin or Super Admin role required
+# Encryption: git-crypt
+# Location: /admin/financial/planning (protected route)

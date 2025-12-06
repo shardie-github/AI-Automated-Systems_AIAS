@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import dynamic from "next/dynamic"; // Unused
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Note: AnalyticsDashboard removed - not used in this component
-// If needed in future, use dynamic import for code splitting
 
 interface MetricsData {
   performance: {

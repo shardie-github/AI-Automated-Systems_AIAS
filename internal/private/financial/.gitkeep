@@ -1,0 +1,13 @@
+# This directory contains sensitive financial data encrypted with git-crypt
+# 
+# To set up git-crypt:
+# 1. Install git-crypt: brew install git-crypt (Mac) or apt-get install git-crypt (Linux)
+# 2. Initialize: git-crypt init
+# 3. Add GPG key: git-crypt add-gpg-user YOUR_EMAIL
+# 4. Files in this directory will be automatically encrypted
+#
+# To decrypt (for authorized users):
+# git-crypt unlock
+#
+# To lock (after viewing):
+# git-crypt lock

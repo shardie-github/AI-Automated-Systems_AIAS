@@ -1,11 +1,116 @@
-# Git-crypt configuration for sensitive documents
-# Files in INVESTOR-RELATIONS-PRIVATE should be encrypted
-INVESTOR-RELATIONS-PRIVATE/** filter=git-crypt diff=git-crypt
-*.key filter=git-crypt diff=git-crypt
-*.pem filter=git-crypt diff=git-crypt
+# Git Attributes for git-crypt
+# Protect sensitive business and financial data
 
-# Planning and venture documents should be encrypted
-**/planning/** filter=git-crypt diff=git-crypt
-**/venture/** filter=git-crypt diff=git-crypt
-**/*planning*.md filter=git-crypt diff=git-crypt
-**/*venture*.md filter=git-crypt diff=git-crypt
+# ============================================
+# FINANCIAL DATA - ENCRYPTED
+# ============================================
+
+# Financial data directory - encrypted
+internal/private/financial/** filter=git-crypt diff=git-crypt
+internal/private/financial/** !filter !diff
+
+# AIAS-specific financial reports - encrypted
+internal/private/financial/aias/** filter=git-crypt diff=git-crypt
+internal/private/financial/aias/** !filter !diff
+
+# Financial data files (anywhere in repo)
+*.financial filter=git-crypt diff=git-crypt
+*.financial !filter !diff
+
+# Accounting data files
+*.accounting filter=git-crypt diff=git-crypt
+*.accounting !filter !diff
+
+# Sensitive reports
+internal/private/reports/** filter=git-crypt diff=git-crypt
+internal/private/reports/** !filter !diff
+
+# ============================================
+# BUSINESS PLANNING - ENCRYPTED
+# ============================================
+
+# Business planning documents
+internal/private/business-planning/** filter=git-crypt diff=git-crypt
+internal/private/business-planning/** !filter !diff
+
+# Investor relations materials
+internal/private/investor-relations/** filter=git-crypt diff=git-crypt
+internal/private/investor-relations/** !filter !diff
+
+# YC and fundraising materials
+internal/private/yc-materials/** filter=git-crypt diff=git-crypt
+internal/private/yc-materials/** !filter !diff
+
+# INVESTOR-RELATIONS-PRIVATE directory
+INVESTOR-RELATIONS-PRIVATE/** filter=git-crypt diff=git-crypt
+INVESTOR-RELATIONS-PRIVATE/** !filter !diff
+
+# Financial models and projections
+models/finance_model.csv filter=git-crypt diff=git-crypt
+models/finance_model.csv !filter !diff
+
+# Product revenue storyboard (contains business strategy)
+product_revenue_storyboard.md filter=git-crypt diff=git-crypt
+product_revenue_storyboard.md !filter !diff
+
+# Investor deck (sensitive business information)
+docs/investor-deck.md filter=git-crypt diff=git-crypt
+docs/investor-deck.md !filter !diff
+
+# Investor outreach materials
+docs/archive/2025/general/investor-outreach-email-bank.md filter=git-crypt diff=git-crypt
+docs/archive/2025/general/investor-outreach-email-bank.md !filter !diff
+
+# Seed round financial documents
+docs/seed-round/3_YEAR_FINANCIAL_MODEL.md filter=git-crypt diff=git-crypt
+docs/seed-round/3_YEAR_FINANCIAL_MODEL.md !filter !diff
+
+docs/seed-round/investor-outreach/INVESTOR_TARGET_LIST.md filter=git-crypt diff=git-crypt
+docs/seed-round/investor-outreach/INVESTOR_TARGET_LIST.md !filter !diff
+
+# YC financial projections
+yc/FINANCIAL_PROJECTIONS.md filter=git-crypt diff=git-crypt
+yc/FINANCIAL_PROJECTIONS.md !filter !diff
+
+yc/FUNDRAISING_PLAN.md filter=git-crypt diff=git-crypt
+yc/FUNDRAISING_PLAN.md !filter !diff
+
+# Business metrics dashboard (may contain sensitive data)
+monitoring/grafana/dashboards/aias-business.json filter=git-crypt diff=git-crypt
+monitoring/grafana/dashboards/aias-business.json !filter !diff
+
+# ============================================
+# KEEP VISIBLE (NOT ENCRYPTED) - FOR IP PROTECTION
+# ============================================
+
+# Admin tools and modules - VISIBLE (for IP protection)
+lib/admin/** !filter !diff
+app/admin/** !filter !diff
+components/admin/** !filter !diff
+
+# Cost tracking modules - VISIBLE (tools, not data)
+lib/cost-tracking/** !filter !diff
+app/api/cost/** !filter !diff
+
+# Accounting tools module - VISIBLE (for developers)
+lib/admin/accounting-tools.ts !filter !diff
+
+# Admin authentication - VISIBLE (security through code)
+lib/auth/admin-auth.ts !filter !diff
+lib/middleware/admin-guard.ts !filter !diff
+
+# API routes structure - VISIBLE (endpoints, not data)
+app/api/admin/** !filter !diff
+
+# Dashboard components - VISIBLE (UI, not data)
+components/admin/** !filter !diff
+
+# Public business strategy (non-sensitive)
+docs/marketing_strategy.md !filter !diff
+docs/funnel_strategy.md !filter !diff
+docs/technical-roadmap.md !filter !diff
+
+# YC application materials (public versions)
+yc/YC_*.md !filter !diff
+yc/README.md !filter !diff
+yc/QUICK_START.md !filter !diff

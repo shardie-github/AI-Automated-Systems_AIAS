@@ -1,4 +1,4 @@
-// import { config } from '@ai-consultancy/config'; // Unused
+// Note: Config import reserved for future CRM connector configuration
 
 export interface CRMContact {
   id: string;

@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { signUpUser } from "@/lib/actions/auth-actions";
 import { Loader2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { validateEmail, validatePassword } from "@/lib/utils/form-validation";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 
 /**
  * Sign-Up Form Component
@@ -29,10 +31,27 @@ export function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !password) {
+    // Client-side validation with user-friendly messages
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
       toast({
-        title: "Validation Error",
-        description: "Please provide both email and password.",
+        title: "Invalid Email",
+        description: emailValidation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const passwordValidation = validatePassword(password, {
+      minLength: 8,
+      requireUppercase: true,
+      requireLowercase: true,
+      requireNumbers: true,
+    });
+    if (!passwordValidation.valid) {
+      toast({
+        title: "Invalid Password",
+        description: passwordValidation.error,
         variant: "destructive",
       });
       return;
@@ -55,16 +74,25 @@ export function SignUpForm() {
           router.push("/account");
         }, 1500);
       } else {
+        // Use user-friendly error messages
+        const friendlyError = getUserFriendlyError(
+          result.error || "Sign-up failed",
+          { action: "create your account" }
+        );
         toast({
-          title: "Sign-Up Failed",
-          description: result.error || "Please try again later.",
+          title: friendlyError.title,
+          description: friendlyError.message,
           variant: "destructive",
         });
       }
     } catch (error) {
+      const friendlyError = getUserFriendlyError(
+        error instanceof Error ? error : String(error),
+        { action: "create your account" }
+      );
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: friendlyError.title,
+        description: friendlyError.message,
         variant: "destructive",
       });
     } finally {
@@ -118,9 +146,10 @@ export function SignUpForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
+              aria-describedby="password-help"
             />
-            <p className="text-xs text-muted-foreground">
-              Must be at least 8 characters long
+            <p id="password-help" className="text-xs text-muted-foreground">
+              Must be at least 8 characters with uppercase, lowercase, and numbers
             </p>
           </div>
 

@@ -95,7 +95,7 @@ serve(async (req) => {
         };
 
         // TODO: Send email via your email service
-        console.log('Rescue email would be sent:', emailContent);
+        // Email content prepared (logging removed for production)
 
         emailsSent.push({
           userId: user.id,

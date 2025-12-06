@@ -9,10 +9,15 @@ export function PWARegistration() {
       navigator.serviceWorker
         .register("/sw.js", { scope: "/" })
         .then((registration) => {
-          console.log("SW registered:", registration);
+          // Service worker registered (use logger in production)
+          if (process.env.NODE_ENV === "development") {
+            const { logger } = require("@/lib/utils/logger");
+            logger.debug("Service worker registered", { scope: registration.scope });
+          }
         })
         .catch((error) => {
-          console.error("SW registration failed:", error);
+          const { logger } = require("@/lib/utils/logger");
+          logger.error("Service worker registration failed", error as Error);
         });
     }
   }, []);

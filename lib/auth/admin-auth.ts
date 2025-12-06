@@ -1,100 +1,186 @@
-import { NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
-
 /**
- * Admin Authentication Helper
- * Verifies user has admin role for protected admin routes
+ * Admin Authentication & Authorization
+ * 
+ * Provides utilities for checking admin access and protecting admin routes.
  */
 
-// Use centralized env management - throws error if missing
-const supabaseUrl = env.supabase.url;
-const supabaseServiceKey = env.supabase.serviceRoleKey;
+import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
+import { env } from "@/lib/env";
+import { NextRequest, NextResponse } from "next/server";
+
+const supabase = createClient(env.supabase.url, env.supabase.anonKey);
 
 export interface AdminUser {
   id: string;
   email: string;
   role: string;
+  isAdmin: boolean;
 }
 
 /**
- * Verify admin authentication from request
+ * Check if user is admin
  */
-export async function verifyAdminAuth(
-  request: NextRequest
-): Promise<{ user: AdminUser | null; error: string | null }> {
+export async function isAdmin(userId?: string): Promise<boolean> {
+  if (!userId) return false;
+
   try {
-    // Get authorization header
-    const authHeader = request.headers.get("authorization");
-    const token = authHeader?.replace("Bearer ", "");
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
 
-    if (!token) {
-      // In development, allow access if no token (for testing)
-      if (env.runtime.isDevelopment) {
-        return {
-          user: {
-            id: "dev-admin",
-            email: "admin@aiautomatedsystems.ca",
-            role: "admin",
-          },
-          error: null,
-        };
-      }
-      return { user: null, error: "No authorization token provided" };
-    }
-
-    // Verify token with Supabase
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
-
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      return { user: null, error: "Invalid or expired token" };
-    }
+    if (error || !data) return false;
 
     // Check if user has admin role
-    // TODO: Implement proper role checking from user metadata or database
-    const userRole = user.user_metadata?.role || "user";
-
-    if (userRole !== "admin") {
-      return { user: null, error: "Insufficient permissions. Admin role required." };
-    }
-
-    return {
-      user: {
-        id: user.id,
-        email: user.email || "",
-        role: userRole,
-      },
-      error: null,
-    };
+    return data.role === "admin" || data.role === "super_admin";
   } catch (error) {
-    console.error("Admin auth error:", error);
-    return {
-      user: null,
-      error: "Authentication error",
-    };
+    console.error("Error checking admin status:", error);
+    return false;
   }
 }
 
 /**
- * Check if request is from authenticated admin (simplified for development)
+ * Get current admin user from session
  */
-export function isAdminRequest(request: NextRequest): boolean {
-  // In development, always allow
-  if (env.runtime.isDevelopment) {
-    return true;
+export async function getAdminUser(): Promise<AdminUser | null> {
+  try {
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get("sb-access-token")?.value;
+
+    if (!authToken) return null;
+
+    // Verify token and get user
+    const { data: { user }, error } = await supabase.auth.getUser(authToken);
+
+    if (error || !user) return null;
+
+    // Check admin status
+    const adminStatus = await isAdmin(user.id);
+    if (!adminStatus) return null;
+
+    // Get profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    return {
+      id: user.id,
+      email: user.email || "",
+      role: profile?.role || "admin",
+      isAdmin: true,
+    };
+  } catch (error) {
+    console.error("Error getting admin user:", error);
+    return null;
+  }
+}
+
+/**
+ * Require admin access middleware
+ */
+export async function requireAdmin(
+  request: NextRequest
+): Promise<{ authorized: boolean; user?: AdminUser; response?: NextResponse }> {
+  const adminUser = await getAdminUser();
+
+  if (!adminUser) {
+    return {
+      authorized: false,
+      response: NextResponse.json(
+        { error: "Unauthorized: Admin access required" },
+        { status: 403 }
+      ),
+    };
   }
 
-  // In production, check for admin token
-  const authHeader = request.headers.get("authorization");
-  return !!authHeader;
+  return {
+    authorized: true,
+    user: adminUser,
+  };
+}
+
+/**
+ * Check admin access in server components
+ */
+export async function checkAdminAccess(): Promise<{
+  isAdmin: boolean;
+  user: AdminUser | null;
+  redirect?: string;
+}> {
+  const adminUser = await getAdminUser();
+
+  if (!adminUser) {
+    return {
+      isAdmin: false,
+      user: null,
+      redirect: "/signin?redirect=/admin",
+    };
+  }
+
+  return {
+    isAdmin: true,
+    user: adminUser,
+  };
+}
+
+/**
+ * Admin role levels
+ */
+export enum AdminRole {
+  ADMIN = "admin",
+  SUPER_ADMIN = "super_admin",
+  FINANCIAL_ADMIN = "financial_admin",
+}
+
+/**
+ * Check if user has specific admin role
+ */
+export async function hasAdminRole(
+  userId: string,
+  requiredRole: AdminRole
+): Promise<boolean> {
+  const user = await getAdminUser();
+  if (!user || user.id !== userId) return false;
+
+  const roleHierarchy: Record<AdminRole, number> = {
+    [AdminRole.ADMIN]: 1,
+    [AdminRole.FINANCIAL_ADMIN]: 2,
+    [AdminRole.SUPER_ADMIN]: 3,
+  };
+
+  const userRoleLevel = roleHierarchy[user.role as AdminRole] || 0;
+  const requiredRoleLevel = roleHierarchy[requiredRole] || 0;
+
+  return userRoleLevel >= requiredRoleLevel;
+}
+
+/**
+ * Require specific admin role
+ */
+export async function requireAdminRole(
+  request: NextRequest,
+  requiredRole: AdminRole
+): Promise<{ authorized: boolean; user?: AdminUser; response?: NextResponse }> {
+  const adminCheck = await requireAdmin(request);
+
+  if (!adminCheck.authorized || !adminCheck.user) {
+    return adminCheck;
+  }
+
+  const hasRole = await hasAdminRole(adminCheck.user.id, requiredRole);
+  if (!hasRole) {
+    return {
+      authorized: false,
+      response: NextResponse.json(
+        { error: `Unauthorized: ${requiredRole} role required` },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return adminCheck;
 }

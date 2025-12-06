@@ -94,7 +94,7 @@ serve(async (req) => {
 
     // TODO: Send email via your email service (Resend, SendGrid, etc.)
     // For now, just log it
-    console.log('Welcome email would be sent:', emailContent);
+    // Welcome email content prepared (logging removed for production)
 
     // Track that welcome email was sent
     await supabase.from('app_events').insert({

@@ -203,9 +203,14 @@ class ErrorDetector {
       try {
         // Datadog integration would go here
         // Example: fetch('https://api.datadoghq.com/api/v1/events', { ... })
-        console.log('Datadog integration: Would send alert', alertPayload);
+        // Datadog alert prepared (use logger in production)
+        if (process.env.NODE_ENV === "development") {
+          const { logger } = require("@/lib/utils/logger");
+          logger.debug("Datadog alert", { payload: alertPayload });
+        }
       } catch (e) {
-        console.warn('Failed to send to Datadog:', e);
+        const { logger } = require("@/lib/utils/logger");
+        logger.warn("Failed to send to Datadog", e as Error);
       }
     }
 

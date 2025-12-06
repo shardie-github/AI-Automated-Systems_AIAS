@@ -27,7 +27,11 @@ export function ConversionButton({
     // Track conversion event
     if (trackEvent && typeof window !== "undefined") {
       // Analytics tracking would go here
-      console.log("Conversion event:", trackEvent);
+      // Conversion event tracked (use logger in production)
+      if (process.env.NODE_ENV === "development") {
+        const { logger } = require("@/lib/utils/logger");
+        logger.debug("Conversion event", trackEvent);
+      }
     }
     onClick?.(e);
   };

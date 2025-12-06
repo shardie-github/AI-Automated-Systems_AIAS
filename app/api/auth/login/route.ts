@@ -5,23 +5,47 @@ import { env } from "@/lib/env";
 import { logger } from "@/lib/logging/structured-logger";
 import { createPOSTHandler } from "@/lib/api/route-handler";
 import { track } from "@/lib/telemetry/track";
+import { rateLimit, getClientIP } from "@/lib/utils/rate-limit";
 
 const supabase = createClient(env.supabase.url, env.supabase.serviceRoleKey);
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export const runtime = "edge";
 
 /**
  * POST /api/auth/login
- * User login with telemetry tracking
+ * User login with telemetry tracking and rate limiting
  */
 export const POST = createPOSTHandler(
   async (context) => {
     const { request } = context;
+    
+    // Rate limiting: 5 login attempts per 15 minutes per IP
+    const ip = getClientIP(request);
+    const limit = rateLimit(ip, 5, 15 * 60 * 1000);
+    
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { 
+          error: "Too many login attempts. Please try again later.",
+          retryAfter: Math.ceil((limit.resetTime - Date.now()) / 1000)
+        },
+        { 
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil((limit.resetTime - Date.now()) / 1000)),
+            "X-RateLimit-Limit": "5",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(limit.resetTime),
+          }
+        }
+      );
+    }
+    
     const body = await request.json();
     const validatedData = loginSchema.parse(body);
 
@@ -33,8 +57,9 @@ export const POST = createPOSTHandler(
 
     if (authError || !authData.user) {
       logger.error("Login failed", authError || undefined, { email: validatedData.email });
+      // Don't reveal if email exists or not (security best practice)
       return NextResponse.json(
-        { error: authError?.message || "Invalid credentials" },
+        { error: "Invalid email or password. Please check your credentials and try again." },
         { status: 401 }
       );
     }
