@@ -1,0 +1,14 @@
+# Investor Relations Documents
+# 
+# This directory contains sensitive investor relations materials encrypted with git-crypt.
+# 
+# Contents:
+# - Investor deck
+# - Investor outreach emails
+# - Investor target lists
+# - Pitch materials
+# - Due diligence documents
+#
+# Access: Financial Admin or Super Admin role required
+# Encryption: git-crypt
+# Location: /admin/financial/investor (protected route)
