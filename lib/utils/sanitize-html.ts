@@ -131,10 +131,19 @@ export function sanitizeHTMLServer(html: string): string {
 
 /**
  * Main sanitization function that works in both client and server contexts
+ * 
+ * NOTE: For better security, consider using DOMPurify via dompurify-wrapper.ts
  */
 export function sanitize(html: string): string {
-  if (typeof window === 'undefined') {
-    return sanitizeHTMLServer(html);
+  // Try to use DOMPurify if available
+  try {
+    const { sanitizeHTML: dompurifySanitize } = require('./dompurify-wrapper');
+    return dompurifySanitize(html);
+  } catch (e) {
+    // Fallback to basic sanitization
+    if (typeof window === 'undefined') {
+      return sanitizeHTMLServer(html);
+    }
+    return sanitizeHTML(html);
   }
-  return sanitizeHTML(html);
 }
