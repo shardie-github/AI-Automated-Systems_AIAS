@@ -166,8 +166,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="AI Automated Systems" />
         
-        {/* Service Worker */}
-        <script dangerouslySetInnerHTML={{__html:`if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}`}} />
+        {/* Service Worker - Use Next.js Script component for better security */}
+        <script
+          id="service-worker-registration"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                    console.warn('Service Worker registration failed:', err);
+                  });
+                });
+              }
+            `,
+          }}
+        />
         
         {/* Structured Data */}
         <OrganizationSchema />

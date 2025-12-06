@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
+import { logger } from "@/lib/utils/logger";
 
 export default function Error({
   error,
@@ -16,9 +17,13 @@ export default function Error({
     // Track error with telemetry
     telemetry.trackError(error, {
       digest: error.digest,
-      page: window.location.pathname,
+      page: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
     });
-    console.error("Application error:", error);
+    // Use logger instead of console.error for environment-aware logging
+    logger.error("Application error", error, {
+      digest: error.digest,
+      page: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
+    });
   }, [error]);
 
   return (

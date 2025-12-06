@@ -7,6 +7,7 @@ import Link from "next/link";
 import { CommentsSection } from "@/components/blog/comments-section";
 import { AffiliateDisclosure } from "@/components/monetization/affiliate-disclosure";
 import { AffiliateLink } from "@/components/monetization/affiliate-link";
+import { sanitizeHTMLServer } from "@/lib/utils/sanitize-html";
 
 interface PageProps {
   params: {
@@ -97,7 +98,7 @@ export default function BlogArticlePage({ params }: PageProps) {
         {/* Article Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none mb-12">
           {article.content ? (
-            <div dangerouslySetInnerHTML={{ __html: article.content }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHTMLServer(article.content) }} />
           ) : (
             <ArticleContent article={article} />
           )}

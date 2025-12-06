@@ -34,7 +34,9 @@ export default async function HomePage() {
     content = await loadAIASContent();
   } catch (error) {
     // Fallback to defaults if loading fails
-    console.error("Error loading content, using defaults:", error);
+    // Use server logger for server-side rendering
+    const { serverLogger } = await import("@/lib/utils/logger");
+    serverLogger.error("Error loading content, using defaults", error as Error);
     content = null;
   }
 
