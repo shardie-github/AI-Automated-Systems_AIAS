@@ -1,265 +1,151 @@
 /**
- * Security Monitoring & Observability
- * Real-time security event monitoring and alerting
+ * Security Monitoring
+ * 
+ * Tracks security events, suspicious activity, and potential threats.
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { env } from '@/lib/env';
+import { logger } from "@/lib/utils/logger";
+import { telemetry } from "@/lib/monitoring/enhanced-telemetry";
 
 export interface SecurityEvent {
-  type: 'rate_limit' | 'unauthorized' | 'suspicious' | 'attack' | 'error';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  tenantId?: string;
-  userId?: string;
-  ipAddress: string;
-  endpoint: string;
-  method: string;
+  type: "rate_limit" | "csrf_failure" | "suspicious_activity" | "injection_attempt" | "unauthorized_access";
+  severity: "low" | "medium" | "high" | "critical";
+  ip: string;
+  path: string;
   userAgent?: string;
   details?: Record<string, any>;
-  timestamp: Date;
+  timestamp: number;
 }
 
-export class SecurityMonitor {
-  private supabase;
-  private eventBuffer: SecurityEvent[] = [];
-  private bufferSize = 100;
-  private flushInterval = 60000; // 1 minute
-  
-  constructor() {
-    this.supabase = createClient(
-      env.supabase.url,
-      env.supabase.serviceRoleKey
-    );
-    
-    // Flush buffer periodically
-    setInterval(() => {
-      this.flushEvents();
-    }, this.flushInterval);
-  }
-  
+class SecurityMonitor {
+  private events: SecurityEvent[] = [];
+  private readonly maxEvents = 1000;
+
   /**
-   * Record security event
+   * Log security event
    */
-  async recordEvent(event: Omit<SecurityEvent, 'timestamp'>): Promise<void> {
+  logEvent(event: Omit<SecurityEvent, "timestamp">): void {
     const fullEvent: SecurityEvent = {
       ...event,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
-    
-    this.eventBuffer.push(fullEvent);
-    
-    // Flush if buffer is full
-    if (this.eventBuffer.length >= this.bufferSize) {
-      await this.flushEvents();
-    }
-    
-    // Alert on critical events
-    if (event.severity === 'critical') {
-      await this.sendAlert(fullEvent);
-    }
-  }
-  
-  /**
-   * Flush events to database
-   */
-  private async flushEvents(): Promise<void> {
-    if (this.eventBuffer.length === 0) return;
-    
-    const events = [...this.eventBuffer];
-    this.eventBuffer = [];
-    
-    try {
-      await this.supabase
-        .from('security_events')
-        .insert(
-          events.map(event => ({
-            type: event.type,
-            severity: event.severity,
-            tenant_id: event.tenantId,
-            user_id: event.userId,
-            ip_address: event.ipAddress,
-            endpoint: event.endpoint,
-            method: event.method,
-            user_agent: event.userAgent,
-            details: event.details,
-            timestamp: event.timestamp.toISOString(),
-          }))
-        );
-    } catch (error) {
-      console.error('Error flushing security events:', error);
-      // Re-add events to buffer on error
-      this.eventBuffer.unshift(...events);
-    }
-  }
-  
-  /**
-   * Send alert for critical events
-   */
-  private async sendAlert(event: SecurityEvent): Promise<void> {
-    // Implement alerting logic (email, Slack, PagerDuty, etc.)
-    console.error('SECURITY ALERT:', {
-      type: event.type,
-      severity: event.severity,
-      endpoint: event.endpoint,
-      ipAddress: event.ipAddress,
-      details: event.details,
-    });
-    
-    // TODO: Integrate with alerting service
-  }
-  
-  /**
-   * Get security events
-   */
-  async getEvents(filters: {
-    tenantId?: string;
-    userId?: string;
-    type?: SecurityEvent['type'];
-    severity?: SecurityEvent['severity'];
-    startDate?: Date;
-    endDate?: Date;
-    limit?: number;
-  }): Promise<SecurityEvent[]> {
-    try {
-      let query = this.supabase
-        .from('security_events')
-        .select('*')
-        .order('timestamp', { ascending: false });
-      
-      if (filters.tenantId) {
-        query = query.eq('tenant_id', filters.tenantId);
-      }
-      
-      if (filters.userId) {
-        query = query.eq('user_id', filters.userId);
-      }
-      
-      if (filters.type) {
-        query = query.eq('type', filters.type);
-      }
-      
-      if (filters.severity) {
-        query = query.eq('severity', filters.severity);
-      }
-      
-      if (filters.startDate) {
-        query = query.gte('timestamp', filters.startDate.toISOString());
-      }
-      
-      if (filters.endDate) {
-        query = query.lte('timestamp', filters.endDate.toISOString());
-      }
-      
-      if (filters.limit) {
-        query = query.limit(filters.limit);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        throw error;
-      }
-      
-      interface SecurityEventRow {
-        type: string;
-        severity: string;
-        tenant_id?: string;
-        user_id?: string;
-        ip_address?: string;
-        endpoint?: string;
-        method?: string;
-        user_agent?: string;
-        details?: Record<string, unknown>;
-        timestamp: string;
-      }
 
-      return (data || []).map((row: SecurityEventRow) => ({
-        type: row.type as "error" | "unauthorized" | "rate_limit" | "suspicious" | "attack",
-        severity: row.severity as "critical" | "low" | "medium" | "high",
-        tenantId: row.tenant_id,
-        userId: row.user_id,
-        ipAddress: row.ip_address || "",
-        endpoint: row.endpoint || "",
-        method: row.method || "",
-        userAgent: row.user_agent || "",
-        details: row.details,
-        timestamp: new Date(row.timestamp),
-      }));
-    } catch (error) {
-      console.error('Error getting security events:', error);
-      return [];
+    this.events.push(fullEvent);
+
+    // Keep only recent events
+    if (this.events.length > this.maxEvents) {
+      this.events = this.events.slice(-this.maxEvents);
+    }
+
+    // Log to console in development
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[SECURITY] ${event.type}:`, event);
+    }
+
+    // Send to telemetry
+    try {
+      telemetry.trackSecurityEvent(event.type, event.severity, {
+        ip: event.ip,
+        path: event.path,
+        userAgent: event.userAgent,
+        ...event.details,
+      });
+    } catch (e) {
+      // Silently fail if telemetry unavailable
+    }
+
+    // Log to server logger
+    logger.warn(`Security event: ${event.type}`, undefined, {
+      severity: event.severity,
+      ip: event.ip,
+      path: event.path,
+      ...event.details,
+    });
+
+    // Alert on critical events
+    if (event.severity === "critical") {
+      this.alertCritical(event);
     }
   }
-  
+
+  /**
+   * Get recent security events
+   */
+  getRecentEvents(limit: number = 100): SecurityEvent[] {
+    return this.events.slice(-limit);
+  }
+
+  /**
+   * Get events by type
+   */
+  getEventsByType(type: SecurityEvent["type"]): SecurityEvent[] {
+    return this.events.filter((e) => e.type === type);
+  }
+
+  /**
+   * Get events by severity
+   */
+  getEventsBySeverity(severity: SecurityEvent["severity"]): SecurityEvent[] {
+    return this.events.filter((e) => e.severity === severity);
+  }
+
+  /**
+   * Check if IP has suspicious activity
+   */
+  isSuspiciousIP(ip: string, threshold: number = 5): boolean {
+    const recentEvents = this.events.filter(
+      (e) => e.ip === ip && Date.now() - e.timestamp < 60 * 60 * 1000 // Last hour
+    );
+    return recentEvents.length >= threshold;
+  }
+
+  /**
+   * Alert on critical security events
+   */
+  private alertCritical(event: SecurityEvent): void {
+    // In production, this would:
+    // - Send email/SMS alert
+    // - Create incident in monitoring system
+    // - Notify security team
+    // - Log to external security monitoring service
+
+    if (process.env.NODE_ENV === "production") {
+      // TODO: Integrate with alerting system
+      console.error("[CRITICAL SECURITY ALERT]", event);
+    }
+  }
+
   /**
    * Get security statistics
    */
-  async getStatistics(tenantId?: string): Promise<{
+  getStats(): {
     totalEvents: number;
-    eventsByType: Record<string, number>;
-    eventsBySeverity: Record<string, number>;
-    recentCriticalEvents: number;
-  }> {
-    try {
-      let query = this.supabase
-        .from('security_events')
-        .select('type, severity');
-      
-      if (tenantId) {
-        query = query.eq('tenant_id', tenantId);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        throw error;
-      }
-      
-      const events = data || [];
-      const eventsByType: Record<string, number> = {};
-      const eventsBySeverity: Record<string, number> = {};
-      
-      interface EventRow {
-        type: string;
-        severity: string;
-      }
+    byType: Record<string, number>;
+    bySeverity: Record<string, number>;
+    recentCritical: number;
+  } {
+    const byType: Record<string, number> = {};
+    const bySeverity: Record<string, number> = {};
+    let recentCritical = 0;
 
-      events.forEach((event: EventRow) => {
-        eventsByType[event.type] = (eventsByType[event.type] || 0) + 1;
-        eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] || 0) + 1;
-      });
-      
-      // Get recent critical events (last 24 hours)
-      const oneDayAgo = new Date();
-      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
-      
-      let criticalQuery = this.supabase
-        .from('security_events')
-        .select('id', { count: 'exact' })
-        .eq('severity', 'critical')
-        .gte('timestamp', oneDayAgo.toISOString());
-      
-      if (tenantId) {
-        criticalQuery = criticalQuery.eq('tenant_id', tenantId);
+    this.events.forEach((event) => {
+      byType[event.type] = (byType[event.type] || 0) + 1;
+      bySeverity[event.severity] = (bySeverity[event.severity] || 0) + 1;
+
+      if (
+        event.severity === "critical" &&
+        Date.now() - event.timestamp < 24 * 60 * 60 * 1000
+      ) {
+        recentCritical++;
       }
-      
-      const { count } = await criticalQuery;
-      
-      return {
-        totalEvents: events.length,
-        eventsByType,
-        eventsBySeverity,
-        recentCriticalEvents: count || 0,
-      };
-    } catch (error) {
-      console.error('Error getting security statistics:', error);
-      return {
-        totalEvents: 0,
-        eventsByType: {},
-        eventsBySeverity: {},
-        recentCriticalEvents: 0,
-      };
-    }
+    });
+
+    return {
+      totalEvents: this.events.length,
+      byType,
+      bySeverity,
+      recentCritical,
+    };
   }
 }
 

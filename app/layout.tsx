@@ -153,6 +153,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.in" />
         
+        {/* Preload critical resources */}
+        <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        
+        {/* Prefetch likely next pages */}
+        <link rel="prefetch" href="/signup" />
+        <link rel="prefetch" href="/pricing" />
+        
         {/* PWA */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3b82f6" />
