@@ -253,6 +253,14 @@ export function OnboardingWizard() {
         </CardHeader>
         <CardContent>
           {steps[currentStep].component}
+          {/* Show success celebration after workflow creation step */}
+          {steps[currentStep].id === "create-workflow" && completedSteps.includes("create-workflow") && (
+            <div className="mt-4">
+              {React.createElement(
+                require("@/components/onboarding/success-celebration").SuccessCelebration
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

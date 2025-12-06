@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, TrendingDown, Clock, Zap, CheckCircle, XCircle } from "lucide-react";
+import { UsageProgressBanner } from "@/components/monetization/usage-progress-banner";
+import { TrialCountdownBanner } from "@/components/monetization/trial-countdown-banner";
 
 interface UsageData {
   plan: string;
@@ -35,6 +37,7 @@ export default function AnalyticsPage() {
   const [timeSaved, setTimeSaved] = useState<TimeSaved | null>(null);
   const [loading, setLoading] = useState(true);
   const [executionHistory, setExecutionHistory] = useState<Array<{ date: string; completed: number; failed: number }>>([]);
+  const [trialInfo, setTrialInfo] = useState<{ daysRemaining: number; trialEndDate: string } | null>(null);
 
   useEffect(() => {
     fetchAnalytics();
@@ -71,6 +74,18 @@ export default function AnalyticsPage() {
         const historyData = await historyResponse.json();
         setExecutionHistory(historyData);
       }
+
+      // Fetch trial info (if on trial)
+      const trialResponse = await fetch("/api/trial/user-data");
+      if (trialResponse.ok) {
+        const trialData = await trialResponse.json();
+        if (trialData.plan === "trial" && trialData.trialEndDate) {
+          const endDate = new Date(trialData.trialEndDate);
+          const now = new Date();
+          const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          setTrialInfo({ daysRemaining, trialEndDate: trialData.trialEndDate });
+        }
+      }
     } catch (error) {
       console.error("Failed to fetch analytics", error);
     } finally {
@@ -96,6 +111,21 @@ export default function AnalyticsPage() {
           Track your automation usage, workflow performance, and time savings
         </p>
       </div>
+
+      {/* Upgrade Nudges */}
+      {usage && (
+        <UsageProgressBanner
+          used={usage.used}
+          limit={usage.limit}
+          plan={usage.plan}
+        />
+      )}
+      {trialInfo && trialInfo.daysRemaining <= 3 && (
+        <TrialCountdownBanner
+          daysRemaining={trialInfo.daysRemaining}
+          trialEndDate={trialInfo.trialEndDate}
+        />
+      )}
 
       {/* Usage Overview */}
       {usage && (
